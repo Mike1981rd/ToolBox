@@ -20,12 +20,11 @@
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar-wrapper">
-            <div class="sidebar-heading d-flex justify-content-between align-items-center py-3 px-3">
+            <div class="sidebar-heading d-flex flex-column justify-content-center align-items-center">
                 <div class="logo-container">
-                    <img src="~/img/logo.svg" alt="ToolBox Logo" class="logo" />
-                    <span class="ms-2 d-none d-md-inline">Admin Dashboard</span>
+                    <img src="~/img/toolbox-logo.svg" alt="ToolBox Logo" class="logo">
                 </div>
-                <button class="btn btn-link d-md-none" id="menu-toggle" aria-expanded="true" aria-label="Close sidebar">
+                <button class="btn btn-link d-md-none position-absolute top-0 end-0" id="menu-toggle" aria-expanded="true" aria-label="Close sidebar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -98,11 +97,11 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     
-                    <div class="d-flex ms-auto">
+                    <div class="d-flex ms-auto align-items-center">
                         <!-- Language Selector -->
-                        <div class="dropdown me-2">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-language"></i> <span id="selectedLanguage">Select Language</span>
+                        <div class="dropdown me-3">
+                            <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-language me-1"></i> <span id="selectedLanguage">Select Language</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
                                 <li><a class="dropdown-item lang-select" href="#" data-lang="en">English</a></li>
@@ -111,26 +110,33 @@
                         </div>
                         
                         <!-- Theme Toggler -->
-                        <button class="btn btn-sm btn-outline-secondary me-2" id="theme-toggle">
+                        <button class="btn me-3" id="theme-toggle">
                             <i class="fas fa-moon" id="theme-icon"></i>
                         </button>
                         
                         <!-- Notifications -->
-                        <a href="#" class="btn btn-sm btn-outline-secondary me-2 position-relative">
-                            <i class="fas fa-bell"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                                <span class="visually-hidden">New alerts</span>
-                            </span>
-                        </a>
+                        <div class="me-3 position-relative">
+                            <a href="#" class="btn position-relative">
+                                <i class="fas fa-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                    <span class="visually-hidden">New alerts</span>
+                                </span>
+                            </a>
+                        </div>
                         
                         <!-- User Profile -->
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="https://via.placeholder.com/32" alt="Carlos Checo" width="32" height="32" class="rounded-circle me-2">
-                                <span class="text-white-50">Carlos Checo</span>
+                                <div class="avatar-wrapper me-2">
+                                    <svg width="38" height="38" xmlns="http://www.w3.org/2000/svg" class="rounded-circle" style="background-color: #7367f0;">
+                                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff">CC</text>
+                                    </svg>
+                                </div>
+                                <span class="user-name">Carlos Checo</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="#" data-translate-key="profile">Profile</a></li>
+                                <li><a class="dropdown-item" href="#" data-translate-key="settings">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#" data-translate-key="logout">Logout</a></li>
                             </ul>
@@ -141,15 +147,15 @@
             
             <!-- Main Content -->
             <div class="container-fluid px-4 py-4">
-                <h1 class="mt-2 mb-4">@ViewData["Title"]</h1>
+                <h3 class="mt-2 mb-3 fw-normal">@ViewData["Title"]</h3>
                 @RenderBody()
             </div>
             
             <!-- Footer -->
-            <footer class="footer mt-auto py-3">
+            <footer class="footer mt-auto py-2">
                 <div class="container-fluid px-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span>&copy; @DateTime.Now.Year - Admin Dashboard</span>
+                        <span class="text-muted small">&copy; @DateTime.Now.Year - ToolBox Admin Dashboard</span>
                         <div>
                             <a href="#" class="me-2"><i class="fab fa-github"></i></a>
                             <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
