@@ -13,6 +13,8 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/admin-style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/roles-style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/users-style.css" asp-append-version="true" />
     
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -31,6 +33,12 @@
             <div class="list-group list-group-flush sidebar-nav">
                 <a href="@Url.Action("Dashboard", "Admin")" class="list-group-item list-group-item-action active" data-translate-key="dashboard">
                     <i class="fas fa-tachometer-alt fa-fw"></i><span class="sidebar-item-text">Dashboard</span>
+                </a>
+                <a href="@Url.Action("Index", "Roles")" class="list-group-item list-group-item-action" data-translate-key="roles_menu">
+                    <i class="fas fa-user-shield fa-fw"></i><span class="sidebar-item-text">Roles</span>
+                </a>
+                <a href="@Url.Action("Index", "Users")" class="list-group-item list-group-item-action" data-translate-key="users_menu">
+                    <i class="fas fa-users fa-fw"></i><span class="sidebar-item-text">Users</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="areas_of_life">
                     <i class="fas fa-heartbeat fa-fw"></i><span class="sidebar-item-text">Areas of Life</span>

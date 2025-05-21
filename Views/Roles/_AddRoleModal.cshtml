@@ -1,0 +1,67 @@
+<div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRoleModalLabel" data-translate-key="modal_add_new_role_title">Add New Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center text-muted mb-3" data-translate-key="modal_set_role_permissions">Set role permissions</p>
+                <form id="addRoleForm">
+                    <div class="mb-3">
+                        <label for="roleNameInput" class="form-label" data-translate-key="modal_role_name_label">Role Name</label>
+                        <input type="text" class="form-control" id="roleNameInput" placeholder="Enter a role name" data-translate-placeholder-key="modal_enter_role_name_placeholder">
+                    </div>
+
+                    <h6 class="mt-4 mb-3" data-translate-key="modal_role_permissions_section_title">Role Permissions</h6>
+
+                    <div class="table-responsive">
+                        <table class="table table-flush-spacing">
+                            <tbody>
+                                <tr>
+                                    <td class="text-nowrap fw-semibold">
+                                        <span data-translate-key="perm_admin_access">Administrator Access</span>
+                                        <i class="fas fa-info-circle text-muted ms-1" data-bs-toggle="tooltip" data-translate-tooltip-key="tooltip_admin_access" title="Allows full access to the system"></i>
+                                    </td>
+                                    <td>
+                                        <div class="form-check form-switch d-flex justify-content-end">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="selectAllPermissions">
+                                            <label class="form-check-label ms-2" for="selectAllPermissions" data-translate-key="select_all">Select All</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @foreach (var permCategory in new[] { "User Management", "Content Management", "Disputes Management", "Database Management", "Financial Management", "Reporting", "API Control", "Repository Management", "Payroll" })
+                                {
+                                    string categoryKey = permCategory.ToLower().Replace(" ", "_");
+                                    <tr>
+                                        <td class="text-nowrap" data-translate-key="perm_cat_@(categoryKey)">@permCategory</td>
+                                        <td>
+                                            <div class="d-flex justify-content-end">
+                                                <div class="form-check form-switch me-3">
+                                                    <input class="form-check-input permission-toggle" type="checkbox" role="switch" id="perm_@(categoryKey)_read">
+                                                    <label class="form-check-label" for="perm_@(categoryKey)_read" data-translate-key="perm_read">Read</label>
+                                                </div>
+                                                <div class="form-check form-switch me-3">
+                                                    <input class="form-check-input permission-toggle" type="checkbox" role="switch" id="perm_@(categoryKey)_write">
+                                                    <label class="form-check-label" for="perm_@(categoryKey)_write" data-translate-key="perm_write">Write</label>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input permission-toggle" type="checkbox" role="switch" id="perm_@(categoryKey)_create">
+                                                    <label class="form-check-label" for="perm_@(categoryKey)_create" data-translate-key="perm_create">Create</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="cancel_button">Cancel</button>
+                <button type="submit" form="addRoleForm" class="btn btn-primary" data-translate-key="submit_button">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

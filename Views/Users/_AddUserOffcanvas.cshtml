@@ -1,0 +1,197 @@
+@* No se necesita ningún modelo específico para este formulario *@
+
+<div class="offcanvas offcanvas-end user-offcanvas offcanvas-custom-width" tabindex="-1" id="addUserOffcanvas" aria-labelledby="addUserOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="addUserOffcanvasLabel" data-translate-key="add_user_title">Add User</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body flex-grow-1">
+        <form class="add-new-user needs-validation pt-0" id="addNewUserForm" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <!-- User Avatar - Improved Layout -->
+            <div class="mb-4 text-center">
+                <label class="form-label" data-translate-key="offcanvas_user_avatar">User Avatar</label>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="me-3">
+                        <img src="https://via.placeholder.com/100x100/DFE3E7/8C98A4?text=Avatar" 
+                             alt="User Avatar" 
+                             class="img-fluid rounded-circle" 
+                             id="userAvatarPreview" 
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
+                    <div>
+                        <label for="uploadAvatarInput" class="btn btn-primary btn-sm mb-2 d-block" data-translate-key="offcanvas_upload_new_photo">
+                            <i class="fas fa-upload me-1"></i> Upload new photo
+                        </label>
+                        <input type="file" id="uploadAvatarInput" class="d-none" accept="image/*">
+                        <button type="button" class="btn btn-outline-secondary btn-sm d-block w-100" id="resetAvatarButton" data-translate-key="offcanvas_reset_avatar">
+                            <i class="fas fa-trash-alt me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <p class="text-muted small mt-2" data-translate-key="offcanvas_avatar_allowed_formats">Allowed JPG, GIF or PNG. Max size of 800K</p>
+            </div>
+
+            <!-- User Info Section - Improved Layout -->
+            <div class="row g-3">
+                <!-- Full Name -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-user-fullname" class="form-label" data-translate-key="form_full_name">Full Name</label>
+                    <input type="text" class="form-control" id="add-user-fullname" name="fullName" placeholder="John Doe" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_name">Please enter a valid name</div>
+                </div>
+
+                <!-- Username -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-user-username" class="form-label" data-translate-key="offcanvas_username">Username</label>
+                    <input type="text" class="form-control" id="add-user-username" name="username" placeholder="johndoe" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_username">Please enter a valid username</div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-12 mb-3">
+                    <label for="add-user-email" class="form-label" data-translate-key="form_email">Email</label>
+                    <input type="email" class="form-control" id="add-user-email" name="email" placeholder="john.doe@example.com" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_email">Please enter a valid email</div>
+                </div>
+
+                <!-- Password - Modern Toggle -->
+                <div class="col-12 mb-3 form-password-toggle">
+                    <label class="form-label" for="add-user-password" data-translate-key="offcanvas_password">Password</label>
+                    <div class="input-group input-group-merge">
+                        <input type="password" id="add-user-password" class="form-control" name="password" placeholder="············" required>
+                        <span class="input-group-text cursor-pointer" id="togglePasswordVisibility"><i class="fas fa-eye-slash"></i></span>
+                    </div>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_password">Please provide a password</div>
+                </div>
+
+                <!-- Confirm Password - Modern Toggle -->
+                <div class="col-12 mb-3 form-password-toggle">
+                    <label class="form-label" for="add-user-confirm-password" data-translate-key="form_confirm_password">Confirm Password</label>
+                    <div class="input-group input-group-merge">
+                        <input type="password" id="add-user-confirm-password" class="form-control" name="confirmPassword" placeholder="············" required>
+                        <span class="input-group-text cursor-pointer" id="toggleConfirmPasswordVisibility"><i class="fas fa-eye-slash"></i></span>
+                    </div>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_password_match">Passwords must match</div>
+                </div>
+            </div>
+
+            <div class="divider my-4">
+                <div class="divider-text" data-translate-key="form_section_payment">Payment Details</div>
+            </div>
+
+            <!-- Contact & Company Section -->
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label for="add-user-contact" class="form-label" data-translate-key="form_contact">Contact</label>
+                    <input type="text" id="add-user-contact" class="form-control phone-mask" placeholder="+1 (609) 988-44-11" name="contact">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="add-user-company" class="form-label" data-translate-key="offcanvas_company">Company</label>
+                    <input type="text" id="add-user-company" name="company" class="form-control" placeholder="Web Developer Inc.">
+                </div>
+            </div>
+
+            <!-- Tax ID & Country -->
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label for="taxId" class="form-label" data-translate-key="form_tax_id">Tax ID</label>
+                    <input type="text" class="form-control" id="taxId" name="taxId">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="country" class="form-label" data-translate-key="form_country">Country</label>
+                    <select class="form-select" id="country" name="country">
+                        <option value="" data-translate-key="select_country_option">Select Country</option>
+                        <option value="USA" data-translate-key="country_usa">United States</option>
+                        <option value="UK" data-translate-key="country_uk">United Kingdom</option>
+                        <option value="Spain" data-translate-key="country_spain">Spain</option>
+                        <option value="France" data-translate-key="country_france">France</option>
+                        <option value="Germany" data-translate-key="country_germany">Germany</option>
+                        <option value="Other" data-translate-key="country_other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Role & Plan -->
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label for="user-role" class="form-label" data-translate-key="form_role">User Role</label>
+                    <select class="form-select" id="user-role" name="role" required>
+                        <option value="" data-translate-key="form_select_role">Select Role</option>
+                        <option value="Admin" data-translate-key="role_admin">Admin</option>
+                        <option value="Editor" data-translate-key="role_editor">Editor</option>
+                        <option value="Author" data-translate-key="role_author">Author</option>
+                        <option value="Maintainer" data-translate-key="role_maintainer">Maintainer</option>
+                        <option value="Subscriber" data-translate-key="role_subscriber">Subscriber</option>
+                    </select>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_role">Please select a role</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="user-plan" class="form-label" data-translate-key="form_plan">Select Plan</label>
+                    <select class="form-select" id="user-plan" name="plan" required>
+                        <option value="" data-translate-key="form_select_plan">Select Plan</option>
+                        <option value="Basic" data-translate-key="plan_basic">Basic</option>
+                        <option value="Team" data-translate-key="plan_team">Team</option>
+                        <option value="Company" data-translate-key="plan_company">Company</option>
+                        <option value="Enterprise" data-translate-key="plan_enterprise">Enterprise</option>
+                    </select>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_plan">Please select a plan</div>
+                </div>
+            </div>
+
+            <!-- Billing Method & Status -->
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label for="billingMethod" class="form-label" data-translate-key="form_billing_method">Billing Method</label>
+                    <select class="form-select" id="billingMethod" name="billingMethod">
+                        <option value="Auto Debit" data-translate-key="payment_auto_debit">Auto Debit</option>
+                        <option value="Manual - Paypal" data-translate-key="payment_manual_paypal">Manual - Paypal</option>
+                        <option value="Manual - Credit Card" data-translate-key="payment_manual_cc">Manual - Credit Card</option>
+                        <option value="Manual - Bank Transfer" data-translate-key="payment_manual_bank">Manual - Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" data-translate-key="form_status">Status</label>
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="activeStatus" name="activeStatus" checked>
+                        <label class="form-check-label" for="activeStatus" data-translate-key="form_status_active">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language -->
+            <div class="mb-3">
+                <label for="language" class="form-label" data-translate-key="form_language">Language</label>
+                <select class="form-select" id="language" name="language">
+                    <option value="en" data-translate-key="language_english">English</option>
+                    <option value="es" data-translate-key="language_spanish">Spanish</option>
+                </select>
+            </div>
+
+            <div class="divider my-4">
+                <div class="divider-text" data-translate-key="form_section_security">Security</div>
+            </div>
+
+            <!-- Two-Factor Authentication -->
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="twoFactorAuth" name="twoFactorAuth">
+                    <label class="form-check-label" for="twoFactorAuth" data-translate-key="form_2fa">
+                        Enable Two-Factor Authentication
+                    </label>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" data-translate-key="form_button_cancel">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" data-translate-key="form_button_submit">
+                    Add User
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

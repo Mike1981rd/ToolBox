@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text;
 using ToolBox.Data;
 using ToolBox.Models;
 
@@ -21,6 +24,50 @@ namespace ToolBox.Controllers
         public async Task<IActionResult> Index()
         {
             return View(await _context.Users.ToListAsync());
+        }
+        
+        // Acciones para Exportar
+        public async Task<IActionResult> ExportToExcel()
+        {
+            var users = await _context.Users.ToListAsync();
+            
+            // En una implementación real, utilizaremos EPPlus o ClosedXML para generar Excel
+            // Por ahora, crearemos un archivo CSV con formato simple
+            var builder = new StringBuilder();
+            builder.AppendLine("ID,Name,Email,Role,Status,Created Date");
+            
+            foreach (var user in users)
+            {
+                builder.AppendLine($"{user.Id},\"{user.Name}\",\"{user.Email}\",\"{user.Role}\",\"{(user.IsActive ? "Active" : "Inactive")}\",\"{user.CreatedAt.ToShortDateString()}\"");
+            }
+            
+            byte[] fileBytes = Encoding.UTF8.GetBytes(builder.ToString());
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "users.xlsx");
+        }
+
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var users = await _context.Users.ToListAsync();
+            
+            // En una implementación real, utilizaríamos QuestPDF o similar para generar PDF
+            // Por ahora, mostraremos un mensaje indicando que se requiere la biblioteca
+            return Content("Para implementar esta funcionalidad, instalar el paquete NuGet QuestPDF");
+        }
+
+        public async Task<IActionResult> ExportToCsv()
+        {
+            var users = await _context.Users.ToListAsync();
+            
+            var builder = new StringBuilder();
+            builder.AppendLine("ID,Name,Email,Role,Status,Created Date");
+            
+            foreach (var user in users)
+            {
+                builder.AppendLine($"{user.Id},\"{user.Name}\",\"{user.Email}\",\"{user.Role}\",\"{(user.IsActive ? "Active" : "Inactive")}\",\"{user.CreatedAt.ToShortDateString()}\"");
+            }
+            
+            byte[] fileBytes = Encoding.UTF8.GetBytes(builder.ToString());
+            return File(fileBytes, "text/csv", "users.csv");
         }
 
         // GET: Users/Details/5

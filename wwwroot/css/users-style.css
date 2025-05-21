@@ -1,0 +1,234 @@
+/* Estilos específicos para el módulo de Usuarios */
+
+/* Tarjetas de estadísticas */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+.card .badge {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card .content-left span {
+    color: var(--body-text);
+    font-size: 0.857rem;
+}
+
+.card .content-left small {
+    color: var(--body-text);
+    font-size: 0.785rem;
+    opacity: 0.8;
+}
+
+/* Tabla de usuarios */
+.card-datatable {
+    padding: 0;
+}
+
+.dataTable th, .dataTable td {
+    padding: 1rem 1.5rem;
+}
+
+.dt-checkboxes-cell {
+    width: 18px !important;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+/* Paginación */
+.pagination .page-link {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    margin: 0 0.15rem;
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Filtros */
+.form-select:focus, .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.15);
+}
+
+/* Botones de exportación y añadir */
+.btn-outline-secondary {
+    border-color: #ebe9f1;
+    color: var(--body-text);
+}
+
+.btn-outline-secondary:hover, 
+.btn-outline-secondary:focus {
+    background-color: rgba(115, 103, 240, 0.08);
+    color: var(--primary-color);
+    border-color: rgba(115, 103, 240, 0.5);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #5e50ee;
+    border-color: #5e50ee;
+    box-shadow: 0 8px 15px -8px rgba(115, 103, 240, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .dt-buttons, .dataTables_filter {
+        margin-top: 1rem;
+    }
+    
+    .card-datatable .row > div {
+        justify-content: center;
+    }
+    
+    .dataTables_length {
+        text-align: center;
+    }
+}
+
+/* Offcanvas Styles */
+.offcanvas-custom-width {
+    --bs-offcanvas-width: 600px; /* Ancho personalizado */
+}
+
+@media (max-width: 767.98px) {
+    .offcanvas-custom-width {
+        --bs-offcanvas-width: 100%; /* En móviles, ancho completo */
+    }
+}
+
+.user-offcanvas {
+    max-width: 100%;
+}
+
+/* Estilos para el toggle de contraseña */
+.form-password-toggle .input-group-text {
+    cursor: pointer;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Estilos para la imagen de avatar */
+#userAvatarPreview {
+    transition: all 0.3s ease;
+    border: 4px solid rgba(115, 103, 240, 0.1);
+}
+
+#userAvatarPreview:hover {
+    border-color: var(--primary-color);
+}
+
+.user-offcanvas .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--body-text);
+    font-size: 0.9rem;
+    margin: 1.5rem 0;
+}
+
+.user-offcanvas .divider::before,
+.user-offcanvas .divider::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+.user-offcanvas .divider-text {
+    padding: 0 1rem;
+    opacity: 0.8;
+}
+
+.user-offcanvas .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.toggle-password {
+    cursor: pointer;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .form-select option {
+    background-color: var(--card-bg);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .pagination .page-link {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+[data-theme="dark"] .pagination .page-item.disabled .page-link {
+    background-color: transparent;
+    color: var(--body-text);
+    opacity: 0.5;
+}

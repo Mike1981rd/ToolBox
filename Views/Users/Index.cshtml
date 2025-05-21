@@ -1,82 +1,379 @@
 @model IEnumerable<ToolBox.Models.User>
-
 @{
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "Users";
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-4">User Management</h1>
-            <p class="lead">Manage all users in the system</p>
-        </div>
-        <div class="col-auto d-flex align-items-center">
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Create New User
-            </a>
+<!-- Tarjetas de Estadísticas Superiores -->
+<div class="row g-4 mb-4">
+    <!-- Tarjeta de Sesión -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="content-left">
+                        <span data-translate-key="card_session_title">Session</span>
+                        <div class="d-flex align-items-end mt-2">
+                            <h3 class="mb-0 me-2">21,459</h3>
+                            <small class="text-success">(+29%)</small>
+                        </div>
+                        <small data-translate-key="card_session_total_users">Total Users</small>
+                    </div>
+                    <span class="badge bg-primary rounded p-2">
+                        <i class="fas fa-users fa-lg"></i>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>@Html.DisplayNameFor(model => model.Name)</th>
-                            <th>@Html.DisplayNameFor(model => model.Email)</th>
-                            <th>@Html.DisplayNameFor(model => model.Role)</th>
-                            <th>@Html.DisplayNameFor(model => model.IsActive)</th>
-                            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                                <td><span class="badge bg-info">@Html.DisplayFor(modelItem => item.Role)</span></td>
-                                <td>
-                                    @if (item.IsActive)
-                                    {
-                                        <span class="badge bg-success">Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Inactive</span>
-                                    }
-                                </td>
-                                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">
-                                            <i class="fas fa-info-circle"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <!-- Tarjeta de Usuarios Activos -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="content-left">
+                        <span data-translate-key="card_active_users_title">Active Users</span>
+                        <div class="d-flex align-items-end mt-2">
+                            <h3 class="mb-0 me-2">19,860</h3>
+                            <small class="text-success">(+18%)</small>
+                        </div>
+                        <small data-translate-key="card_active_users_last_week">Last week analytics</small>
+                    </div>
+                    <span class="badge bg-success rounded p-2">
+                        <i class="fas fa-user-check fa-lg"></i>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Sección Principal (Contenedor tipo Card para Filtros y Tabla) -->
+<div class="card shadow-sm">
+    <div class="card-header border-bottom">
+        <h5 class="card-title mb-0" data-translate-key="filters_title">Filters</h5>
+    </div>
+    <div class="card-body">
+        <!-- Filtros (row con selects) -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label" for="selectRole" data-translate-key="filter_select_role">Select Role</label>
+                <select id="selectRole" class="form-select">
+                    <option value="" data-translate-key="all_option">All</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Editor">Editor</option>
+                    <option value="Author">Author</option>
+                    <option value="Maintainer">Maintainer</option>
+                    <option value="Subscriber">Subscriber</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="selectPlan" data-translate-key="filter_select_plan">Select Plan</label>
+                <select id="selectPlan" class="form-select">
+                    <option value="" data-translate-key="all_option">All</option>
+                    <option value="Basic">Basic</option>
+                    <option value="Company">Company</option>
+                    <option value="Enterprise">Enterprise</option>
+                    <option value="Team">Team</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="selectStatus" data-translate-key="filter_select_status">Select Status</label>
+                <select id="selectStatus" class="form-select">
+                    <option value="" data-translate-key="all_option">All</option>
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divisor o directamente la tabla -->
+    <hr class="m-0">
+
+    <div class="card-datatable table-responsive pt-0">
+        <div class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-6">
+                    <div class="dataTables_length" id="DataTables_Table_0_length">
+                        <label>
+                            <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                        <input type="search" class="form-control form-control-sm" placeholder="Search User" aria-controls="DataTables_Table_0" data-translate-placeholder-key="search_user_placeholder">
+                    </div>
+                    <div class="dt-buttons btn-group flex-wrap ms-2">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" tabindex="0" aria-haspopup="true" type="button" aria-expanded="false" data-bs-toggle="dropdown">
+                                <i class="fas fa-share-square me-1"></i> <span data-translate-key="export_button">Export</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="@Url.Action("ExportToExcel", "Users")" data-translate-key="export_to_excel"><i class="fas fa-file-excel me-1"></i> Excel</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("ExportToPdf", "Users")" data-translate-key="export_to_pdf"><i class="fas fa-file-pdf me-1"></i> PDF</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("ExportToCsv", "Users")" data-translate-key="export_to_csv"><i class="fas fa-file-csv me-1"></i> CSV</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-sm btn-primary ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#addUserOffcanvas" aria-controls="addUserOffcanvas">
+                            <i class="fas fa-plus me-1"></i> <span data-translate-key="add_new_record_button">Add New Record</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover dataTable no-footer dtr-column" id="usersTable">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled" rowspan="1" colspan="1" style="width: 0px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 18px;" data-col="1" aria-label=""><input type="checkbox" class="form-check-input"></th>
+                        <th data-translate-key="th_user_list_user">USER</th>
+                        <th data-translate-key="th_user_list_role">ROLE</th>
+                        <th data-translate-key="th_user_list_plan">PLAN</th>
+                        <th data-translate-key="th_user_list_billing">BILLING</th>
+                        <th data-translate-key="th_user_list_status">STATUS</th>
+                        <th data-translate-key="th_user_list_actions">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper me-3">
+                                    <div class="avatar avatar-sm">
+                                        <img src="https://via.placeholder.com/40/7367F0/FFFFFF?Text=VK" alt="Avatar" class="rounded-circle">
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <a href="#" class="text-body text-truncate">
+                                        <span class="fw-semibold">Vladimir Koschek</span>
+                                    </a>
+                                    <small class="text-muted">v.koschek@example.com</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-flex align-items-center">
+                                <span class="badge badge-center rounded-pill bg-label-secondary w-px-30 h-px-30 me-2">
+                                    <i class="fas fa-pencil-alt fs-sm"></i>
+                                </span>
+                                <span data-translate-key="role_editor">Editor</span>
+                            </span>
+                        </td>
+                        <td>Basic</td>
+                        <td>Manual - Paypal</td>
+                        <td><span class="badge bg-label-secondary" data-translate-key="status_inactive">Inactive</span></td>
+                        <td>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_view">View</a>
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper me-3">
+                                    <div class="avatar avatar-sm">
+                                        <img src="https://via.placeholder.com/40/28C76F/FFFFFF?Text=ZM" alt="Avatar" class="rounded-circle">
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <a href="#" class="text-body text-truncate">
+                                        <span class="fw-semibold">ZsaZsa McCleverty</span>
+                                    </a>
+                                    <small class="text-muted">zmcleverty@soundround.com</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-flex align-items-center">
+                                <span class="badge badge-center rounded-pill bg-label-info w-px-30 h-px-30 me-2">
+                                    <i class="fas fa-cog fs-sm"></i>
+                                </span>
+                                <span data-translate-key="role_maintainer">Maintainer</span>
+                            </span>
+                        </td>
+                        <td>Enterprise</td>
+                        <td>Auto Debit</td>
+                        <td><span class="badge bg-label-success" data-translate-key="status_active">Active</span></td>
+                        <td>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_view">View</a>
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper me-3">
+                                    <div class="avatar avatar-sm">
+                                        <img src="https://via.placeholder.com/40/EA5455/FFFFFF?Text=SP" alt="Avatar" class="rounded-circle">
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <a href="#" class="text-body text-truncate">
+                                        <span class="fw-semibold">Sophia Pledger</span>
+                                    </a>
+                                    <small class="text-muted">spledger@technorati.com</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-flex align-items-center">
+                                <span class="badge badge-center rounded-pill bg-label-success w-px-30 h-px-30 me-2">
+                                    <i class="fas fa-user-shield fs-sm"></i>
+                                </span>
+                                <span data-translate-key="role_admin">Admin</span>
+                            </span>
+                        </td>
+                        <td>Enterprise</td>
+                        <td>Auto Debit</td>
+                        <td><span class="badge bg-label-success" data-translate-key="status_active">Active</span></td>
+                        <td>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_view">View</a>
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper me-3">
+                                    <div class="avatar avatar-sm">
+                                        <img src="https://via.placeholder.com/40/00CFE8/FFFFFF?Text=LF" alt="Avatar" class="rounded-circle">
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <a href="#" class="text-body text-truncate">
+                                        <span class="fw-semibold">Lanny Fitzalan</span>
+                                    </a>
+                                    <small class="text-muted">lfitzalan@seesaa.net</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-flex align-items-center">
+                                <span class="badge badge-center rounded-pill bg-label-primary w-px-30 h-px-30 me-2">
+                                    <i class="fas fa-chart-line fs-sm"></i>
+                                </span>
+                                <span data-translate-key="role_author">Author</span>
+                            </span>
+                        </td>
+                        <td>Basic</td>
+                        <td>Manual Payment</td>
+                        <td><span class="badge bg-label-warning" data-translate-key="status_pending">Pending</span></td>
+                        <td>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_view">View</a>
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper me-3">
+                                    <div class="avatar avatar-sm">
+                                        <img src="https://via.placeholder.com/40/FF9F43/FFFFFF?Text=RM" alt="Avatar" class="rounded-circle">
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <a href="#" class="text-body text-truncate">
+                                        <span class="fw-semibold">Robert Miller</span>
+                                    </a>
+                                    <small class="text-muted">rmiller@blogspot.com</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-flex align-items-center">
+                                <span class="badge badge-center rounded-pill bg-label-warning w-px-30 h-px-30 me-2">
+                                    <i class="fas fa-user fs-sm"></i>
+                                </span>
+                                <span data-translate-key="role_subscriber">Subscriber</span>
+                            </span>
+                        </td>
+                        <td>Team</td>
+                        <td>Auto Debit</td>
+                        <td><span class="badge bg-label-success" data-translate-key="status_active">Active</span></td>
+                        <td>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_view">View</a>
+                                    <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite" data-translate-key="showing_entries" data-translate-values='{"start":1, "end":10, "total":50}'>
+                        Showing 1 to 10 of 50 entries
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                        <ul class="pagination justify-content-center justify-content-md-end">
+                            <li class="paginate_button page-item previous disabled"><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="0" tabindex="0" class="page-link">«</a></li>
+                            <li class="paginate_button page-item active"><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="3" tabindex="0" class="page-link">3</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="4" tabindex="0" class="page-link">4</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="5" tabindex="0" class="page-link">5</a></li>
+                            <li class="paginate_button page-item next"><a href="#" aria-controls="DataTables_Table_0" data-dt-idx="6" tabindex="0" class="page-link">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir Offcanvas para añadir nuevos usuarios -->
+@await Html.PartialAsync("_AddUserOffcanvas")
+
 @section Scripts {
-    <script>
-        // Additional scripts can be added here if needed
-        $(document).ready(function() {
-            // For example, you could add DataTables or other enhancements
-        });
-    </script>
+    <script src="~/js/users-script.js"></script>
 }
