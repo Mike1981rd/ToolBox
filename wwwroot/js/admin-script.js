@@ -567,7 +567,42 @@ const translations = {
         description_work_mission: "Career and life purpose",
         description_economy_finance: "Financial health and wealth building",
         description_health_body: "Physical wellness and fitness",
-        description_recreation_fun: "Leisure activities and entertainment"
+        description_recreation_fun: "Leisure activities and entertainment",
+        // X-Ray of Life Module
+        xray_life_menu: "X-Ray of life",
+        breadcrumb_xray_life_index: "X-Ray of life",
+        xray_life_page_title: "X-Ray of life",
+        xray_life_main_title: "X-Ray of Life",
+        xray_life_main_subtitle: "Select an Area of Life or search for specific questions.",
+        search_articles_placeholder: "Search questions...",
+        all_areas_filter: "All Areas",
+        // Offcanvas
+        offcanvas_add_xray_question_title: "Add New Question",
+        offcanvas_edit_xray_question_title: "Edit Question",
+        form_label_life_area_category: "Area of Life (Category)",
+        select_life_area_placeholder: "Select an Area of Life",
+        form_label_xray_question: "Question",
+        form_placeholder_xray_question: "Enter the question text...",
+        add_button: "Add",
+        save_changes_button: "Save Changes",
+        add_new_question_button: "Add New Question",
+        add_new_question_button_short: "Add",
+        no_questions_found: "No questions found for this area or search.",
+        no_questions_found_filter: "No questions match your current filter or search criteria.",
+        edit_button: "Edit",
+        deactivate_button: "Deactivate",
+        // Sample Questions
+        xray_q_spirit_1: "How do I connect with my spiritual side?",
+        xray_q_spirit_2: "What practices help develop inner peace?",
+        xray_q_growth_1: "How can I set effective learning goals?",
+        xray_q_social_1: "How do I build meaningful relationships?",
+        xray_q_family_1: "How to maintain strong family bonds?",
+        // Sample Answers
+        xray_a_spirit_1: "Consider meditation, prayer, or spending time in nature to connect with your spiritual self.",
+        xray_a_spirit_2: "Regular meditation, mindfulness practices, and gratitude exercises can help develop inner peace.",
+        xray_a_growth_1: "Set SMART goals, break them into smaller steps, and track your progress regularly.",
+        xray_a_social_1: "Be authentic, listen actively, show empathy, and invest time in nurturing relationships.",
+        xray_a_family_1: "Schedule regular family time, communicate openly, and create shared traditions and memories."
     },
     es: {
         dashboard: "Tablero",
@@ -1162,7 +1197,42 @@ const translations = {
         description_work_mission: "Carrera y propósito de vida",
         description_economy_finance: "Salud financiera y construcción de riqueza",
         description_health_body: "Bienestar físico y estado físico",
-        description_recreation_fun: "Actividades de ocio y entretenimiento"
+        description_recreation_fun: "Actividades de ocio y entretenimiento",
+        // X-Ray of Life Module
+        xray_life_menu: "Radiografía de Vida",
+        breadcrumb_xray_life_index: "Radiografía de Vida",
+        xray_life_page_title: "Radiografía de Vida",
+        xray_life_main_title: "Radiografía de Vida",
+        xray_life_main_subtitle: "Selecciona un Área de Vida o busca preguntas específicas.",
+        search_articles_placeholder: "Buscar preguntas...",
+        all_areas_filter: "Todas las Áreas",
+        // Offcanvas
+        offcanvas_add_xray_question_title: "Añadir Nueva Pregunta",
+        offcanvas_edit_xray_question_title: "Editar Pregunta",
+        form_label_life_area_category: "Área de Vida (Categoría)",
+        select_life_area_placeholder: "Selecciona un Área de Vida",
+        form_label_xray_question: "Pregunta",
+        form_placeholder_xray_question: "Introduce el texto de la pregunta...",
+        add_button: "Añadir",
+        save_changes_button: "Guardar Cambios",
+        add_new_question_button: "Añadir Nueva Pregunta",
+        add_new_question_button_short: "Añadir",
+        no_questions_found: "No se encontraron preguntas para esta área o búsqueda.",
+        no_questions_found_filter: "Ninguna pregunta coincide con tu filtro o criterio de búsqueda actual.",
+        edit_button: "Editar",
+        deactivate_button: "Desactivar",
+        // Sample Questions
+        xray_q_spirit_1: "¿Cómo me conecto con mi lado espiritual?",
+        xray_q_spirit_2: "¿Qué prácticas ayudan a desarrollar la paz interior?",
+        xray_q_growth_1: "¿Cómo puedo establecer metas de aprendizaje efectivas?",
+        xray_q_social_1: "¿Cómo construyo relaciones significativas?",
+        xray_q_family_1: "¿Cómo mantener vínculos familiares fuertes?",
+        // Sample Answers
+        xray_a_spirit_1: "Considera la meditación, oración, o pasar tiempo en la naturaleza para conectar con tu ser espiritual.",
+        xray_a_spirit_2: "La meditación regular, prácticas de atención plena y ejercicios de gratitud pueden ayudar a desarrollar la paz interior.",
+        xray_a_growth_1: "Establece metas SMART, divídelas en pasos más pequeños y haz seguimiento de tu progreso regularmente.",
+        xray_a_social_1: "Sé auténtico, escucha activamente, muestra empatía e invierte tiempo en nutrir las relaciones.",
+        xray_a_family_1: "Programa tiempo familiar regular, comunícate abiertamente y crea tradiciones y recuerdos compartidos."
     }
 };
 
