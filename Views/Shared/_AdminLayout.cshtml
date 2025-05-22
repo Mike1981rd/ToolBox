@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="~/css/roles-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/users-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/customers-style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/instructors-style.css" asp-append-version="true" />
     
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -47,7 +48,7 @@
                 <a href="@Url.Action("AllCustomers", "Customers")" class="list-group-item list-group-item-action" data-translate-key="customers_menu">
                     <i class="fas fa-id-card-alt fa-fw"></i><span class="sidebar-item-text">Customers</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action" data-translate-key="areas_of_life">
+                <a href="@Url.Action("Index", "LifeAreas")" class="list-group-item list-group-item-action" data-translate-key="areas_of_life">
                     <i class="fas fa-heartbeat fa-fw"></i><span class="sidebar-item-text">Areas of Life</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="xray_of_life">
@@ -56,8 +57,8 @@
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">
                     <i class="fas fa-comment-dots fa-fw"></i><span class="sidebar-item-text">Default Welcome Message</span>
                 </a>
-                <a href="@Url.Action("Index", "Users")" class="list-group-item list-group-item-action" data-translate-key="coaches">
-                    <i class="fas fa-users fa-fw"></i><span class="sidebar-item-text">Coaches</span>
+                <a href="@Url.Action("Index", "Instructors")" class="list-group-item list-group-item-action" data-translate-key="coaches_menu">
+                    <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Instructors</span>
                 </a>
                 <a href="@Url.Action("Create", "Users")" class="list-group-item list-group-item-action" data-translate-key="add_user">
                     <i class="fas fa-user-plus fa-fw"></i><span class="sidebar-item-text">Add USER</span>

@@ -1,0 +1,202 @@
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0" data-translate-key="tab_instructor_account_title">Account Details</h5>
+    </div>
+    <div class="card-body">
+        <form id="instructorAccountForm">
+            <!-- Sección de Avatar -->
+            <div class="row mb-3">
+                <label class="col-sm-3 col-form-label" data-translate-key="form_avatar_label">Avatar</label>
+                <div class="col-sm-9">
+                    <div class="d-flex align-items-center">
+                        <img src="https://via.placeholder.com/100x100/DFE3E7/8C98A4?text=Avatar"
+                             alt="Instructor Avatar"
+                             class="img-fluid rounded me-3"
+                             id="instructorAvatarPreview"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                        <div>
+                            <label for="uploadInstructorAvatar" class="btn btn-primary btn-sm mb-2 d-block" data-translate-key="form_upload_button">
+                                Upload new photo
+                            </label>
+                            <input type="file" id="uploadInstructorAvatar" class="d-none" accept="image/*" name="instructorAvatarFile">
+                            <button type="button" class="btn btn-outline-secondary btn-sm d-block w-100" id="resetInstructorAvatar" data-translate-key="form_reset_button">Reset</button>
+                            <p class="text-muted small mt-2 mb-0" data-translate-key="form_avatar_allowed_formats">Allowed JPG, GIF or PNG. Max size of 800K</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Campos del Formulario -->
+            <div class="row mb-3">
+                <label for="instructorFirstName" class="col-sm-3 col-form-label" data-translate-key="form_first_name_label">First Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorFirstName" name="FirstName" placeholder="John">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorLastName" class="col-sm-3 col-form-label" data-translate-key="form_last_name_label">Last Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorLastName" name="LastName" placeholder="Doe">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorEmail" class="col-sm-3 col-form-label" data-translate-key="form_email_label">E-mail</label>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" id="instructorEmail" name="Email" placeholder="john.doe@example.com">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorOrganization" class="col-sm-3 col-form-label" data-translate-key="form_organization_label">Organization</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorOrganization" name="Organization" placeholder="Pixinvent">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorPhoneNumber" class="col-sm-3 col-form-label" data-translate-key="form_phone_number_label">Phone Number</label>
+                <div class="col-sm-9">
+                    <input type="tel" class="form-control" id="instructorPhoneNumber" name="PhoneNumber" placeholder="US (+) 202 555 0111">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorAddress" class="col-sm-3 col-form-label" data-translate-key="form_address_label">Address</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorAddress" name="Address" placeholder="123 Virginia Lane">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorState" class="col-sm-3 col-form-label" data-translate-key="form_state_label">State</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorState" name="State" placeholder="California">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorZipCode" class="col-sm-3 col-form-label" data-translate-key="form_zip_code_label">Zip Code</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="instructorZipCode" name="ZipCode" placeholder="231465">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorCountry" class="col-sm-3 col-form-label" data-translate-key="form_country_label">Country</label>
+                <div class="col-sm-9">
+                    <select class="form-select" id="instructorCountry" name="Country">
+                        <option value="" data-translate-key="select_country_option">Select Country</option>
+                        <option value="US" data-translate-key="country_usa_option">USA</option>
+                        <option value="AR" data-translate-key="country_ar_option">Argentina</option>
+                        <option value="BO" data-translate-key="country_bo_option">Bolivia</option>
+                        <option value="BR" data-translate-key="country_br_option">Brazil</option>
+                        <option value="CL" data-translate-key="country_cl_option">Chile</option>
+                        <option value="CO" data-translate-key="country_co_option">Colombia</option>
+                        <option value="CR" data-translate-key="country_cr_option">Costa Rica</option>
+                        <option value="CU" data-translate-key="country_cu_option">Cuba</option>
+                        <option value="DO" data-translate-key="country_do_option">Dominican Republic</option>
+                        <option value="EC" data-translate-key="country_ec_option">Ecuador</option>
+                        <option value="SV" data-translate-key="country_sv_option">El Salvador</option>
+                        <option value="GT" data-translate-key="country_gt_option">Guatemala</option>
+                        <option value="HN" data-translate-key="country_hn_option">Honduras</option>
+                        <option value="MX" data-translate-key="country_mx_option">Mexico</option>
+                        <option value="NI" data-translate-key="country_ni_option">Nicaragua</option>
+                        <option value="PA" data-translate-key="country_pa_option">Panama</option>
+                        <option value="PY" data-translate-key="country_py_option">Paraguay</option>
+                        <option value="PE" data-translate-key="country_pe_option">Peru</option>
+                        <option value="PR" data-translate-key="country_pr_option">Puerto Rico</option>
+                        <option value="UY" data-translate-key="country_uy_option">Uruguay</option>
+                        <option value="VE" data-translate-key="country_ve_option">Venezuela</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorLanguage" class="col-sm-3 col-form-label" data-translate-key="form_language_label">Language</label>
+                <div class="col-sm-9">
+                    <select class="form-select" id="instructorLanguage" name="Language" multiple>
+                        <option value="en" data-translate-key="language_english_option" selected>English</option>
+                        <option value="es" data-translate-key="language_spanish_option">Spanish</option>
+                        <option value="fr" data-translate-key="language_french_option">French</option>
+                        <option value="de" data-translate-key="language_german_option">German</option>
+                        <option value="pt" data-translate-key="language_portuguese_option">Portuguese</option>
+                        <option value="it" data-translate-key="language_italian_option">Italian</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorTimezone" class="col-sm-3 col-form-label" data-translate-key="form_timezone_label">Timezone</label>
+                <div class="col-sm-9">
+                    <select class="form-select" id="instructorTimezone" name="Timezone">
+                        <option value="" data-translate-key="select_timezone_option">Select Timezone</option>
+                        <option value="-12">(GMT-12:00) International Date Line West</option>
+                        <option value="-11">(GMT-11:00) Midway Island, Samoa</option>
+                        <option value="-10">(GMT-10:00) Hawaii</option>
+                        <option value="-9">(GMT-09:00) Alaska</option>
+                        <option value="-8">(GMT-08:00) Pacific Time (US & Canada)</option>
+                        <option value="-7">(GMT-07:00) Mountain Time (US & Canada)</option>
+                        <option value="-6">(GMT-06:00) Central Time (US & Canada), Mexico City</option>
+                        <option value="-5" selected>(GMT-05:00) Eastern Time (US & Canada)</option>
+                        <option value="-4">(GMT-04:00) Atlantic Time (Canada), Caracas</option>
+                        <option value="-3">(GMT-03:00) Brazil, Buenos Aires, Georgetown</option>
+                        <option value="-2">(GMT-02:00) Mid-Atlantic</option>
+                        <option value="-1">(GMT-01:00) Azores, Cape Verde Islands</option>
+                        <option value="0">(GMT+00:00) Western Europe Time, London, Lisbon</option>
+                        <option value="1">(GMT+01:00) Brussels, Copenhagen, Madrid, Paris</option>
+                        <option value="2">(GMT+02:00) Kaliningrad, South Africa</option>
+                        <option value="3">(GMT+03:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="instructorCurrency" class="col-sm-3 col-form-label" data-translate-key="form_currency_label">Currency</label>
+                <div class="col-sm-9">
+                    <select class="form-select" id="instructorCurrency" name="Currency">
+                        <option value="" data-translate-key="select_currency_option">Select Currency</option>
+                        <option value="USD" selected data-translate-key="currency_usd_option">USD</option>
+                        <option value="EUR" data-translate-key="currency_eur_option">EUR</option>
+                        <option value="GBP" data-translate-key="currency_gbp_option">GBP</option>
+                        <option value="ARS" data-translate-key="currency_ars_option">ARS - Argentine Peso</option>
+                        <option value="BRL" data-translate-key="currency_brl_option">BRL - Brazilian Real</option>
+                        <option value="CLP" data-translate-key="currency_clp_option">CLP - Chilean Peso</option>
+                        <option value="COP" data-translate-key="currency_cop_option">COP - Colombian Peso</option>
+                        <option value="MXN" data-translate-key="currency_mxn_option">MXN - Mexican Peso</option>
+                        <option value="PEN" data-translate-key="currency_pen_option">PEN - Peruvian Sol</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <div class="row">
+                    <div class="col-sm-9 offset-sm-3">
+                         <button type="submit" class="btn btn-primary me-2" data-translate-key="save_changes_button">Save changes</button>
+                         <button type="reset" class="btn btn-outline-secondary" data-translate-key="form_reset_button_alt">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <hr class="my-4">
+
+        <!-- Sección "Delete Account" -->
+        <div class="card shadow-none border border-danger">
+            <div class="card-header bg-danger bg-opacity-10">
+                <h5 class="card-title text-danger mb-0" data-translate-key="delete_account_section_title">Delete Account</h5>
+            </div>
+            <div class="card-body">
+                <p data-translate-key="delete_account_warning">Once you delete your account, there is no going back. Please be certain.</p>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="accountActivation" id="confirmAccountDeactivation">
+                    <label class="form-check-label fw-semibold" for="confirmAccountDeactivation" data-translate-key="confirm_account_deactivation_label">I confirm my account deactivation</label>
+                </div>
+                <button type="button" class="btn btn-danger" id="deactivateAccountButton" disabled data-translate-key="deactivate_account_button">Deactivate Account</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,184 @@
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0" data-translate-key="tab_instructor_security_title">Security Settings</h5>
+    </div>
+    <div class="card-body">
+        <!-- 1. Change Password Section -->
+        <div class="mb-4">
+            <h6 class="mb-3" data-translate-key="security_change_password_title">Change Password</h6>
+            <form id="instructorChangePasswordForm">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="form-password-toggle">
+                            <label class="form-label" for="currentPassword" data-translate-key="security_current_password_label">Current Password</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="············">
+                                <span class="input-group-text cursor-pointer toggle-password-instructor-security"><i class="fas fa-eye-slash"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="form-password-toggle">
+                            <label class="form-label" for="newPassword" data-translate-key="security_new_password_label">New Password</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="············">
+                                <span class="input-group-text cursor-pointer toggle-password-instructor-security"><i class="fas fa-eye-slash"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-password-toggle">
+                            <label class="form-label" for="confirmNewPassword" data-translate-key="security_confirm_new_password_label">Confirm New Password</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="············">
+                                <span class="input-group-text cursor-pointer toggle-password-instructor-security"><i class="fas fa-eye-slash"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h6 data-translate-key="security_password_requirements_title">Password Requirements:</h6>
+                    <ul class="ps-3 mb-0">
+                        <li data-translate-key="security_req_min_chars">Minimum 8 characters long - the more, the better</li>
+                        <li data-translate-key="security_req_lowercase">At least one lowercase character</li>
+                        <li data-translate-key="security_req_number_symbol">At least one number, symbol, or whitespace character</li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary me-2" data-translate-key="save_changes_button">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary" data-translate-key="cancel_button">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- 2. Two-steps verification Section -->
+        <div class="mb-4">
+            <h6 class="mb-1" data-translate-key="security_2fa_title">Two-steps verification</h6>
+            <p class="text-muted" data-translate-key="security_2fa_description">Two factor authentication adds an additional layer of security to your account by requiring more than just a password to log in. <a href="javascript:void(0);" data-translate-key="learn_more_link">Learn more.</a></p>
+            <!-- Lógica para mostrar si está habilitado o no, y cómo habilitarlo -->
+            <div class="alert alert-warning" role="alert">
+                 <h6 class="alert-heading mb-1" data-translate-key="security_2fa_not_enabled_title">Two factor authentication is not enabled yet.</h6>
+                 <p class="mb-0" data-translate-key="security_2fa_not_enabled_text">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-translate-key="security_enable_2fa_button">Enable Two-Factor Authentication</button>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- 3. Create an API key Section -->
+        <div class="mb-4">
+            <h6 class="mb-1" data-translate-key="security_create_api_key_title">Create an API key</h6>
+            <p class="text-muted" data-translate-key="security_create_api_key_description">API keys allow third-party applications to access your account's data without needing your password.</p>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="apiKeyType" class="form-label" data-translate-key="security_choose_key_type_label">Choose the API key type you want to create</label>
+                    <select id="apiKeyType" class="form-select">
+                        <option value="" data-translate-key="select_option_default">Select Option</option>
+                        <option value="full" data-translate-key="api_key_type_full">Full Access</option>
+                        <option value="read" data-translate-key="api_key_type_read">Read Only</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="apiKeyName" class="form-label" data-translate-key="security_name_api_key_label">Name the API key</label>
+                    <input type="text" class="form-control" id="apiKeyName" name="apiKeyName" placeholder="API Key Name">
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary mt-3" id="securityCreateKeyButton" data-translate-key="security_create_key_button">Create Key</button>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- 4. API Key List & Access Section -->
+        <div class="mb-4">
+            <h6 class="mb-3" data-translate-key="security_api_key_list_title">API Key List & Access</h6>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th data-translate-key="th_api_server_key">Server Key</th>
+                            <th data-translate-key="th_api_created_on">Created On</th>
+                            <th data-translate-key="th_api_actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Server Key 1</strong> 
+                                <span class="badge bg-label-primary" data-translate-key="api_key_full_access">Full Access</span>
+                                <br><small class="text-muted">23eaf7f0-f47f-490e-8865-fad2f20282e</small>
+                            </td>
+                            <td><small>Created on 28 Dec 2021, 12:00 AM</small></td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy API Key">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Delete API Key">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Server Key 2</strong> 
+                                <span class="badge bg-label-info" data-translate-key="api_key_read_only">Read Only</span>
+                                <br><small class="text-muted">bb98e571-a2e2-4de8-90a9-2e231b5e99</small>
+                            </td>
+                            <td><small>Created on 12 Feb 2021, 10:30 AM</small></td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy API Key">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Delete API Key">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- 5. Recent Devices Section -->
+        <div>
+            <h6 class="mb-3" data-translate-key="security_recent_devices_title">Recent Devices</h6>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                     <thead>
+                        <tr>
+                            <th data-translate-key="th_device_browser">BROWSER</th>
+                            <th data-translate-key="th_device_device">DEVICE</th>
+                            <th data-translate-key="th_device_location">LOCATION</th>
+                            <th data-translate-key="th_device_recent_activity">RECENT ACTIVITY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fab fa-chrome me-2 text-warning"></i>Chrome on Windows</td>
+                            <td>HP Spectre 360</td>
+                            <td>Switzerland</td>
+                            <td>10, July 2021 20:07</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fab fa-firefox-browser me-2 text-primary"></i>Firefox on Windows</td>
+                            <td>HP Spectre 360</td>
+                            <td>Switzerland</td>
+                            <td>20, July 2021 10:20</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fab fa-safari me-2 text-info"></i>Safari on iPhone</td>
+                            <td>iPhone 12x</td>
+                            <td>Switzerland</td>
+                            <td>13, July 2021 10:10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

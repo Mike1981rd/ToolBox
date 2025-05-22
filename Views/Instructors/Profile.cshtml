@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "Instructor Profile";
+    Layout = "_AdminLayout";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="@ViewBag.BreadcrumbActiveKey">Instructor Profile</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-pills flex-column flex-sm-row mb-4 nav-fill">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#instructorAccount" data-translate-key="tab_instructor_account"><i class="fas fa-user-circle me-1"></i>Account</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#instructorSecurity" data-translate-key="tab_instructor_security"><i class="fas fa-shield-alt me-1"></i>Security</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#instructorFinancial" data-translate-key="tab_instructor_financial"><i class="fas fa-credit-card me-1"></i>Financial</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#instructorNotifications" data-translate-key="tab_instructor_notifications"><i class="fas fa-bell me-1"></i>Notifications</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#instructorFeatures" data-translate-key="tab_instructor_features"><i class="fas fa-star me-1"></i>Features</a>
+            </li>
+        </ul>
+
+        <div class="tab-content shadow-sm">
+            <!-- Pestaña Account -->
+            <div class="tab-pane fade show active" id="instructorAccount" role="tabpanel">
+                @await Html.PartialAsync("_InstructorAccountTab")
+            </div>
+            <!-- Pestaña Security -->
+            <div class="tab-pane fade" id="instructorSecurity" role="tabpanel">
+                @await Html.PartialAsync("_InstructorSecurityTab")
+            </div>
+            <!-- Pestaña Financial -->
+            <div class="tab-pane fade" id="instructorFinancial" role="tabpanel">
+                @await Html.PartialAsync("_InstructorFinancialTab")
+            </div>
+            <!-- Pestaña Notifications -->
+            <div class="tab-pane fade" id="instructorNotifications" role="tabpanel">
+                @await Html.PartialAsync("_InstructorNotificationsTab")
+            </div>
+            <!-- Pestaña Features -->
+            <div class="tab-pane fade" id="instructorFeatures" role="tabpanel">
+                @await Html.PartialAsync("_InstructorFeaturesTab")
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/instructors.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize translation with current language
+            if (typeof setLanguage === 'function') {
+                const currentLanguage = localStorage.getItem('language') || 'en';
+                setLanguage(currentLanguage);
+            }
+        });
+    </script>
+}

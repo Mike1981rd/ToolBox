@@ -1,0 +1,109 @@
+@* Vista Parcial: Views/Instructors/_InstructorFeaturesTab.cshtml *@
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0" data-translate-key="tab_instructor_features_title">Instructor Features & Expertise</h5>
+    </div>
+    <div class="card-body">
+        <form id="instructorFeaturesForm">
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label for="instructorTitleProfession" class="form-label" data-translate-key="features_title_profession_label">Title / Profession</label>
+                    <input type="text" class="form-control" id="instructorTitleProfession" name="TitleProfession" placeholder="e.g., Senior Software Developer, Marketing Specialist">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="instructorYearsExperience" class="form-label" data-translate-key="features_years_experience_label">Years of Experience</label>
+                    <input type="number" class="form-control" id="instructorYearsExperience" name="YearsExperience" min="0" placeholder="e.g., 5">
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="instructorSpecialties" class="form-label" data-translate-key="features_specialties_label">Specialties</label>
+                    <select id="instructorSpecialties" name="Specialties" class="form-select" multiple> <!-- Usar un plugin JS como Tom Select para la funcionalidad de añadir/editar -->
+                        <!-- Opciones Placeholder - se cargarían desde la BD o se añadirían dinámicamente -->
+                        <option value="programming" data-translate-key="specialty_programming">Programming</option>
+                        <option value="design" data-translate-key="specialty_design">Design</option>
+                        <option value="marketing" data-translate-key="specialty_marketing">Marketing</option>
+                        <option value="data_science" data-translate-key="specialty_data_science">Data Science</option>
+                    </select>
+                    <small class="form-text text-muted" data-translate-key="features_specialties_note">Select multiple. If a specialty is not listed, type it to add it (requires JS plugin).</small>
+                    <!-- NOTA: La funcionalidad de "crear si no existe" y "editar" dentro del select
+                         requiere un plugin JS avanzado (Tom Select, Select2 con config avanzada).
+                         Por ahora, Claude debe maquetar el select múltiple estándar.
+                         Los botones para "Añadir Nueva Especialidad" o "Gestionar Especialidades" (que abran un modal/offcanvas)
+                         pueden ser una alternativa más simple si el plugin es muy complejo de configurar ahora.
+                         Considera añadir un botón aquí:
+                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="modal" data-bs-target="#manageSpecialtiesModal" data-translate-key="manage_specialties_button">Manage Specialties</button>
+                    -->
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="instructorEducationLevel" class="form-label" data-translate-key="features_education_level_label">Education Level</label>
+                    <select id="instructorEducationLevel" name="EducationLevel" class="form-select">
+                        <option value="" data-translate-key="select_option_default">Select Level</option>
+                        <option value="high_school" data-translate-key="education_high_school">High School / GED</option>
+                        <option value="technical_degree" data-translate-key="education_technical_degree">Technical Degree / Associate</option>
+                        <option value="bachelors" data-translate-key="education_bachelors">Bachelor's Degree</option>
+                        <option value="masters" data-translate-key="education_masters">Master's Degree</option>
+                        <option value="doctorate" data-translate-key="education_doctorate">Doctorate (PhD, EdD, etc.)</option>
+                        <option value="professional" data-translate-key="education_professional">Professional Degree (MD, JD, etc.)</option>
+                        <option value="other" data-translate-key="education_other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="instructorInstitution" class="form-label" data-translate-key="features_institution_label">Institution of Studies</label>
+                    <input type="text" class="form-control" id="instructorInstitution" name="Institution" placeholder="e.g., Massachusetts Institute of Technology">
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="instructorCertifications" class="form-label" data-translate-key="features_certifications_label">Certifications</label>
+                    <textarea class="form-control" id="instructorCertifications" name="Certifications" rows="3" placeholder="List relevant certifications, one per line or separated by commas"></textarea>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="instructorPortfolioUrl" class="form-label" data-translate-key="features_portfolio_url_label">Portfolio URL</label>
+                    <input type="url" class="form-control" id="instructorPortfolioUrl" name="PortfolioUrl" placeholder="https://www.example.com/portfolio">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="instructorWebsiteUrl" class="form-label" data-translate-key="features_website_url_label">Personal Website URL</label>
+                    <input type="url" class="form-control" id="instructorWebsiteUrl" name="WebsiteUrl" placeholder="https://www.johndoe.com">
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="instructorDocumentUpload" class="form-label" data-translate-key="features_document_upload_label">Upload CV / Diploma</label>
+                    <input class="form-control" type="file" id="instructorDocumentUpload" name="DocumentFile">
+                    <small class="form-text text-muted" data-translate-key="features_document_upload_note">Optional. PDF, DOC, DOCX. Max size 5MB.</small>
+                    <!-- Mostrar archivo actual si ya existe y permitir eliminar/reemplazar -->
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary me-2" data-translate-key="save_changes_button">Save changes</button>
+                <button type="reset" class="btn btn-outline-secondary" data-translate-key="cancel_button">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Opcional: Modal para "Gestionar Especialidades" si se opta por un botón externo -->
+<!--
+<div class="modal fade" id="manageSpecialtiesModal" tabindex="-1" aria-labelledby="manageSpecialtiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageSpecialtiesModalLabel" data-translate-key="manage_specialties_modal_title">Manage Specialties</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p data-translate-key="manage_specialties_modal_text">Here you would list existing specialties with edit/delete options, and a form to add a new one.</p>
+                <!-- Formulario para añadir nueva especialidad -->
+                <!-- Lista de especialidades existentes con opciones de edición/eliminación -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="close_button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->

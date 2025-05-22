@@ -1,0 +1,49 @@
+@* Vista Parcial: Views/LifeAreas/_AddEditLifeAreaOffcanvas.cshtml *@
+@{
+    // bool isEditMode = ViewData["IsEditMode"] as bool? ?? false;
+    // string titleKey = isEditMode ? "offcanvas_edit_life_area_title" : "offcanvas_add_life_area_title";
+}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="addEditLifeAreaOffcanvas" aria-labelledby="addEditLifeAreaOffcanvasLabel" style="width: 600px;">
+    <div class="offcanvas-header">
+        <h5 id="addEditLifeAreaOffcanvasLabel" class="offcanvas-title" data-translate-key='@ViewData["OffcanvasTitleKey"]'>Add New Area of Life</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+        <form class="add-edit-life-area-form pt-0" id="addEditLifeAreaForm">
+            <input type="hidden" id="lifeAreaId" name="LifeAreaId" value="0"> <!-- Para modo edición -->
+
+            <div class="mb-3">
+                <label class="form-label" for="lifeAreaTitle" data-translate-key="form_label_title">Title</label>
+                <input type="text" class="form-control" id="lifeAreaTitle" name="Title" placeholder="Enter area of life title" data-translate-placeholder-key="form_placeholder_title">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="lifeAreaAttachment" data-translate-key="form_label_attachment">Attachment (Icon/Image)</label>
+                <input class="form-control" type="file" id="lifeAreaAttachment" name="AttachmentFile">
+                <small class="form-text text-muted" data-translate-key="form_attachment_note">Optional. Small icon or representative image.</small>
+                <!-- Previsualización de imagen actual si está en modo edición -->
+                <div id="currentAttachmentPreview" class="mt-2"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="lifeAreaDescription" data-translate-key="form_label_description">Description</label>
+                <textarea class="form-control" id="lifeAreaDescription" name="Description" rows="5" placeholder="Write a brief description..." data-translate-placeholder-key="form_placeholder_description"></textarea>
+                <!-- No necesitamos el editor de texto enriquecido aquí, un textarea simple es suficiente -->
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="lifeAreaStatus" data-translate-key="form_label_status">Status</label>
+                <select id="lifeAreaStatus" name="Status" class="form-select">
+                    <option value="active" data-translate-key="status_active">Active</option>
+                    <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                    <option value="scheduled" data-translate-key="status_scheduled">Scheduled</option>
+                </select>
+            </div>
+
+            <div class="mt-4 d-flex">
+                <button type="submit" class="btn btn-primary me-2 data-submit flex-grow-1" data-translate-key="add_button">Add</button> <!-- El texto cambiará a "Save Changes" en modo edición -->
+                <button type="reset" class="btn btn-outline-secondary flex-grow-1" data-bs-dismiss="offcanvas" data-translate-key="discard_button">Discard</button>
+            </div>
+        </form>
+    </div>
+</div>

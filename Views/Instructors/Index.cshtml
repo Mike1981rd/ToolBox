@@ -1,0 +1,123 @@
+@* Vista: Views/Instructors/Index.cshtml *@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Asegurar que el layout se aplique
+    // ViewData["Title"] = "Instructors List"; // O una clave de traducción para el <title> del navegador
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_instructors_list">Instructors List</li>
+    </ol>
+</nav>
+
+<div class="card shadow-sm">
+    <div class="card-datatable table-responsive pt-0">
+        <div class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-4 col-lg-6">
+                    <div class="dataTables_length" id="DataTables_Table_Instructors_length">
+                        <label>
+                            <select name="DataTables_Table_Instructors_length" aria-controls="DataTables_Table_Instructors" class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-8 col-lg-6 d-flex justify-content-center justify-content-md-end">
+                    <div id="DataTables_Table_Instructors_filter" class="dataTables_filter me-2">
+                        <input type="search" class="form-control form-control-sm" placeholder="Search Instructor" aria-controls="DataTables_Table_Instructors" data-translate-placeholder-key="search_instructor_placeholder">
+                    </div>
+                    <div class="dt-buttons btn-group flex-wrap">
+                        <a href="@Url.Action("Create", "Instructors")" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i> <span data-translate-key="add_new_instructor_button">Add New Instructor</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover dataTable no-footer dtr-column" id="instructorsTable">
+                <thead>
+                    <tr>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 18px;" data-col="1" aria-label=""><input type="checkbox" class="form-check-input"></th>
+                        <th data-translate-key="th_instructor_name">INSTRUCTOR</th>
+                        <th data-translate-key="th_instructor_email">EMAIL</th>
+                        <th data-translate-key="th_instructor_specialties">SPECIALTIES</th>
+                        <th data-translate-key="th_instructor_status">STATUS</th>
+                        <th data-translate-key="th_instructor_actions">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var instructors = new[] {
+                            new { Id = 1, Name="Dr. Jane Doe", Email="jane.doe@example.com", Specialties="Programming, Data Science", Status="Active", AvatarText="JD" },
+                            new { Id = 2, Name="John Smith", Email="john.smith@example.com", Specialties="Marketing, Design", Status="Inactive", AvatarText="JS" },
+                            new { Id = 3, Name="Alice Brown", Email="alice.brown@example.com", Specialties="Project Management", Status="Active", AvatarText="AB" },
+                        };
+                         var avatarColors = new[] { "bg-primary", "bg-success", "bg-danger", "bg-warning", "bg-info" };
+                         int colorIndex = 0;
+                    }
+                    @foreach (var instructor in instructors)
+                    {
+                        var bgColor = avatarColors[colorIndex % avatarColors.Length];
+                        colorIndex++;
+                        var statusClass = instructor.Status == "Active" ? "bg-success-subtle text-success-emphasis" : "bg-secondary-subtle text-secondary-emphasis";
+
+                        <tr>
+                            <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                            <td>
+                                <div class="d-flex justify-content-start align-items-center instructor-name">
+                                    <div class="avatar-wrapper me-3">
+                                        <div class="avatar avatar-sm">
+                                            <span class="avatar-initial rounded-circle @bgColor bg-opacity-25 text-@bgColor.Replace("bg-","")">@instructor.AvatarText</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <a href="@Url.Action("Profile", "Instructors", new { id = instructor.Id })" class="text-body text-truncate">
+                                            <span class="fw-semibold">@instructor.Name</span>
+                                        </a>
+                                        <small class="text-muted">ID: INST-@instructor.Id.ToString("D3")</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@instructor.Email</td>
+                            <td>
+                                @foreach(var specialty in instructor.Specialties.Split(',')) {
+                                    <span class="badge bg-label-info me-1">@specialty.Trim()</span>
+                                }
+                            </td>
+                            <td><span class="badge rounded-pill @statusClass">@instructor.Status</span></td>
+                            <td>
+                                <div class="d-inline-block text-nowrap">
+                                    <a href="@Url.Action("Profile", "Instructors", new { id = instructor.Id })" class="btn btn-sm btn-icon" data-bs-toggle="tooltip" title="View Profile" data-translate-title-key="tooltip_view_profile"><i class="fas fa-eye"></i></a>
+                                    <a href="@Url.Action("Profile", "Instructors", new { id = instructor.Id, editMode = true })" class="btn btn-sm btn-icon" data-bs-toggle="tooltip" title="Edit Profile" data-translate-title-key="tooltip_edit_profile"><i class="fas fa-edit"></i></a>
+                                    <button class="btn btn-sm btn-icon deactivate-instructor-btn" data-instructor-id="@instructor.Id" data-bs-toggle="tooltip" title="Deactivate" data-translate-title-key="tooltip_deactivate_instructor"><i class="fas fa-user-slash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info">Showing 1 to 3 of 3 entries</div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <div class="dataTables_paginate paging_simple_numbers">
+                        <ul class="pagination justify-content-center justify-content-md-end">
+                            <li class="paginate_button page-item previous disabled"><a href="#" class="page-link">«</a></li>
+                            <li class="paginate_button page-item active"><a href="#" class="page-link">1</a></li>
+                            <li class="paginate_button page-item next disabled"><a href="#" class="page-link">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
