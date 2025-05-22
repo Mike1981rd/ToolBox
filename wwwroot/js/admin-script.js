@@ -141,6 +141,8 @@ const translations = {
         areas_of_life: "Areas of Life",
         xray_of_life: "X-Ray of life",
         default_welcome_message: "Default Welcome Message",
+        "welcome-message-title": "Default Welcome Message",
+        "welcome-message-subtitle": "Configure the welcome message that clients will see when accessing the platform",
         coaches: "Coaches",
         add_user: "Add USER",
         profile: "Profile",
@@ -1162,6 +1164,24 @@ const translations = {
         areas_of_life: "Áreas de Vida",
         xray_of_life: "Radiografía de Vida",
         default_welcome_message: "Mensaje de Bienvenida",
+        "welcome-message-title": "Mensaje de Bienvenida Predeterminado",
+        "welcome-message-subtitle": "Configura el mensaje de bienvenida que verán los clientes al acceder a la plataforma",
+        "content-configuration": "Configuración de Contenido",
+        "video-configuration": "Configuración de Video",
+        "title": "Título",
+        "description": "Descripción",
+        "video-type": "Tipo de Video",
+        "no-video": "Sin Video",
+        "upload-video": "Subir Video",
+        "youtube-video": "YouTube",
+        "vimeo-video": "Vimeo",
+        "select-video": "Seleccionar Video",
+        "upload-info": "Formatos soportados: MP4, AVI, MOV, WMV, WEBM",
+        "youtube-url": "URL de YouTube",
+        "vimeo-url": "URL de Vimeo",
+        "save-changes": "Guardar Cambios",
+        "update-preview": "Actualizar Vista Previa",
+        "preview": "Vista Previa",
         coaches: "Coaches",
         add_user: "Añadir Usuario",
         profile: "Perfil",
@@ -2125,7 +2145,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const language = this.getAttribute('data-lang');
             setLanguage(language);
-            console.log("Changing language to: " + language);
         });
     });
     
@@ -3198,4 +3217,362 @@ function showToast(message, type = 'info') {
     toastElement.addEventListener('hidden.bs.toast', function() {
         this.remove();
     });
+}
+
+/**
+ * Welcome Message Module Functions
+ */
+let welcomeMessageEditor;
+
+function initializeWelcomeMessageEditor() {
+    // Destroy existing editor instance if it exists
+    if (CKEDITOR.instances.description) {
+        CKEDITOR.instances.description.destroy(true);
+    }
+    
+    // Initialize CKEditor with full configuration
+    CKEDITOR.replace('description', {
+        height: 300,
+        width: '100%',
+        toolbar: 'Full',
+        toolbarGroups: [
+            { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+            { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+            { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            { name: 'forms', groups: [ 'forms' ] },
+            '/',
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            { name: 'links', groups: [ 'links' ] },
+            { name: 'insert', groups: [ 'insert' ] },
+            '/',
+            { name: 'styles', groups: [ 'styles' ] },
+            { name: 'colors', groups: [ 'colors' ] },
+            { name: 'tools', groups: [ 'tools' ] },
+            { name: 'others', groups: [ 'others' ] },
+            { name: 'about', groups: [ 'about' ] }
+        ],
+        removeButtons: 'Save,NewPage,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CreateDiv,Language,BidiRtl,BidiLtr,Flash,Smiley,SpecialChar,PageBreak,Iframe,ShowBlocks,About',
+        extraPlugins: 'justify,colorbutton,font,fontSize',
+        format_tags: 'p;h1;h2;h3;h4;h5;h6;pre;address;div',
+        fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;72/72px',
+        font_names: 'Arial/Arial, Helvetica, sans-serif;Comic Sans MS/Comic Sans MS, cursive;Courier New/Courier New, Courier, monospace;Georgia/Georgia, serif;Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;Verdana/Verdana, Geneva, sans-serif',
+        language: 'es',
+        uiColor: '#FAFAFA',
+        resize_enabled: true,
+        resize_dir: 'vertical',
+        enterMode: CKEDITOR.ENTER_P,
+        shiftEnterMode: CKEDITOR.ENTER_BR,
+        autoParagraph: false
+    });
+
+    welcomeMessageEditor = CKEDITOR.instances.description;
+
+    // Initialize video type handlers
+    initializeVideoTypeHandlers();
+    
+    // Initialize form handlers
+    initializeWelcomeMessageForm();
+    
+    // Initialize preview handlers
+    initializePreviewHandlers();
+    
+    // Show initial video section based on current type
+    showVideoSection();
+    
+    // Initialize real-time preview updates
+    initializeRealTimePreview();
+}
+
+function initializeVideoTypeHandlers() {
+    const videoTypeRadios = document.querySelectorAll("input[name=\"videoType\"]");
+    
+    videoTypeRadios.forEach(radio => {
+        radio.addEventListener("change", function() {
+            showVideoSection();
+            updateVideoPreview();
+        });
+    });
+}
+
+function showVideoSection() {
+    const videoType = document.querySelector("input[name=\"videoType\"]:checked")?.value || "None";
+    
+    // Hide all sections
+    document.getElementById("uploadVideoSection").style.display = "none";
+    document.getElementById("youtubeVideoSection").style.display = "none";
+    document.getElementById("vimeoVideoSection").style.display = "none";
+    
+    // Show relevant section
+    switch(videoType) {
+        case "Uploaded":
+            document.getElementById("uploadVideoSection").style.display = "block";
+            break;
+        case "YouTube":
+            document.getElementById("youtubeVideoSection").style.display = "block";
+            break;
+        case "Vimeo":
+            document.getElementById("vimeoVideoSection").style.display = "block";
+            break;
+    }
+}
+
+function initializeWelcomeMessageForm() {
+    const form = document.getElementById("welcomeMessageForm");
+    
+    if (form) {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            saveWelcomeMessage();
+        });
+    }
+    
+    // Handle video file upload
+    const videoFileInput = document.getElementById("videoFile");
+    if (videoFileInput) {
+        videoFileInput.addEventListener("change", function() {
+            if (this.files && this.files[0]) {
+                previewUploadedVideo(this.files[0]);
+            }
+        });
+    }
+}
+
+function initializePreviewHandlers() {
+    const previewButton = document.querySelector(".btn-preview");
+    
+    if (previewButton) {
+        previewButton.addEventListener("click", function() {
+            updatePreview();
+        });
+    }
+}
+
+function initializeRealTimePreview() {
+    // Title input
+    const titleInput = document.getElementById("title");
+    if (titleInput) {
+        titleInput.addEventListener("input", function() {
+            updateTitlePreview();
+        });
+    }
+    
+    // CKEditor content changes
+    if (welcomeMessageEditor) {
+        welcomeMessageEditor.on("change", function() {
+            updateDescriptionPreview();
+        });
+    }
+    
+    // URL inputs
+    const youtubeInput = document.getElementById("youtubeUrl");
+    const vimeoInput = document.getElementById("vimeoUrl");
+    
+    if (youtubeInput) {
+        youtubeInput.addEventListener("input", debounce(updateVideoPreview, 500));
+    }
+    
+    if (vimeoInput) {
+        vimeoInput.addEventListener("input", debounce(updateVideoPreview, 500));
+    }
+}
+
+function updateTitlePreview() {
+    const title = document.getElementById("title").value;
+    const previewTitle = document.getElementById("previewTitle");
+    
+    if (previewTitle) {
+        previewTitle.textContent = title || "Título del mensaje";
+    }
+}
+
+function updateDescriptionPreview() {
+    if (welcomeMessageEditor) {
+        const content = welcomeMessageEditor.getData();
+        const previewDescription = document.getElementById("previewDescription");
+        
+        if (previewDescription) {
+            previewDescription.innerHTML = content || "<p>Descripción del mensaje...</p>";
+        }
+    }
+}
+
+function updateVideoPreview() {
+    const videoType = document.querySelector("input[name=\"videoType\"]:checked")?.value || "None";
+    const previewVideo = document.getElementById("previewVideo");
+    
+    if (!previewVideo) return;
+    
+    switch(videoType) {
+        case "None":
+            previewVideo.innerHTML = "<p>Sin video seleccionado</p>";
+            break;
+            
+        case "Uploaded":
+            const videoFile = document.getElementById("videoFile").files[0];
+            if (videoFile) {
+                previewUploadedVideo(videoFile);
+            } else {
+                previewVideo.innerHTML = "<p>Selecciona un archivo de video</p>";
+            }
+            break;
+            
+        case "YouTube":
+            const youtubeUrl = document.getElementById("youtubeUrl").value;
+            if (youtubeUrl) {
+                previewYouTubeVideo(youtubeUrl);
+            } else {
+                previewVideo.innerHTML = "<p>Ingresa una URL de YouTube</p>";
+            }
+            break;
+            
+        case "Vimeo":
+            const vimeoUrl = document.getElementById("vimeoUrl").value;
+            if (vimeoUrl) {
+                previewVimeoVideo(vimeoUrl);
+            } else {
+                previewVideo.innerHTML = "<p>Ingresa una URL de Vimeo</p>";
+            }
+            break;
+    }
+}
+
+function previewUploadedVideo(file) {
+    const previewVideo = document.getElementById("previewVideo");
+    const url = URL.createObjectURL(file);
+    
+    previewVideo.innerHTML = `
+        <video controls>
+            <source src="${url}" type="${file.type}">
+            Tu navegador no soporta el elemento video.
+        </video>
+    `;
+}
+
+function previewYouTubeVideo(url) {
+    const previewVideo = document.getElementById("previewVideo");
+    const videoId = extractYouTubeVideoId(url);
+    
+    if (videoId) {
+        previewVideo.innerHTML = `
+            <iframe 
+                src="https://www.youtube.com/embed/${videoId}" 
+                frameborder="0" 
+                allowfullscreen>
+            </iframe>
+        `;
+    } else {
+        previewVideo.innerHTML = "<p>URL de YouTube no válida</p>";
+    }
+}
+
+function previewVimeoVideo(url) {
+    const previewVideo = document.getElementById("previewVideo");
+    const videoId = extractVimeoVideoId(url);
+    
+    if (videoId) {
+        previewVideo.innerHTML = `
+            <iframe 
+                src="https://player.vimeo.com/video/${videoId}" 
+                frameborder="0" 
+                allowfullscreen>
+            </iframe>
+        `;
+    } else {
+        previewVideo.innerHTML = "<p>URL de Vimeo no válida</p>";
+    }
+}
+
+function extractYouTubeVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function extractVimeoVideoId(url) {
+    const regExp = /(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+}
+
+function updatePreview() {
+    updateTitlePreview();
+    updateDescriptionPreview();
+    updateVideoPreview();
+}
+
+function saveWelcomeMessage() {
+    const form = document.getElementById("welcomeMessageForm");
+    const submitBtn = form.querySelector(".btn-save");
+    
+    // Show loading state
+    submitBtn.classList.add("loading");
+    submitBtn.disabled = true;
+    
+    // Update CKEditor content
+    if (welcomeMessageEditor) {
+        welcomeMessageEditor.updateElement();
+    }
+    
+    const formData = new FormData(form);
+    
+    fetch("/WelcomeMessage/Save", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "RequestVerificationToken": document.querySelector("input[name=\"__RequestVerificationToken\"]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(data.message, "success");
+        } else {
+            showMessage(data.message, "error");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        showMessage("Error al guardar el mensaje de bienvenida", "error");
+    })
+    .finally(() => {
+        // Remove loading state
+        submitBtn.classList.remove("loading");
+        submitBtn.disabled = false;
+    });
+}
+
+function showMessage(message, type) {
+    const container = document.querySelector(".welcome-message-content");
+    const existingMessage = container.querySelector(".message-success, .message-error");
+    
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message-${type}`;
+    messageDiv.innerHTML = `
+        <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+        <span>${message}</span>
+    `;
+    
+    container.insertBefore(messageDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 5000);
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }

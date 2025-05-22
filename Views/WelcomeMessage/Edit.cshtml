@@ -1,0 +1,194 @@
+@model ToolBox.Models.WelcomeMessageEditViewModel
+@{
+    ViewData["Title"] = "Configurar Mensaje de Bienvenida";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="welcome-message-container">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="page-title">
+                    <i class="fas fa-hand-wave me-3"></i>
+                    <span data-translate-key="welcome-message-title">Mensaje de Bienvenida Predeterminado</span>
+                </h2>
+                <p class="page-subtitle" data-translate-key="welcome-message-subtitle">
+                    Configura el mensaje de bienvenida que verán los clientes al acceder a la plataforma
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="welcome-message-content">
+        <form id="welcomeMessageForm" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="welcome-card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                <span data-translate-key="content-configuration">Configuración de Contenido</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="title" class="form-label" data-translate-key="title">Título</label>
+                                <input type="text" 
+                                       class="form-control welcome-input" 
+                                       id="title" 
+                                       name="WelcomeMessage.Title" 
+                                       value="@Model.WelcomeMessage.Title" 
+                                       placeholder="Ingrese el título del mensaje de bienvenida"
+                                       data-translate-key-placeholder="title-placeholder" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="description" class="form-label" data-translate-key="description">Descripción</label>
+                                <div class="rich-text-container">
+                                    <textarea id="description" 
+                                              name="WelcomeMessage.Description" 
+                                              class="rich-text-editor">@Model.WelcomeMessage.Description</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="welcome-card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-video me-2"></i>
+                                <span data-translate-key="video-configuration">Configuración de Video</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="video-type-selector mb-4">
+                                <label class="form-label" data-translate-key="video-type">Tipo de Video</label>
+                                <div class="video-type-options">
+                                    <div class="video-type-option">
+                                        <input type="radio" name="videoType" id="videoTypeNone" value="None" 
+                                               @(Model.WelcomeMessage.VideoType == DefaultVideoType.None ? "checked" : "") />
+                                        <label for="videoTypeNone" class="video-type-label">
+                                            <i class="fas fa-ban"></i>
+                                            <span data-translate-key="no-video">Sin Video</span>
+                                        </label>
+                                    </div>
+                                    <div class="video-type-option">
+                                        <input type="radio" name="videoType" id="videoTypeUpload" value="Uploaded" 
+                                               @(Model.WelcomeMessage.VideoType == DefaultVideoType.Uploaded ? "checked" : "") />
+                                        <label for="videoTypeUpload" class="video-type-label">
+                                            <i class="fas fa-upload"></i>
+                                            <span data-translate-key="upload-video">Subir Video</span>
+                                        </label>
+                                    </div>
+                                    <div class="video-type-option">
+                                        <input type="radio" name="videoType" id="videoTypeYoutube" value="YouTube" 
+                                               @(Model.WelcomeMessage.VideoType == DefaultVideoType.YouTube ? "checked" : "") />
+                                        <label for="videoTypeYoutube" class="video-type-label">
+                                            <i class="fab fa-youtube"></i>
+                                            <span data-translate-key="youtube-video">YouTube</span>
+                                        </label>
+                                    </div>
+                                    <div class="video-type-option">
+                                        <input type="radio" name="videoType" id="videoTypeVimeo" value="Vimeo" 
+                                               @(Model.WelcomeMessage.VideoType == DefaultVideoType.Vimeo ? "checked" : "") />
+                                        <label for="videoTypeVimeo" class="video-type-label">
+                                            <i class="fab fa-vimeo"></i>
+                                            <span data-translate-key="vimeo-video">Vimeo</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="uploadVideoSection" class="video-section" style="display: none;">
+                                <label for="videoFile" class="form-label" data-translate-key="select-video">Seleccionar Video</label>
+                                <div class="video-upload-area">
+                                    <input type="file" 
+                                           class="form-control" 
+                                           id="videoFile" 
+                                           name="WelcomeMessage.VideoFile" 
+                                           accept=".mp4,.avi,.mov,.wmv,.webm" />
+                                    <div class="upload-info">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p data-translate-key="upload-info">Formatos soportados: MP4, AVI, MOV, WMV, WEBM</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="youtubeVideoSection" class="video-section" style="display: none;">
+                                <label for="youtubeUrl" class="form-label" data-translate-key="youtube-url">URL de YouTube</label>
+                                <input type="url" 
+                                       class="form-control welcome-input" 
+                                       id="youtubeUrl" 
+                                       name="WelcomeMessage.YouTubeUrl" 
+                                       value="@Model.WelcomeMessage.YouTubeUrl" 
+                                       placeholder="https://www.youtube.com/watch?v=..."
+                                       data-translate-key-placeholder="youtube-placeholder" />
+                            </div>
+
+                            <div id="vimeoVideoSection" class="video-section" style="display: none;">
+                                <label for="vimeoUrl" class="form-label" data-translate-key="vimeo-url">URL de Vimeo</label>
+                                <input type="url" 
+                                       class="form-control welcome-input" 
+                                       id="vimeoUrl" 
+                                       name="WelcomeMessage.VimeoUrl" 
+                                       value="@Model.WelcomeMessage.VimeoUrl" 
+                                       placeholder="https://vimeo.com/..."
+                                       data-translate-key-placeholder="vimeo-placeholder" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary btn-save">
+                            <i class="fas fa-save me-2"></i>
+                            <span data-translate-key="save-changes">Guardar Cambios</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-preview">
+                            <i class="fas fa-eye me-2"></i>
+                            <span data-translate-key="update-preview">Actualizar Vista Previa</span>
+                        </button>
+                    </div>
+
+                    <div class="welcome-card preview-card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-eye me-2"></i>
+                                <span data-translate-key="preview">Vista Previa</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="previewContent" class="preview-content">
+                                <div class="preview-title" id="previewTitle">@Model.WelcomeMessage.Title</div>
+                                <div class="preview-description" id="previewDescription">
+                                    @Html.Raw(Model.WelcomeMessage.Description)
+                                </div>
+                                <div id="previewVideo" class="preview-video"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.ckeditor.com/4.25.0/standard/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for CKEditor to load
+            function initWhenReady() {
+                if (typeof CKEDITOR !== 'undefined') {
+                    initializeWelcomeMessageEditor();
+                } else {
+                    setTimeout(initWhenReady, 100);
+                }
+            }
+            initWhenReady();
+        });
+    </script>
+}
