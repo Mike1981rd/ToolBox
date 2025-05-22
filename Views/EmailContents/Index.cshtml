@@ -1,0 +1,382 @@
+@model ToolBox.Models.EmailIndexViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .email-app {
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+        
+        .email-sidebar {
+            width: 260px;
+            background: #fff;
+            border-right: 1px solid #e3e6ed;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .email-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+        
+        .email-list-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .email-search-bar {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e3e6ed;
+        }
+        
+        .email-toolbar {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e3e6ed;
+            background: #f8f9fa;
+        }
+        
+        .email-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .email-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e3e6ed;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .email-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .email-item.unread {
+            background: #f0f8ff;
+            font-weight: 600;
+        }
+        
+        .email-item.selected {
+            background: #e3f2fd;
+        }
+        
+        .compose-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        
+        .compose-btn:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+        }
+        
+        .folder-item, .label-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 0.25rem;
+        }
+        
+        .folder-item:hover, .label-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .folder-item.active {
+            background: #e3f2fd;
+            color: #007bff;
+        }
+        
+        .folder-icon, .label-dot {
+            margin-right: 0.75rem;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .label-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+        }
+        
+        .folder-count {
+            margin-left: auto;
+            background: #6c757d;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        
+        .email-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+        
+        .email-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .email-sender {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .email-subject {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .email-preview {
+            color: #6c757d;
+            font-size: 0.875rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .email-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-left: 1rem;
+        }
+        
+        .email-date {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .email-labels {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .email-label {
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.625rem;
+            color: white;
+        }
+        
+        .star-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1.125rem;
+            padding: 0;
+            margin-right: 0.5rem;
+        }
+        
+        .star-btn.starred {
+            color: #ffc107;
+        }
+        
+        .checkbox-col {
+            width: 40px;
+            text-align: center;
+        }
+        
+        .email-detail-view {
+            display: none;
+            flex: 1;
+            padding: 2rem;
+            border-left: 1px solid #e3e6ed;
+            overflow-y: auto;
+        }
+    </style>
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="email.emailContents">Contenido de Correo</li>
+    </ol>
+</nav>
+
+<div class="email-app d-flex">
+    <!-- Email Sidebar -->
+    <div class="email-sidebar">
+        <!-- Compose Button -->
+        <button type="button" class="btn compose-btn" data-bs-toggle="modal" data-bs-target="#composeModal" data-translate-key="email.compose">
+            <i class="fas fa-edit me-2"></i>Redactar
+        </button>
+        
+        <!-- Folders -->
+        <div class="mb-4">
+            <h6 class="text-muted mb-3" data-translate-key="email.folders">Carpetas</h6>
+            @foreach (var folder in Model.Folders)
+            {
+                <div class="folder-item @(Model.CurrentFolder == folder.Name ? "active" : "")" data-folder="@folder.Name">
+                    <i class="@folder.Icon folder-icon @folder.CssClass"></i>
+                    <span data-translate-key="@folder.TranslateKey">@folder.Name.Substring(0, 1).ToUpper()@folder.Name.Substring(1)</span>
+                    @if (folder.Count > 0)
+                    {
+                        <span class="folder-count">@folder.Count</span>
+                    }
+                </div>
+            }
+        </div>
+        
+        <!-- Labels -->
+        <div>
+            <h6 class="text-muted mb-3" data-translate-key="email.labels">Etiquetas</h6>
+            @foreach (var label in Model.Labels)
+            {
+                <div class="label-item" data-label="@label.Name">
+                    <div class="label-dot" style="background-color: @label.Color;"></div>
+                    <span data-translate-key="@label.TranslateKey">@label.Name.Substring(0, 1).ToUpper()@label.Name.Substring(1)</span>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <!-- Email Main Content -->
+    <div class="email-main">
+        <!-- Search Bar -->
+        <div class="email-search-bar">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Buscar correo..." data-translate-placeholder-key="email.searchMail" id="emailSearchInput">
+            </div>
+        </div>
+        
+        <!-- Email Toolbar -->
+        <div class="email-toolbar">
+            <div class="d-flex align-items-center">
+                <div class="form-check me-3">
+                    <input class="form-check-input" type="checkbox" id="selectAllEmails">
+                    <label class="form-check-label" for="selectAllEmails"></label>
+                </div>
+                
+                <div class="btn-group me-3" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Actualizar" data-translate-title-key="email.refresh" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Marcar como no leído" data-translate-title-key="email.markUnread" id="markUnreadBtn">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Eliminar" data-translate-title-key="email.delete" id="deleteBtn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-translate-key="email.moveToFolder">
+                        Mover a
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var folder in Model.Folders)
+                        {
+                            <li><a class="dropdown-item move-to-folder" data-folder="@folder.Name" data-translate-key="@folder.TranslateKey">@folder.Name.Substring(0, 1).ToUpper()@folder.Name.Substring(1)</a></li>
+                        }
+                    </ul>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-translate-key="email.applyLabel">
+                        Aplicar etiqueta
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var label in Model.Labels)
+                        {
+                            <li><a class="dropdown-item apply-label" data-label="@label.Name">
+                                <div class="d-flex align-items-center">
+                                    <div class="label-dot me-2" style="background-color: @label.Color;"></div>
+                                    <span data-translate-key="@label.TranslateKey">@label.Name.Substring(0, 1).ToUpper()@label.Name.Substring(1)</span>
+                                </div>
+                            </a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Email List Container -->
+        <div class="email-list-container">
+            <div class="email-list" id="emailList">
+                @foreach (var email in Model.Emails)
+                {
+                    <div class="email-item @(!email.IsRead ? "unread" : "")" data-email-id="@email.Id">
+                        <div class="d-flex align-items-center">
+                            <div class="checkbox-col">
+                                <input class="form-check-input email-checkbox" type="checkbox" value="@email.Id">
+                            </div>
+                            
+                            <button class="star-btn @(email.IsStarred ? "starred" : "")" data-email-id="@email.Id">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            
+                            <img src="@email.SenderAvatar" alt="@email.SenderName" class="email-avatar">
+                            
+                            <div class="email-content">
+                                <div class="email-sender">@email.SenderName</div>
+                                <div class="email-subject">@email.Subject</div>
+                                <div class="email-preview">@email.Preview</div>
+                            </div>
+                            
+                            <div class="email-meta">
+                                <div class="email-date">@email.Date.ToString("MMM dd")</div>
+                                @if (email.AttachmentsCount > 0)
+                                {
+                                    <div class="text-muted mb-1">
+                                        <i class="fas fa-paperclip"></i>
+                                    </div>
+                                }
+                                <div class="email-labels">
+                                    @foreach (var labelName in email.Labels)
+                                    {
+                                        var label = Model.Labels.FirstOrDefault(l => l.Name == labelName);
+                                        if (label != null)
+                                        {
+                                            <span class="email-label" style="background-color: @label.Color;">@labelName</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Email Detail View (Initially Hidden) -->
+    <div class="email-detail-view" id="emailDetailView">
+        <div id="emailDetailContent">
+            <!-- Email detail content will be loaded here via JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Include Compose Modal -->
+@await Html.PartialAsync("_ComposeEmailModal", new ToolBox.Models.ComposeEmailViewModel())
+
+@section Scripts {
+    <script src="~/js/email-contents.js"></script>
+}
