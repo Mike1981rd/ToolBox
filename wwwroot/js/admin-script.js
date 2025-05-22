@@ -2366,6 +2366,12 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.forEach(element => {
             const key = element.getAttribute('data-translate-key');
             
+            // SOLUCIÓN A: Excluir el textarea específico de CKEditor
+            if (element.tagName === 'TEXTAREA' && element.id === 'description') {
+                console.log('Saltando traducción directa del textarea #description para CKEditor.');
+                return;
+            }
+            
             if (!translations[lang] || !translations[lang][key]) {
                 console.warn(`Missing translation for key: ${key} in language: ${lang}`);
                 return;
@@ -3224,47 +3230,41 @@ function showToast(message, type = 'info') {
  */
 let welcomeMessageEditor;
 
+/* Función initializeWelcomeMessageEditor comentada temporalmente para depuración
 function initializeWelcomeMessageEditor() {
     // Destroy existing editor instance if it exists
     if (CKEDITOR.instances.description) {
         CKEDITOR.instances.description.destroy(true);
     }
     
-    // Initialize CKEditor with full configuration
-    CKEDITOR.replace('description', {
-        height: 300,
-        width: '100%',
-        toolbar: 'Full',
-        toolbarGroups: [
-            { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
-            { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
-            { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
-            { name: 'forms', groups: [ 'forms' ] },
-            '/',
-            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
-            { name: 'links', groups: [ 'links' ] },
-            { name: 'insert', groups: [ 'insert' ] },
-            '/',
-            { name: 'styles', groups: [ 'styles' ] },
-            { name: 'colors', groups: [ 'colors' ] },
-            { name: 'tools', groups: [ 'tools' ] },
-            { name: 'others', groups: [ 'others' ] },
-            { name: 'about', groups: [ 'about' ] }
-        ],
-        removeButtons: 'Save,NewPage,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CreateDiv,Language,BidiRtl,BidiLtr,Flash,Smiley,SpecialChar,PageBreak,Iframe,ShowBlocks,About',
-        extraPlugins: 'justify,colorbutton,font,fontSize',
-        format_tags: 'p;h1;h2;h3;h4;h5;h6;pre;address;div',
-        fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;72/72px',
-        font_names: 'Arial/Arial, Helvetica, sans-serif;Comic Sans MS/Comic Sans MS, cursive;Courier New/Courier New, Courier, monospace;Georgia/Georgia, serif;Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;Verdana/Verdana, Geneva, sans-serif',
-        language: 'es',
-        uiColor: '#FAFAFA',
-        resize_enabled: true,
-        resize_dir: 'vertical',
-        enterMode: CKEDITOR.ENTER_P,
-        shiftEnterMode: CKEDITOR.ENTER_BR,
-        autoParagraph: false
-    });
+    // Inicio del código de depuración
+    console.log('Intentando inicializar CKEditor para el ID: description');
+    const textareaElement = document.getElementById('description');
+    console.log('Resultado de document.getElementById("description"):', textareaElement);
+
+    if (textareaElement) {
+        console.log('Textarea #description ENCONTRADO. Atributos:', {
+            id: textareaElement.id,
+            name: textareaElement.name,
+            className: textareaElement.className,
+            valueLength: textareaElement.value ? textareaElement.value.length : 0,
+            isVisible: !!(textareaElement.offsetWidth || textareaElement.offsetHeight || textareaElement.getClientRects().length) // Comprueba si es visible
+        });
+        
+        // Línea original de inicialización (después del código de depuración)
+        CKEDITOR.replace('description', {
+            height: 300,
+            width: '100%',
+            language: 'es',
+            uiColor: '#FAFAFA'
+            // Sin ninguna configuración de toolbar o extraPlugins por ahora
+        });
+        
+        console.log('CKEditor.replace() ejecutado');
+        
+    } else {
+        console.error('¡ERROR CRÍTICO! Textarea con ID "description" NO FUE ENCONTRADO EN EL DOM al momento de la inicialización de CKEditor.');
+    }
 
     welcomeMessageEditor = CKEDITOR.instances.description;
 
@@ -3283,6 +3283,7 @@ function initializeWelcomeMessageEditor() {
     // Initialize real-time preview updates
     initializeRealTimePreview();
 }
+*/
 
 function initializeVideoTypeHandlers() {
     const videoTypeRadios = document.querySelectorAll("input[name=\"videoType\"]");
