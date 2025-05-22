@@ -842,7 +842,21 @@ const translations = {
         "labels.publishDate": "Publish Date",
         "labels.tags": "Tags",
         "breadcrumbs.dashboard": "Dashboard",
-        "breadcrumbs.academy": "Toolbox Academy"
+        "breadcrumbs.academy": "Toolbox Academy",
+        // Life Assessment Questionnaires Module
+        "sidebar.lifeAssessmentQuestionnaires": "Life Assessment Questionnaires",
+        "page_titles.lifeAssessment": "Life Assessment Questionnaires",
+        "breadcrumbs.lifeAssessment": "Life Assessment Questionnaires",
+        "labels.filterByCategory": "Filter By Category",
+        "labels.question": "Question",
+        "labels.questions": "Assessment Questions",
+        "labels.selectAnswer": "Select Answer",
+        "placeholders.selectArea": "Select an Area...",
+        "buttons.submitAnswers": "Submit Answers",
+        "messages.noQuestionsFound": "No questions found for this area.",
+        "messages.answersSubmittedSuccess": "Answers submitted successfully!",
+        "messages.selectAreaToStart": "Select an area to start your assessment",
+        "messages.selectAreaDescription": "Choose a life area from the dropdown above to see related questions and begin your evaluation."
     },
     es: {
         dashboard: "Tablero",
@@ -1712,7 +1726,21 @@ const translations = {
         "labels.publishDate": "Fecha de Publicación",
         "labels.tags": "Etiquetas",
         "breadcrumbs.dashboard": "Tablero",
-        "breadcrumbs.academy": "Academia Toolbox"
+        "breadcrumbs.academy": "Academia Toolbox",
+        // Life Assessment Questionnaires Module
+        "sidebar.lifeAssessmentQuestionnaires": "Cuestionarios de Evaluación de Vida",
+        "page_titles.lifeAssessment": "Cuestionarios de Evaluación de Vida",
+        "breadcrumbs.lifeAssessment": "Cuestionarios de Evaluación de Vida",
+        "labels.filterByCategory": "Filtrar por Categoría",
+        "labels.question": "Pregunta",
+        "labels.questions": "Preguntas de Evaluación",
+        "labels.selectAnswer": "Seleccionar Respuesta",
+        "placeholders.selectArea": "Seleccione un Área...",
+        "buttons.submitAnswers": "Enviar Respuestas",
+        "messages.noQuestionsFound": "No se encontraron preguntas para esta área.",
+        "messages.answersSubmittedSuccess": "¡Respuestas enviadas con éxito!",
+        "messages.selectAreaToStart": "Seleccione un área para comenzar su evaluación",
+        "messages.selectAreaDescription": "Elija un área de vida del menú desplegable arriba para ver las preguntas relacionadas y comenzar su evaluación."
     }
 };
 

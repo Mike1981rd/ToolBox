@@ -1,0 +1,599 @@
+@model ToolBox.Models.LifeAssessmentIndexViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* Life Assessment Custom Styles */
+        .life-assessment-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 2rem;
+        }
+
+        .assessment-card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .assessment-card-body {
+            padding: 2rem;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+        }
+
+        .area-select {
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .area-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .questions-container {
+            min-height: 300px;
+        }
+
+        .question-item {
+            background: white;
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .question-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .answer-input {
+            width: 100px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .scale-indicator {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        .submit-section {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+            color: #667eea;
+        }
+
+        .no-questions {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .no-questions-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+        }
+
+        .alert-danger-custom {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .question-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .answer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        @@media (max-width: 768px) {
+            .question-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .answer-section {
+                align-self: stretch;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .answer-input {
+                width: 80px;
+            }
+
+            .submit-btn {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="life-assessment-header">
+    <div class="container">
+        <h1 class="h2 mb-0" data-translate-key="page_titles.lifeAssessment">Life Assessment Questionnaires</h1>
+        <p class="mb-0 mt-2 opacity-90">Evaluate different areas of your life on a scale of 1-10</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item">
+                <a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumbs.lifeAssessment">Life Assessment Questionnaires</li>
+        </ol>
+    </nav>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <label for="areaSelect" class="form-label fw-semibold" data-translate-key="labels.filterByCategory">
+                    <i class="fas fa-filter me-2"></i>Filter By Category
+                </label>
+            </div>
+            <div class="col-md-6">
+                <select id="areaSelect" class="form-select area-select">
+                    <option value="" data-translate-key="placeholders.selectArea">Select an Area...</option>
+                    @foreach (var area in Model.LifeAreas)
+                    {
+                        <option value="@area.Id" data-count="@area.QuestionCount">
+                            @area.Icon @area.Name (@area.QuestionCount questions)
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <span id="questionCount">Select an area to begin</span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Section -->
+    <div class="assessment-card">
+        <div class="assessment-card-header">
+            <h3 class="h5 mb-0">
+                <i class="fas fa-clipboard-list me-2"></i>
+                <span id="sectionTitle" data-translate-key="labels.questions">Assessment Questions</span>
+            </h3>
+            <small class="text-muted mt-1" id="sectionSubtitle">
+                Rate each statement on a scale of 1 (strongly disagree) to 10 (strongly agree)
+            </small>
+        </div>
+        <div class="assessment-card-body">
+            <div id="questionsContainer" class="questions-container">
+                <!-- Loading state -->
+                <div id="loadingSpinner" class="loading-spinner d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 mb-0">Loading questions...</p>
+                </div>
+
+                <!-- No questions state -->
+                <div id="noQuestions" class="no-questions">
+                    <div class="no-questions-icon">📋</div>
+                    <h4 data-translate-key="messages.selectAreaToStart">Select an area to start your assessment</h4>
+                    <p class="text-muted" data-translate-key="messages.selectAreaDescription">
+                        Choose a life area from the dropdown above to see related questions and begin your evaluation.
+                    </p>
+                </div>
+
+                <!-- Questions will be dynamically loaded here -->
+                <div id="questionsList" class="d-none"></div>
+            </div>
+
+            <!-- Submit Section -->
+            <div id="submitSection" class="submit-section d-none">
+                <button id="submitAnswersBtn" class="btn submit-btn" data-translate-key="buttons.submitAnswers">
+                    <i class="fas fa-paper-plane me-2"></i>Submit Answers
+                </button>
+                <p class="text-muted mt-3 mb-0">
+                    Make sure you've answered all questions before submitting.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer"></div>
+</div>
+
+@section Scripts {
+    <script>
+        // Life Assessment JavaScript
+        const LifeAssessment = {
+            config: {
+                currentAreaId: null,
+                currentQuestions: [],
+                baseUrl: '/LifeAssessment',
+                isLoading: false
+            },
+
+            // Initialize the module
+            init: function() {
+                console.log('Initializing Life Assessment module...');
+                this.bindEvents();
+                this.loadInitialState();
+            },
+
+            // Bind all event handlers
+            bindEvents: function() {
+                // Area selection change
+                $('#areaSelect').on('change', (e) => {
+                    const areaId = parseInt(e.target.value);
+                    if (areaId) {
+                        this.loadQuestionsByArea(areaId);
+                    } else {
+                        this.showNoQuestionsState();
+                    }
+                });
+
+                // Submit answers
+                $('#submitAnswersBtn').on('click', (e) => {
+                    e.preventDefault();
+                    this.submitAnswers();
+                });
+
+                // Answer input validation
+                $(document).on('input', '.answer-input', function() {
+                    const value = parseInt($(this).val());
+                    if (value < 1) $(this).val(1);
+                    if (value > 10) $(this).val(10);
+                    
+                    // Update submit button state
+                    LifeAssessment.updateSubmitButtonState();
+                });
+            },
+
+            // Load initial state
+            loadInitialState: function() {
+                this.showNoQuestionsState();
+                this.updateQuestionCount('Select an area to begin');
+            },
+
+            // Load questions for selected area
+            loadQuestionsByArea: function(areaId) {
+                if (this.config.isLoading) return;
+
+                this.config.isLoading = true;
+                this.config.currentAreaId = areaId;
+                
+                this.showLoadingState();
+                
+                $.get(`${this.config.baseUrl}/GetQuestionsByArea`, { areaId: areaId })
+                    .done((response) => {
+                        if (response.success && response.questions && response.questions.length > 0) {
+                            this.config.currentQuestions = response.questions;
+                            this.renderQuestions(response.questions, response.areaName);
+                            this.updateQuestionCount(`${response.questions.length} questions loaded`);
+                        } else {
+                            this.showNoQuestionsFound(response.areaName || 'Selected Area');
+                        }
+                    })
+                    .fail(() => {
+                        this.showError('Error loading questions. Please try again.');
+                        this.showNoQuestionsState();
+                    })
+                    .always(() => {
+                        this.config.isLoading = false;
+                    });
+            },
+
+            // Show loading state
+            showLoadingState: function() {
+                $('#noQuestions').addClass('d-none');
+                $('#questionsList').addClass('d-none');
+                $('#submitSection').addClass('d-none');
+                $('#loadingSpinner').removeClass('d-none');
+            },
+
+            // Show no questions state
+            showNoQuestionsState: function() {
+                $('#loadingSpinner').addClass('d-none');
+                $('#questionsList').addClass('d-none');
+                $('#submitSection').addClass('d-none');
+                $('#noQuestions').removeClass('d-none');
+                $('#sectionTitle').text('Assessment Questions');
+                $('#sectionSubtitle').text('Rate each statement on a scale of 1 (strongly disagree) to 10 (strongly agree)');
+            },
+
+            // Show no questions found for area
+            showNoQuestionsFound: function(areaName) {
+                $('#loadingSpinner').addClass('d-none');
+                $('#questionsList').addClass('d-none');
+                $('#submitSection').addClass('d-none');
+                $('#noQuestions').removeClass('d-none');
+                
+                $('#noQuestions').html(`
+                    <div class="no-questions-icon">📋</div>
+                    <h4>No questions found</h4>
+                    <p class="text-muted">No questions are available for "${areaName}" at this time.</p>
+                `);
+            },
+
+            // Render questions
+            renderQuestions: function(questions, areaName) {
+                const questionsHtml = questions.map((question, index) => `
+                    <div class="question-item" data-question-id="${question.questionId}">
+                        <div class="question-row">
+                            <div class="question-number">${index + 1}</div>
+                            <div class="question-content">
+                                <div class="question-text">${question.questionText}</div>
+                            </div>
+                            <div class="answer-section">
+                                <input type="number" 
+                                       class="form-control answer-input" 
+                                       min="1" 
+                                       max="10" 
+                                       placeholder="1-10"
+                                       data-question-id="${question.questionId}"
+                                       data-area-id="${question.areaId}">
+                                <div class="scale-indicator">1-10 scale</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                $('#loadingSpinner').addClass('d-none');
+                $('#noQuestions').addClass('d-none');
+                $('#questionsList').html(questionsHtml).removeClass('d-none');
+                $('#submitSection').removeClass('d-none');
+                
+                // Update section title
+                $('#sectionTitle').text(`${areaName} Assessment`);
+                $('#sectionSubtitle').text(`${questions.length} questions • Rate each on a scale of 1-10`);
+                
+                this.updateSubmitButtonState();
+            },
+
+            // Update submit button state
+            updateSubmitButtonState: function() {
+                const inputs = $('.answer-input');
+                const filledInputs = inputs.filter(function() {
+                    const value = $(this).val();
+                    return value && value >= 1 && value <= 10;
+                });
+
+                const allFilled = inputs.length > 0 && filledInputs.length === inputs.length;
+                $('#submitAnswersBtn').prop('disabled', !allFilled);
+                
+                if (inputs.length > 0) {
+                    const progress = Math.round((filledInputs.length / inputs.length) * 100);
+                    $('#submitSection p').text(`${filledInputs.length} of ${inputs.length} questions answered (${progress}%)`);
+                }
+            },
+
+            // Submit answers
+            submitAnswers: function() {
+                const answers = [];
+                $('.answer-input').each(function() {
+                    const questionId = parseInt($(this).data('question-id'));
+                    const areaId = parseInt($(this).data('area-id'));
+                    const value = parseInt($(this).val());
+                    
+                    if (questionId && areaId && value >= 1 && value <= 10) {
+                        answers.push({
+                            questionId: questionId,
+                            answerValue: value,
+                            areaId: areaId
+                        });
+                    }
+                });
+
+                if (answers.length === 0) {
+                    this.showError('Please answer at least one question before submitting.');
+                    return;
+                }
+
+                // Disable submit button
+                $('#submitAnswersBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Submitting...');
+
+                $.ajax({
+                    url: `${this.config.baseUrl}/SubmitAnswers`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(answers),
+                    success: (response) => {
+                        if (response.success) {
+                            this.showSuccess(response.message, response);
+                            this.resetForm();
+                        } else {
+                            this.showError(response.message || 'Error submitting answers');
+                        }
+                    },
+                    error: () => {
+                        this.showError('Network error. Please check your connection and try again.');
+                    },
+                    complete: () => {
+                        $('#submitAnswersBtn').prop('disabled', false).html('<i class="fas fa-paper-plane me-2"></i>Submit Answers');
+                    }
+                });
+            },
+
+            // Reset form
+            resetForm: function() {
+                $('#areaSelect').val('');
+                this.showNoQuestionsState();
+                this.updateQuestionCount('Select an area to begin');
+                this.config.currentAreaId = null;
+                this.config.currentQuestions = [];
+            },
+
+            // Update question count display
+            updateQuestionCount: function(text) {
+                $('#questionCount').text(text);
+            },
+
+            // Show success message
+            showSuccess: function(message, data) {
+                const statsHtml = data.areaName ? `
+                    <div class="mt-3">
+                        <strong>Assessment Results:</strong><br>
+                        Area: ${data.areaName}<br>
+                        Questions Answered: ${data.answeredQuestions}<br>
+                        Average Score: ${data.averageScore}/10
+                    </div>
+                ` : '';
+
+                const alertHtml = `
+                    <div class="alert alert-success-custom alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Success!</strong> ${message}
+                        ${statsHtml}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                $('#messageContainer').html(alertHtml);
+                $('html, body').animate({ scrollTop: $('#messageContainer').offset().top - 100 }, 500);
+            },
+
+            // Show error message
+            showError: function(message) {
+                const alertHtml = `
+                    <div class="alert alert-danger-custom alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error!</strong> ${message}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                $('#messageContainer').html(alertHtml);
+                $('html, body').animate({ scrollTop: $('#messageContainer').offset().top - 100 }, 500);
+            }
+        };
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            LifeAssessment.init();
+        });
+    </script>
+}
