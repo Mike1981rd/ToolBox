@@ -856,7 +856,35 @@ const translations = {
         "messages.noQuestionsFound": "No questions found for this area.",
         "messages.answersSubmittedSuccess": "Answers submitted successfully!",
         "messages.selectAreaToStart": "Select an area to start your assessment",
-        "messages.selectAreaDescription": "Choose a life area from the dropdown above to see related questions and begin your evaluation."
+        "messages.selectAreaDescription": "Choose a life area from the dropdown above to see related questions and begin your evaluation.",
+        // Wheel of Life Module
+        "sidebar.wheelOfLife": "Wheel of Life",
+        "page_titles.wheelOfLife": "Wheel of Life",
+        "breadcrumbs.wheelOfLife": "Wheel of Life",
+        "labels.selectYourScore": "Select your score below:",
+        "labels.totalScore": "Total Score:",
+        "labels.average": "Average",
+        "labels.areas": "Areas",
+        "labels.score": "Score",
+        "buttons.saveScores": "Save Scores",
+        // Life Areas Names
+        "areas.physical-health": "Physical Health",
+        "areas.mental-health": "Mental Health",
+        "areas.career-work": "Career & Work",
+        "areas.financial-wellness": "Financial Wellness",
+        "areas.relationships": "Relationships",
+        "areas.personal-growth": "Personal Growth",
+        "areas.spiritual-life": "Spiritual Life",
+        "areas.recreation-fun": "Recreation & Fun",
+        // Life Areas Descriptions
+        "areas.physical-health.description": "Your physical well-being, fitness, and health habits",
+        "areas.mental-health.description": "Your mental well-being, stress management, and emotional health",
+        "areas.career-work.description": "Your professional life, career satisfaction, and work-life balance",
+        "areas.financial-wellness.description": "Your financial health, planning, and money management",
+        "areas.relationships.description": "Your relationships with family, friends, and romantic partners",
+        "areas.personal-growth.description": "Your personal development, learning, and self-improvement",
+        "areas.spiritual-life.description": "Your spiritual well-being, purpose, and inner peace",
+        "areas.recreation-fun.description": "Your hobbies, leisure activities, and work-life balance"
     },
     es: {
         dashboard: "Tablero",
@@ -1740,7 +1768,37 @@ const translations = {
         "messages.noQuestionsFound": "No se encontraron preguntas para esta área.",
         "messages.answersSubmittedSuccess": "¡Respuestas enviadas con éxito!",
         "messages.selectAreaToStart": "Seleccione un área para comenzar su evaluación",
-        "messages.selectAreaDescription": "Elija un área de vida del menú desplegable arriba para ver las preguntas relacionadas y comenzar su evaluación."
+        "messages.selectAreaDescription": "Elija un área de vida del menú desplegable arriba para ver las preguntas relacionadas y comenzar su evaluación.",
+        // Wheel of Life Module
+        "sidebar.wheelOfLife": "Rueda de la Vida",
+        "page_titles.wheelOfLife": "Rueda de la Vida",
+        "breadcrumbs.wheelOfLife": "Rueda de la Vida",
+        "labels.selectYourScore": "Selecciona tu puntuación abajo:",
+        "labels.totalScore": "Puntuación Total:",
+        "labels.average": "Promedio",
+        "labels.areas": "Áreas",
+        "labels.score": "Puntuación",
+        "buttons.saveScores": "Guardar Puntuaciones",
+        "wheelOfLife.chartTitle": "Tu Rueda de Equilibrio de Vida",
+        "wheelOfLife.subtitle": "Visualiza y equilibra las diferentes áreas de tu vida",
+        // Life Areas Names in Spanish
+        "areas.physical-health": "Salud Física",
+        "areas.mental-health": "Salud Mental",
+        "areas.career-work": "Carrera y Trabajo",
+        "areas.financial-wellness": "Bienestar Financiero",
+        "areas.relationships": "Relaciones",
+        "areas.personal-growth": "Crecimiento Personal",
+        "areas.spiritual-life": "Vida Espiritual",
+        "areas.recreation-fun": "Recreación y Diversión",
+        // Life Areas Descriptions in Spanish
+        "areas.physical-health.description": "Tu bienestar físico, estado físico y hábitos de salud",
+        "areas.mental-health.description": "Tu bienestar mental, manejo del estrés y salud emocional",
+        "areas.career-work.description": "Tu vida profesional, satisfacción laboral y equilibrio trabajo-vida",
+        "areas.financial-wellness.description": "Tu salud financiera, planificación y gestión del dinero",
+        "areas.relationships.description": "Tus relaciones con familia, amigos y parejas románticas",
+        "areas.personal-growth.description": "Tu desarrollo personal, aprendizaje y automejora",
+        "areas.spiritual-life.description": "Tu bienestar espiritual, propósito y paz interior",
+        "areas.recreation-fun.description": "Tus pasatiempos, actividades de ocio y equilibrio trabajo-vida"
     }
 };
 
