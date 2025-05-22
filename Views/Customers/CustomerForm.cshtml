@@ -1,0 +1,407 @@
+@{
+    ViewData["Title"] = ViewBag.IsEditMode ? "Edit Customer" : "Create Customer";
+    Layout = "_AdminLayout";
+    ViewBag.HideTitleInLayout = true;
+    var isEditMode = ViewBag.IsEditMode ?? false;
+    var pageTitle = ViewBag.PageTitleKey ?? "create_customer_page_title";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("AllCustomers", "Customers")" data-translate-key="breadcrumb_customers_all">All Customers</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="@ViewBag.BreadcrumbActiveKey">@(isEditMode ? "Edit Customer" : "Create Customer")</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <!-- Customer Profile Card -->
+    <div class="col-xl-4 col-lg-5 col-md-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="customer-avatar-section text-center mb-4">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRkZGRkZGIiBzdHJva2U9IiNlMGUwZTAiLz4KPHBhdGggZD0iTTYwIDYwQzQ1Ljg1NzkgNjAgMzUgNDkuMTQyMSAzNSAzNUMzNSAyMC44NTc5IDQ1Ljg1NzkgMTAgNjAgMTBDNzQuMTQyMSAxMCA4NSAyMC44NTc5IDg1IDM1Qzg1IDQ5LjE0MjEgNzQuMTQyMSA2MCA2MCA2MFoiIGZpbGw9IiM5Qjk5Qjk5Ii8+CjxwYXRoIGQ9Ik02MCA2NUM0NS44NTc5IDY1IDM1IDU0LjE0MjEgMzUgNDBDMzUgMjUuODU3OSA0NS44NTc5IDE1IDYwIDE1Qzc0LjE0MjEgMTUgODUgMjUuODU3OSA4NSA0MEM4NSA1NC4xNDIxIDc0LjE0MjEgNjUgNjAgNjVaIiBmaWxsPSIjOUI5OTk5Ii8+CjxwYXRoIGQ9Ik02MCA3MEM1MS43MTU5IDcwIDQ1IDc2LjcxNTkgNDUgODVDNDUgOTMuMjg0MSA1MS43MTU5IDEwMCA2MCAxMDBDNjguMjg0MSAxMDAgNzUgOTMuMjg0MSA3NSA4NUM3NSA3Ni43MTU5IDY4LjI4NDEgNzAgNjAgNzBaIiBmaWxsPSIjOUI5OTk5Ii8+Cjwvc3ZnPg==" 
+                         alt="Customer Avatar" class="rounded" height="120" width="120" id="uploadedAvatar">
+                    <div class="mt-3">
+                        <label for="upload" class="btn btn-primary me-2 mb-2" tabindex="0">
+                            <span data-translate-key="offcanvas_avatar_upload">Upload</span>
+                            <input type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg">
+                        </label>
+                        <button type="button" class="btn btn-outline-secondary account-image-reset mb-2" data-translate-key="offcanvas_avatar_reset">Reset</button>
+                        <p class="text-muted small mb-0" data-translate-key="offcanvas_avatar_allowed">Allowed JPG, GIF or PNG. Max size of 800K</p>
+                    </div>
+                </div>
+
+                <form class="customer-form" id="customerForm">
+                    <!-- Basic Information -->
+                    <div class="mb-3">
+                        <label class="form-label" for="customerFirstName" data-translate-key="offcanvas_customer_first_name">First Name</label>
+                        @if (ViewBag.IsEditMode == true)
+                        {
+                            <input type="text" id="customerFirstName" name="customerFirstName" class="form-control" 
+                                   value="@(ViewBag.CustomerName?.ToString().Split(' ')[0] ?? "")" 
+                                   placeholder="John" data-translate-placeholder-key="offcanvas_customer_first_name_placeholder">
+                        }
+                        else
+                        {
+                            <input type="text" id="customerFirstName" name="customerFirstName" class="form-control" 
+                                   value="@(ViewBag.CustomerName?.ToString().Split(' ')[0] ?? "")" 
+                                   placeholder="John" data-translate-placeholder-key="offcanvas_customer_first_name_placeholder" readonly>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="customerLastName" data-translate-key="offcanvas_customer_last_name">Last Name</label>
+                        @if (ViewBag.IsEditMode == true)
+                        {
+                            <input type="text" id="customerLastName" name="customerLastName" class="form-control" 
+                                   value="@(ViewBag.CustomerName?.ToString().Split(' ').Length > 1 ? ViewBag.CustomerName.ToString().Split(' ')[1] : "")" 
+                                   placeholder="Doe" data-translate-placeholder-key="offcanvas_customer_last_name_placeholder">
+                        }
+                        else
+                        {
+                            <input type="text" id="customerLastName" name="customerLastName" class="form-control" 
+                                   value="@(ViewBag.CustomerName?.ToString().Split(' ').Length > 1 ? ViewBag.CustomerName.ToString().Split(' ')[1] : "")" 
+                                   placeholder="Doe" data-translate-placeholder-key="offcanvas_customer_last_name_placeholder" readonly>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="customerEmail" data-translate-key="offcanvas_customer_email">Email</label>
+                        @if (ViewBag.IsEditMode == true)
+                        {
+                            <input type="email" id="customerEmail" name="customerEmail" class="form-control" 
+                                   value="lhischke1@sakura.ne.jp" 
+                                   placeholder="john.doe@example.com" data-translate-placeholder-key="offcanvas_customer_email_placeholder">
+                        }
+                        else
+                        {
+                            <input type="email" id="customerEmail" name="customerEmail" class="form-control" 
+                                   value="lhischke1@sakura.ne.jp" 
+                                   placeholder="john.doe@example.com" data-translate-placeholder-key="offcanvas_customer_email_placeholder" readonly>
+                        }
+                    </div>
+
+                    <!-- Password Section (Always visible, optional in edit mode) -->
+                    <div class="mb-3 form-password-toggle">
+                        <label class="form-label" for="customer-password" data-translate-key="offcanvas_customer_password">Password</label>
+                        <div class="input-group input-group-merge">
+                            <input type="password" id="customer-password" class="form-control" name="customerPassword" 
+                                   placeholder="············" data-translate-placeholder-key="offcanvas_customer_password_placeholder"
+                                   autocomplete="new-password">
+                            <span class="input-group-text cursor-pointer toggle-password-customer"><i class="fas fa-eye-slash"></i></span>
+                        </div>
+                        @if (ViewBag.IsEditMode == true)
+                        {
+                            <small class="form-text text-muted" data-translate-key="password_edit_note">Leave blank to keep current password.</small>
+                        }
+                    </div>
+
+                    <div class="mb-3 form-password-toggle">
+                        <label class="form-label" for="customer-confirm-password" data-translate-key="offcanvas_customer_confirm_password">Confirm Password</label>
+                        <div class="input-group input-group-merge">
+                            <input type="password" id="customer-confirm-password" class="form-control" name="customerConfirmPassword" 
+                                   placeholder="············" data-translate-placeholder-key="offcanvas_customer_confirm_password_placeholder"
+                                   autocomplete="new-password">
+                            <span class="input-group-text cursor-pointer toggle-password-customer"><i class="fas fa-eye-slash"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="mb-3">
+                        <label class="form-label" for="customerPhone" data-translate-key="offcanvas_customer_phone">Phone Number</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" class="form-control" 
+                               value="@(isEditMode ? "(123) 456-7890" : "")" 
+                               placeholder="+1 (609) 988-44-11" data-translate-placeholder-key="offcanvas_customer_phone_placeholder">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="customerCompany" data-translate-key="offcanvas_customer_company">Company</label>
+                        <input type="text" id="customerCompany" name="customerCompany" class="form-control" 
+                               value="@(isEditMode ? "Pixinvent" : "")" 
+                               placeholder="Pixinvent" data-translate-placeholder-key="offcanvas_customer_company_placeholder">
+                    </div>
+
+                    <!-- Status -->
+                    <div class="mb-4">
+                        <label for="customerStatus" class="form-label" data-translate-key="offcanvas_customer_status">Status</label>
+                        <select id="customerStatus" name="customerStatus" class="form-select">
+                            @if (isEditMode)
+                            {
+                                <option value="active" selected data-translate-key="status_active">Active</option>
+                            }
+                            else
+                            {
+                                <option value="active" data-translate-key="status_active">Active</option>
+                            }
+                            <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                            <option value="pending" data-translate-key="status_pending">Pending</option>
+                        </select>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-grid gap-2">
+                        @if (ViewBag.IsEditMode == true)
+                        {
+                            <button type="submit" class="btn btn-primary" data-translate-key="offcanvas_customer_submit">Update Customer</button>
+                        }
+                        else if (string.IsNullOrEmpty(ViewBag.CustomerId?.ToString()))
+                        {
+                            <button type="submit" class="btn btn-primary" data-translate-key="offcanvas_customer_submit">Create Customer</button>
+                        }
+                        <a href="@Url.Action("AllCustomers", "Customers")" class="btn btn-outline-secondary" data-translate-key="@(ViewBag.IsEditMode == false && !string.IsNullOrEmpty(ViewBag.CustomerId?.ToString()) ? "close_button" : "offcanvas_customer_cancel")">
+                            @(ViewBag.IsEditMode == false && !string.IsNullOrEmpty(ViewBag.CustomerId?.ToString()) ? "Close" : "Cancel")
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Tabs -->
+    <div class="col-xl-8 col-lg-7 col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0" data-translate-key="tab_overview">Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <!-- Tabs Navigation -->
+                <ul class="nav nav-pills flex-column flex-md-row mb-3 nav-fill">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#overview" data-translate-key="tab_overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#addressBilling" data-translate-key="tab_address_billing">Address & Billing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#preferences" data-translate-key="tab_notifications">Preferences</a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview">
+                        @await Html.PartialAsync("_CustomerDetailsOverviewTab")
+                    </div>
+                    
+                    <!-- Address & Billing Tab -->
+                    <div class="tab-pane fade" id="addressBilling">
+                        <form class="address-billing-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="customerCountry" class="form-label" data-translate-key="offcanvas_customer_country">Country</label>
+                                        <div class="country-select-wrapper">
+                                            <span class="country-flag-indicator fi fi-ar" id="countryFlagIndicator"></span>
+                                            <select id="customerCountry" name="customerCountry" class="form-select country-select">
+                                                <option value="" data-translate-key="select_country_option">Select Country</option>
+                                                @{
+                                                    var latinAmericanCountries = new Dictionary<string, string>
+                                                    {
+                                                        {"AR", "Argentina"}, {"BO", "Bolivia"}, {"BR", "Brazil"}, {"CL", "Chile"},
+                                                        {"CO", "Colombia"}, {"CR", "Costa Rica"}, {"CU", "Cuba"}, {"DO", "Dominican Republic"},
+                                                        {"EC", "Ecuador"}, {"SV", "El Salvador"}, {"GT", "Guatemala"}, {"HN", "Honduras"},
+                                                        {"MX", "Mexico"}, {"NI", "Nicaragua"}, {"PA", "Panama"}, {"PY", "Paraguay"},
+                                                        {"PE", "Peru"}, {"PR", "Puerto Rico"}, {"UY", "Uruguay"}, {"VE", "Venezuela"}
+                                                    };
+                                                }
+                                                @foreach (var country in latinAmericanCountries)
+                                                {
+                                                    @if (isEditMode && country.Key == "AR")
+                                                    {
+                                                        <option value="@country.Key" selected data-translate-key="country_@country.Key.ToLower()" data-flag-code="@country.Key.ToLower()">@country.Value</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@country.Key" data-translate-key="country_@country.Key.ToLower()" data-flag-code="@country.Key.ToLower()">@country.Value</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="customerLanguage" class="form-label" data-translate-key="offcanvas_customer_language">Language</label>
+                                        <select id="customerLanguage" name="customerLanguage" class="form-select">
+                                            <option value="">Select Language</option>
+                                            @if (isEditMode)
+                                            {
+                                                <option value="en" selected>English</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="en">English</option>
+                                            }
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="customerTaxID" data-translate-key="offcanvas_customer_tax_id">Tax ID</label>
+                                <input type="text" id="customerTaxID" name="customerTaxID" class="form-control" 
+                                       value="@(isEditMode ? "TAX-8894" : "")" 
+                                       placeholder="Tax-8894" data-translate-placeholder-key="offcanvas_customer_tax_id_placeholder">
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Address & Billing Tab -->
+                    <div class="tab-pane fade" id="addressBilling">
+                        <form class="address-billing-form">
+                            <div class="mb-3">
+                                <label class="form-label" for="customerAddress" data-translate-key="offcanvas_customer_address">Address</label>
+                                <input type="text" id="customerAddress" name="customerAddress" class="form-control" 
+                                       value="@(isEditMode ? "1208 Virginie Lane" : "")" 
+                                       placeholder="1208 Virginie Lane" data-translate-placeholder-key="offcanvas_customer_address_placeholder">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="customerState" data-translate-key="offcanvas_customer_state">State</label>
+                                        <input type="text" id="customerState" name="customerState" class="form-control" 
+                                               value="@(isEditMode ? "California" : "")" 
+                                               placeholder="Alabama" data-translate-placeholder-key="offcanvas_customer_state_placeholder">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="customerZip" data-translate-key="offcanvas_customer_zip">Zip Code</label>
+                                        <input type="text" id="customerZip" name="customerZip" class="form-control" 
+                                               value="@(isEditMode ? "90210" : "")" 
+                                               placeholder="500014" data-translate-placeholder-key="offcanvas_customer_zip_placeholder">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Preferences Tab -->
+                    <div class="tab-pane fade" id="preferences">
+                        <form class="preferences-form">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="emailNotifications" @(isEditMode ? "checked" : "")>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Email Notifications
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="smsNotifications">
+                                    <label class="form-check-label" for="smsNotifications">
+                                        SMS Notifications
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="marketingEmails">
+                                    <label class="form-check-label" for="marketingEmails">
+                                        Marketing Emails
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/customers-script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            document.querySelectorAll('.toggle-password-customer').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    var input = this.parentElement.querySelector('input');
+                    var icon = this.querySelector('i');
+
+                    if (input && input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else if (input) {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+
+            // Avatar upload functionality
+            var uploadInput = document.getElementById('upload');
+            if (uploadInput) {
+                uploadInput.addEventListener('change', function() {
+                    var file = this.files[0];
+                    if (file) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var avatar = document.getElementById('uploadedAvatar');
+                            if (avatar) {
+                                avatar.src = e.target.result;
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Avatar reset functionality
+            var resetButton = document.querySelector('.account-image-reset');
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    var avatar = document.getElementById('uploadedAvatar');
+                    var upload = document.getElementById('upload');
+                    if (avatar) {
+                        avatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRkZGRkZGIiBzdHJva2U9IiNlMGUwZTAiLz4KPHBhdGggZD0iTTYwIDYwQzQ1Ljg1NzkgNjAgMzUgNDkuMTQyMSAzNSAzNUMzNSAyMC44NTc5IDQ1Ljg1NzkgMTAgNjAgMTBDNzQuMTQyMSAxMCA4NSAyMC44NTc5IDg1IDM1Qzg1IDQ5LjE0MjEgNzQuMTQyMSA2MCA2MCA2MFoiIGZpbGw9IiM5Qjk5Qjk5Ii8+CjxwYXRoIGQ9Ik02MCA2NUM0NS44NTc5IDY1IDM1IDU0LjE0MjEgMzUgNDBDMzUgMjUuODU3OSA0NS44NTc5IDE1IDYwIDE1Qzc0LjE0MjEgMTUgODUgMjUuODU3OSA4NSA0MEM4NSA1NC4xNDIxIDc0LjE0MjEgNjUgNjAgNjVaIiBmaWxsPSIjOUI5OTk5Ii8+CjxwYXRoIGQ9Ik02MCA3MEM1MS43MTU5IDcwIDQ1IDc2LjcxNTkgNDUgODVDNDUgOTMuMjg0MSA1MS43MTU5IDEwMCA2MCAxMDBDNjguMjg0MSAxMDAgNzUgOTMuMjg0MSA3NSA4NUM3NSA3Ni43MTU5IDY4LjI4NDEgNzAgNjAgNzBaIiBmaWxsPSIjOUI5OTk5Ii8+Cjwvc3ZnPg==';
+                    }
+                    if (upload) {
+                        upload.value = '';
+                    }
+                });
+            }
+
+            // Initialize translation with current language
+            if (typeof setLanguage === 'function') {
+                const currentLanguage = localStorage.getItem('language') || 'en';
+                setLanguage(currentLanguage);
+            }
+
+            // Country flag selector functionality
+            var countrySelect = document.getElementById('customerCountry');
+            var flagIndicator = document.getElementById('countryFlagIndicator');
+            
+            if (countrySelect && flagIndicator) {
+                // Set initial flag based on selected option
+                function updateFlag() {
+                    var selectedOption = countrySelect.options[countrySelect.selectedIndex];
+                    var flagCode = selectedOption.getAttribute('data-flag-code');
+                    
+                    if (flagCode) {
+                        flagIndicator.className = 'country-flag-indicator fi fi-' + flagCode;
+                        flagIndicator.style.display = 'block';
+                    } else {
+                        flagIndicator.style.display = 'none';
+                    }
+                }
+                
+                // Update flag when selection changes
+                countrySelect.addEventListener('change', updateFlag);
+                
+                // Set initial flag
+                updateFlag();
+            }
+        });
+    </script>
+}

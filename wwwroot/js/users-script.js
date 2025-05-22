@@ -14,8 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('add-user-password');
     const confirmPasswordInput = document.getElementById('add-user-confirm-password');
     
-    // Default avatar URL
-    const defaultAvatarUrl = 'https://via.placeholder.com/100x100/DFE3E7/8C98A4?text=Avatar';
+    // Avatar por defecto con mayor calidad para evitar errores de carga
+    const defaultAvatarUrl = 'https://via.placeholder.com/250x250/DFE3E7/8C98A4?text=User';
+    
+    // Imagen fallback local en caso de problemas de red
+    const fallbackAvatarUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI0RGRTNFNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM4Qzk4QTQiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
     
     // 1. Avatar Upload Preview - Mejorado
     if (uploadAvatarInput && userAvatarPreview) {
@@ -50,7 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. Reset Avatar to Default
     if (resetAvatarButton && userAvatarPreview) {
         resetAvatarButton.addEventListener('click', function() {
+            // Intentar usar la URL externa primero, con fallback automático
             userAvatarPreview.src = defaultAvatarUrl;
+            userAvatarPreview.onerror = function() {
+                this.onerror = null; // Evitar bucle infinito
+                this.src = fallbackAvatarUrl;
+            };
+            
             if (uploadAvatarInput) {
                 uploadAvatarInput.value = ''; // Limpiar input file
             }
@@ -123,7 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.reset();
                 this.classList.remove('was-validated');
                 if (userAvatarPreview) {
+                    // Establecemos la imagen por defecto con fallback automático
                     userAvatarPreview.src = defaultAvatarUrl;
+                    userAvatarPreview.onerror = function() {
+                        this.onerror = null; // Evitar bucle infinito
+                        this.src = fallbackAvatarUrl;
+                    };
                 }
                 
                 // Mostrar notificación de éxito (conectaría con un sistema de toasts en implementación real)

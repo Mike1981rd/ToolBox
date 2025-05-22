@@ -247,14 +247,14 @@ body::-webkit-scrollbar {
 .top-navbar {
     background-color: var(--navbar-bg);
     border-bottom: 1px solid var(--border-color);
-    padding: 0.875rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     box-shadow: 0 4px 18px 0 rgba(34, 41, 47, 0.07);
     z-index: 10;
 }
 
 .top-navbar .btn {
     color: var(--navbar-text);
-    padding: 0.5rem;
+    padding: 0.25rem 0.5rem;
     border: none;
     background: transparent;
 }
@@ -343,7 +343,18 @@ body::-webkit-scrollbar {
 /* Main Content Area */
 .container-fluid {
     flex: 1;
-    padding: 1.5rem 1.5rem;
+    padding: 0.75rem 1.5rem;
+}
+
+/* Specific override for main content container in layout */
+#page-content-wrapper .container-fluid.px-4.py-4 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 1rem !important;
+}
+
+/* Reduce top margin of main title */
+#page-content-wrapper h3.mt-2 {
+    margin-top: 0.5rem !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -426,6 +437,19 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     margin-bottom: 1.5rem;
     transition: all var(--transition-speed);
+}
+
+/* Nav Pills Styling for Customer Form Tabs */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.nav-pills .nav-link:not(.active):hover,
+.nav-pills .nav-link:not(.active):focus {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: var(--primary-color);
 }
 
 .card-header {

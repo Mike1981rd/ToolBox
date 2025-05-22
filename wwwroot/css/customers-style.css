@@ -1,0 +1,248 @@
+/* Estilos específicos para el módulo de Clientes */
+
+/* Tabla de clientes */
+.card-datatable {
+    padding: 0;
+}
+
+#customersTable th, 
+#customersTable td {
+    padding: 1rem 1.5rem;
+}
+
+.dt-checkboxes-cell {
+    width: 18px !important;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+/* Avatar con iniciales */
+.avatar-initial {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Flag icons adjustments */
+.fi.fis {
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+}
+
+/* Customer name styling */
+.customer-name {
+    min-width: 200px;
+}
+
+.customer-name .fw-semibold {
+    color: var(--body-text);
+    text-decoration: none;
+}
+
+.customer-name .fw-semibold:hover {
+    color: var(--primary-color);
+}
+
+/* Paginación */
+.pagination .page-link {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    margin: 0 0.15rem;
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Filtros y controles */
+.form-select:focus, 
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.15);
+}
+
+/* Botones */
+.btn-outline-secondary {
+    border-color: #ebe9f1;
+    color: var(--body-text);
+}
+
+.btn-outline-secondary:hover, 
+.btn-outline-secondary:focus {
+    background-color: rgba(115, 103, 240, 0.08);
+    color: var(--primary-color);
+    border-color: rgba(115, 103, 240, 0.5);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #5e50ee;
+    border-color: #5e50ee;
+    box-shadow: 0 8px 15px -8px rgba(115, 103, 240, 0.5);
+}
+
+/* Alineación para los controles de la tabla */
+.dataTables_wrapper .dataTables_filter input.form-control-sm {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    line-height: 1.5;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.dataTables_wrapper .row .col-md-4,
+.dataTables_wrapper .row .col-lg-6 {
+    display: flex;
+    align-items: center;
+}
+
+.dataTables_wrapper .row .col-md-8:last-child,
+.dataTables_wrapper .row .col-lg-6:last-child {
+    justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .dt-buttons, 
+    .dataTables_filter {
+        margin-top: 1rem;
+    }
+    
+    .card-datatable .row > div {
+        justify-content: center;
+    }
+    
+    .dataTables_length {
+        text-align: center;
+    }
+    
+    .customer-name {
+        min-width: auto;
+    }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .form-select option {
+    background-color: var(--card-bg);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .pagination .page-link {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--body-text);
+}
+
+[data-theme="dark"] .pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+[data-theme="dark"] .pagination .page-item.disabled .page-link {
+    background-color: transparent;
+    color: var(--body-text);
+    opacity: 0.5;
+}
+
+/* Country select with flags */
+.country-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-left: 2.5rem;
+    background-position-x: 0.75rem, right 0.75rem;
+}
+
+.country-select::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 15px;
+    background-size: cover;
+    border-radius: 2px;
+}
+
+/* Wrapper para el select con bandera */
+.country-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.country-flag-indicator {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Usar las clases de flag-icons del CDN */
+.country-flag-indicator.fi {
+    background-size: cover;
+}
+
+/* Fallback usando colores para navegadores que no soporten flag-icons */
+.flag-ar { background: linear-gradient(to bottom, #74ACDF 33%, #fff 33%, #fff 66%, #74ACDF 66%); }
+.flag-bo { background: linear-gradient(to bottom, #d52b1e 33%, #ffde00 33%, #ffde00 66%, #007934 66%); }
+.flag-br { background: linear-gradient(45deg, #009b3a 50%, #fedf00 50%); }
+.flag-cl { background: linear-gradient(to bottom, #fff 50%, #d52b1e 50%); }
+.flag-co { background: linear-gradient(to bottom, #ffde00 50%, #003893 75%, #ce1126 75%); }
+.flag-cr { background: linear-gradient(to bottom, #002b7f 20%, #fff 20%, #fff 40%, #ce1126 40%, #ce1126 60%, #fff 60%, #fff 80%, #002b7f 80%); }
+.flag-cu { background: linear-gradient(to bottom, #002a8f 20%, #fff 20%, #fff 40%, #cf142b 40%, #cf142b 60%, #fff 60%, #fff 80%, #002a8f 80%); }
+.flag-do { background: linear-gradient(to bottom, #002d62 50%, #ce1126 50%); }
+.flag-ec { background: linear-gradient(to bottom, #ffde00 50%, #002868 75%, #ce1126 75%); }
+.flag-sv { background: linear-gradient(to bottom, #0047ab 33%, #fff 33%, #fff 66%, #0047ab 66%); }
+.flag-gt { background: linear-gradient(to bottom, #4997d0 33%, #fff 33%, #fff 66%, #4997d0 66%); }
+.flag-hn { background: linear-gradient(to bottom, #0073cf 33%, #fff 33%, #fff 66%, #0073cf 66%); }
+.flag-mx { background: linear-gradient(to bottom, #006847 33%, #fff 33%, #fff 66%, #ce1126 66%); }
+.flag-ni { background: linear-gradient(to bottom, #0067c6 33%, #fff 33%, #fff 66%, #0067c6 66%); }
+.flag-pa { background: linear-gradient(to bottom, #fff 50%, #da020e 50%); }
+.flag-py { background: linear-gradient(to bottom, #d52b1e 33%, #fff 33%, #fff 66%, #0038a8 66%); }
+.flag-pe { background: linear-gradient(to right, #d91023 33%, #fff 33%, #fff 66%, #d91023 66%); }
+.flag-pr { background: linear-gradient(to bottom, #ed1c24 20%, #fff 20%, #fff 40%, #ed1c24 40%, #ed1c24 60%, #fff 60%, #fff 80%, #ed1c24 80%); }
+.flag-uy { background: linear-gradient(to bottom, #fff 11%, #0038a8 11%, #0038a8 22%, #fff 22%, #fff 33%, #0038a8 33%, #0038a8 44%, #fff 44%, #fff 55%, #0038a8 55%, #0038a8 66%, #fff 66%, #fff 77%, #0038a8 77%, #0038a8 88%, #fff 88%); }
+.flag-ve { background: linear-gradient(to bottom, #ffde00 33%, #003893 33%, #003893 66%, #cf142b 66%); }

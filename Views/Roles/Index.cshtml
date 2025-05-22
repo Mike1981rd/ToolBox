@@ -3,6 +3,14 @@
     Layout = "_AdminLayout";
 }
 
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_roles_list">Roles</li>
+    </ol>
+</nav>
+
 <h1 class="page-title" data-translate-key="roles_list_title">Roles List</h1>
 <p class="text-muted mb-4" data-translate-key="roles_list_description">A role provided access to predefined menus and features so that depending on assigned role an administrator can have access to what user needs.</p>
 
@@ -19,9 +27,9 @@
                 <h5 class="card-title mb-3" data-role-name="Administrator">Administrator</h5>
                 <div class="d-flex align-items-center">
                     <div class="avatar-group">
-                        <img src="https://via.placeholder.com/40/7367F0/FFFFFF?Text=JD" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/28C76F/FFFFFF?Text=MM" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/EA5455/FFFFFF?Text=CS" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3MzY3RjAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkpEPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyOEM3NkYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk1NPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFQTU0NTUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkNTPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
                         <span class="avatar-counter rounded-circle">+1</span>
                     </div>
                     <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
@@ -41,9 +49,9 @@
                 <h5 class="card-title mb-3" data-role-name="Manager">Manager</h5>
                 <div class="d-flex align-items-center">
                     <div class="avatar-group">
-                        <img src="https://via.placeholder.com/40/FF9F43/FFFFFF?Text=RK" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/00CFE8/FFFFFF?Text=TW" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/7367F0/FFFFFF?Text=PB" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRjlGNDMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlJLPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwMENGRTgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlRXPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3MzY3RjAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlBCPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
                         <span class="avatar-counter rounded-circle">+4</span>
                     </div>
                     <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
@@ -63,9 +71,9 @@
                 <h5 class="card-title mb-3" data-role-name="Users">Users</h5>
                 <div class="d-flex align-items-center">
                     <div class="avatar-group">
-                        <img src="https://via.placeholder.com/40/28C76F/FFFFFF?Text=DH" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/EA5455/FFFFFF?Text=MB" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/FF9F43/FFFFFF?Text=FL" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyOEM3NkYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkRIPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFQTU0NTUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPk1CPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRjlGNDMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkZMPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
                         <span class="avatar-counter rounded-circle">+2</span>
                     </div>
                     <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
@@ -85,9 +93,9 @@
                 <h5 class="card-title mb-3" data-role-name="Support">Support</h5>
                 <div class="d-flex align-items-center">
                     <div class="avatar-group">
-                        <img src="https://via.placeholder.com/40/00CFE8/FFFFFF?Text=AR" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/7367F0/FFFFFF?Text=SJ" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/28C76F/FFFFFF?Text=BC" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwMENGRTgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkFSPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3MzY3RjAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlNKPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyOEM3NkYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkJDPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
                     </div>
                     <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
                 </div>
@@ -106,8 +114,8 @@
                 <h5 class="card-title mb-3" data-role-name="Restricted User">Restricted User</h5>
                 <div class="d-flex align-items-center">
                     <div class="avatar-group">
-                        <img src="https://via.placeholder.com/40/EA5455/FFFFFF?Text=KM" alt="User" class="avatar rounded-circle">
-                        <img src="https://via.placeholder.com/40/FF9F43/FFFFFF?Text=LG" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFQTU0NTUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPktNPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRjlGNDMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkxHPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
                     </div>
                     <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
                 </div>
@@ -163,7 +171,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="https://via.placeholder.com/40/7367F0/FFFFFF?Text=ZM" alt="User" class="avatar rounded-circle me-2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3MzY3RjAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlpNPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle me-2">
                             <div>
                                 <div class="fw-bold">ZsaZsa McCleverty</div>
                                 <div class="small text-muted">zmcleverty@soundround.com</div>
@@ -183,7 +191,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="https://via.placeholder.com/40/28C76F/FFFFFF?Text=JB" alt="User" class="avatar rounded-circle me-2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyOEM3NkYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkpCPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle me-2">
                             <div>
                                 <div class="fw-bold">John Beckmann</div>
                                 <div class="small text-muted">jbeckmann@netvibes.com</div>
@@ -203,7 +211,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="https://via.placeholder.com/40/EA5455/FFFFFF?Text=SP" alt="User" class="avatar rounded-circle me-2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFQTU0NTUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlNQPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle me-2">
                             <div>
                                 <div class="fw-bold">Sophia Pledger</div>
                                 <div class="small text-muted">spledger@technorati.com</div>
@@ -223,7 +231,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="https://via.placeholder.com/40/00CFE8/FFFFFF?Text=LF" alt="User" class="avatar rounded-circle me-2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwMENGRTgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkxGPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle me-2">
                             <div>
                                 <div class="fw-bold">Lanny Fitzalan</div>
                                 <div class="small text-muted">lfitzalan@seesaa.net</div>
@@ -243,7 +251,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="https://via.placeholder.com/40/FF9F43/FFFFFF?Text=RM" alt="User" class="avatar rounded-circle me-2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRjlGNDMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPlJNPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle me-2">
                             <div>
                                 <div class="fw-bold">Robert Miller</div>
                                 <div class="small text-muted">rmiller@blogspot.com</div>

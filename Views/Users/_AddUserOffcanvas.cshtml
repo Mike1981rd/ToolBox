@@ -14,11 +14,12 @@
                 <label class="form-label" data-translate-key="offcanvas_user_avatar">User Avatar</label>
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="me-3">
-                        <img src="https://via.placeholder.com/100x100/DFE3E7/8C98A4?text=Avatar" 
+                        <img src="https://via.placeholder.com/250x250/DFE3E7/8C98A4?text=User"
                              alt="User Avatar" 
-                             class="img-fluid rounded-circle" 
+                             class="img-fluid rounded" 
                              id="userAvatarPreview" 
-                             style="width: 100px; height: 100px; object-fit: cover;">
+                             style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #dee2e6; transition: all 0.3s ease;"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI0RGRTNFNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM4Qzk4QTQiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
                     </div>
                     <div>
                         <label for="uploadAvatarInput" class="btn btn-primary btn-sm mb-2 d-block" data-translate-key="offcanvas_upload_new_photo">
@@ -103,12 +104,20 @@
                     <label for="country" class="form-label" data-translate-key="form_country">Country</label>
                     <select class="form-select" id="country" name="country">
                         <option value="" data-translate-key="select_country_option">Select Country</option>
-                        <option value="USA" data-translate-key="country_usa">United States</option>
-                        <option value="UK" data-translate-key="country_uk">United Kingdom</option>
-                        <option value="Spain" data-translate-key="country_spain">Spain</option>
-                        <option value="France" data-translate-key="country_france">France</option>
-                        <option value="Germany" data-translate-key="country_germany">Germany</option>
-                        <option value="Other" data-translate-key="country_other">Other</option>
+                        @{
+                            var latinAmericanCountries = new Dictionary<string, string>
+                            {
+                                {"AR", "Argentina"}, {"BO", "Bolivia"}, {"BR", "Brazil"}, {"CL", "Chile"},
+                                {"CO", "Colombia"}, {"CR", "Costa Rica"}, {"CU", "Cuba"}, {"DO", "Dominican Republic"},
+                                {"EC", "Ecuador"}, {"SV", "El Salvador"}, {"GT", "Guatemala"}, {"HN", "Honduras"},
+                                {"MX", "Mexico"}, {"NI", "Nicaragua"}, {"PA", "Panama"}, {"PY", "Paraguay"},
+                                {"PE", "Peru"}, {"PR", "Puerto Rico"}, {"UY", "Uruguay"}, {"VE", "Venezuela"}
+                            };
+                        }
+                        @foreach (var country in latinAmericanCountries)
+                        {
+                            <option value="@country.Key" data-translate-key="country_@country.Key.ToLower()">@country.Value</option>
+                        }
                     </select>
                 </div>
             </div>

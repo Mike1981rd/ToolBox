@@ -1,0 +1,110 @@
+<div class="card border-0">
+    <div class="card-body p-4">
+        <!-- Top Statistics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="card bg-primary bg-opacity-10 border-0 h-100">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+                        <div class="text-primary mb-2">
+                            <i class="fas fa-wallet fa-2x"></i>
+                        </div>
+                        <h6 class="mb-1" data-translate-key="overview_account_balance_title">Account Balance</h6>
+                        <h4 class="mb-0 text-primary">$2,345</h4>
+                        <small class="text-muted" data-translate-key="overview_credit_left">Credit Left</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card bg-success bg-opacity-10 border-0 h-100">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+                        <div class="text-success mb-2">
+                            <i class="fas fa-award fa-2x"></i>
+                        </div>
+                        <h6 class="mb-1" data-translate-key="overview_loyalty_program_title">Loyalty Program</h6>
+                        <h4 class="mb-0 text-success">Platinum</h4>
+                        <small class="text-muted">854 <span data-translate-key="overview_points_to_next_tier">points to next tier</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card bg-warning bg-opacity-10 border-0 h-100">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+                        <div class="text-warning mb-2">
+                            <i class="fas fa-heart fa-2x"></i>
+                        </div>
+                        <h6 class="mb-1" data-translate-key="overview_wishlist_title">Wishlist</h6>
+                        <h4 class="mb-0 text-warning">15</h4>
+                        <small class="text-muted" data-translate-key="overview_items_in_wishlist">items in wishlist</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card bg-info bg-opacity-10 border-0 h-100">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+                        <div class="text-info mb-2">
+                            <i class="fas fa-tag fa-2x"></i>
+                        </div>
+                        <h6 class="mb-1" data-translate-key="overview_coupons_title">Coupons</h6>
+                        <h4 class="mb-0 text-info">21</h4>
+                        <small class="text-muted" data-translate-key="overview_coupons_you_win">Coupons you win</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" data-translate-key="overview_orders_placed_title">Orders placed</h5>
+                <div class="d-flex align-items-center">
+                    <input type="search" class="form-control form-control-sm me-2" placeholder="Search Order" data-translate-placeholder-key="overview_search_order_placeholder">
+                </div>
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th data-translate-key="th_order_id">ORDER</th>
+                            <th data-translate-key="th_order_date">DATE</th>
+                            <th data-translate-key="th_order_status">STATUS</th>
+                            <th data-translate-key="th_order_spent">SPENT</th>
+                            <th data-translate-key="th_order_actions">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                        @{
+                            // Datos Placeholder
+                            var orders = new[] {
+                                new { Id="#9857", Date="Nov 29, 2022", Status="Out for delivery", StatusClass="bg-label-info", Spent="$59.28" },
+                                new { Id="#9841", Date="Jun 20, 2022", Status="Ready to Pickup", StatusClass="bg-label-primary", Spent="$333.83" },
+                                new { Id="#9885", Date="Sep 11, 2022", Status="Delivered", StatusClass="bg-label-success", Spent="$62.71" },
+                            };
+                        }
+                        @foreach(var order in orders)
+                        {
+                            <tr>
+                                <td><a href="#"><strong>@order.Id</strong></a></td>
+                                <td>@order.Date</td>
+                                <td><span class="badge @order.StatusClass me-1">@order.Status</span></td>
+                                <td>@order.Spent</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="javascript:void(0);"><i class="fas fa-eye me-1"></i> View</a>
+                                            <a class="dropdown-item" href="javascript:void(0);"><i class="fas fa-trash-alt me-1"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Paginación Placeholder si es necesaria -->
+            <div class="card-footer d-flex justify-content-end">
+                <small class="text-muted" data-translate-key="showing_3_of_100_entries">Showing 3 of 100 entries</small>
+            </div>
+        </div>
+    </div>
+</div>

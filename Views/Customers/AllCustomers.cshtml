@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "All Customers";
+    Layout = "_AdminLayout";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_customers_all">All Customers</li>
+    </ol>
+</nav>
+
+
+<div class="card shadow-sm">
+    <div class="card-header border-bottom d-flex flex-wrap justify-content-between align-items-center">
+        <!-- Los controles van aquí si se necesitan en el futuro -->
+    </div>
+    <div class="card-datatable table-responsive pt-0">
+        <div class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row p-3 align-items-center">
+                <!-- Controles de la Tabla (Búsqueda, Paginación por página, Exportar, Añadir) -->
+                <div class="col-sm-12 col-md-4 col-lg-6">
+                    <div class="dataTables_length" id="DataTables_Table_Customers_length">
+                        <label>
+                            <select name="DataTables_Table_Customers_length" aria-controls="DataTables_Table_Customers" class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-8 col-lg-6 d-flex justify-content-center justify-content-md-end">
+                    <div id="DataTables_Table_Customers_filter" class="dataTables_filter me-2">
+                        <input type="search" class="form-control form-control-sm" placeholder="Search Customer" aria-controls="DataTables_Table_Customers" data-translate-placeholder-key="search_order_placeholder">
+                    </div>
+                    <div class="dt-buttons btn-group flex-wrap">
+                        <a href="@Url.Action("Create", "Customers")" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i> <span data-translate-key="add_customer_button">Add Customer</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover dataTable no-footer dtr-column" id="customersTable">
+                <thead>
+                    <tr>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 18px;" data-col="1" aria-label=""><input type="checkbox" class="form-check-input"></th>
+                        <th data-translate-key="th_customer_list_customer">CUSTOMER</th>
+                        <th data-translate-key="th_customer_list_customer_id">CUSTOMER ID</th>
+                        <th data-translate-key="th_customer_list_country">COUNTRY</th>
+                        <th data-translate-key="th_customer_list_order">ORDER</th>
+                        <th data-translate-key="th_customer_list_total_spent">TOTAL SPENT</th>
+                        <th data-translate-key="th_user_list_actions">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var customers = new[] {
+                            new { Name="Zeke Arton", Email="zarton@weibo.com", Id="#895280", Country="Ukraine", CountryCode="UA", Orders="539", Spent="$3430.05", AvatarText="ZA" },
+                            new { Name="Zad Rawe", Email="zrawe1t@va.gov", Id="#343593", Country="Libya", CountryCode="LY", Orders="473", Spent="$5218.22", AvatarText="ZR" },
+                            new { Name="Yank Luddy", Email="yluddy22@ftema.gov", Id="#586615", Country="Portugal", CountryCode="PT", Orders="462", Spent="$9157.04", AvatarText="YL" },
+                            new { Name="Valenka Turbill", Email="vturbill2h@nbcnews.com", Id="#179914", Country="Turkmenistan", CountryCode="TM", Orders="550", Spent="$9083.15", AvatarText="VT" },
+                            new { Name="Thomasine Vasentsov", Email="tvasentsov@seesaa.net", Id="#988015", Country="Argentina", CountryCode="AR", Orders="752", Spent="$5984.53", AvatarText="TV" }
+                        };
+                        var avatarColors = new[] { "primary", "success", "danger", "warning", "info" };
+                        int colorIndex = 0;
+                    }
+                    @foreach (var customer in customers)
+                    {
+                        var bgColor = avatarColors[colorIndex % avatarColors.Length];
+                        colorIndex++;
+                        <tr>
+                            <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                            <td>
+                                <div class="d-flex justify-content-start align-items-center customer-name">
+                                    <div class="avatar-wrapper me-3">
+                                        <div class="avatar avatar-sm">
+                                            <span class="avatar-initial rounded-circle bg-@bgColor bg-opacity-25 text-@bgColor">@customer.AvatarText</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <a href="@Url.Action("Details", "Customers", new { id = customer.Id.Replace("#", "") })" 
+                                           class="text-body text-truncate"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title="View Customer Details"
+                                           data-translate-title-key="tooltip_view_customer_details">
+                                            <span class="fw-semibold">@customer.Name</span>
+                                        </a>
+                                        <small class="text-muted">@customer.Email</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="text-body fw-medium">@customer.Id</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="fi fi-@customer.CountryCode.ToLower() fis me-2"></span>
+                                    @customer.Country
+                                </div>
+                            </td>
+                            <td>@customer.Orders</td>
+                            <td>@customer.Spent</td>
+                            <td>
+                                <div class="d-inline-block text-nowrap">
+                                    <a href="@Url.Action("Details", "Customers", new { id = customer.Id.Replace("#", "") })" 
+                                       class="btn btn-sm btn-icon"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="View"
+                                       data-translate-title-key="tooltip_view_action">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Edit", "Customers", new { id = customer.Id.Replace("#", "") })" 
+                                       class="btn btn-sm btn-icon"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Edit"
+                                       data-translate-title-key="tooltip_edit_action">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-icon deactivate-customer-btn" 
+                                            data-customer-id="@customer.Id.Replace("#", "")"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Deactivate"
+                                            data-translate-title-key="tooltip_deactivate_action">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info" id="DataTables_Table_Customers_info" role="status" aria-live="polite" data-translate-key="showing_entries" data-translate-values='{"start":1, "end":5, "total":5}'>
+                        Showing 1 to 5 of 5 entries
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_Customers_paginate">
+                        <ul class="pagination justify-content-center justify-content-md-end">
+                            <li class="paginate_button page-item previous disabled"><a href="#" class="page-link">«</a></li>
+                            <li class="paginate_button page-item active"><a href="#" class="page-link">1</a></li>
+                            <li class="paginate_button page-item next disabled"><a href="#" class="page-link">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas removed - Using full page forms instead -->
+
+@section Scripts {
+    <script src="~/js/customers-script.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize translation after DOM is ready
+            if (typeof translatePage === 'function') {
+                translatePage();
+            }
+        });
+    </script>
+}

@@ -160,13 +160,147 @@ const translations = {
         admin_role: "Admin",
         total_coach: "Total Coaches",
         active_coaches: "Active Coaches",
-        activity_rate: "Activity Rate"
+        activity_rate: "Activity Rate",
+        // Customers module
+        customers_menu: "Customers",
+        all_customers_title: "All Customers",
+        search_order_placeholder: "Search Customer",
+        add_customer_button: "Add Customer",
+        // Customer table headers
+        th_customer_list_customer: "CUSTOMER",
+        th_customer_list_customer_id: "CUSTOMER ID",
+        th_customer_list_country: "COUNTRY",
+        th_customer_list_order: "ORDER",
+        th_customer_list_total_spent: "TOTAL SPENT",
+        // Customer details
+        customer_details_title_prefix: "Customer ID #",
+        customer_details_joined_on: "Joined on",
+        button_edit_details: "Edit Details",
+        button_delete_customer: "Delete Customer",
+        button_deactivate_customer: "Deactivate Customer",
+        card_upgrade_to_premium_title: "Upgrade to premium",
+        card_upgrade_to_premium_text: "Upgrade customer to premium membership to access pro features.",
+        button_upgrade_to_premium: "Upgrade to premium",
+        // Tabs
+        tab_overview: "Overview",
+        tab_security: "Security",
+        tab_address_billing: "Address & Billing",
+        tab_notifications: "Notifications",
+        // Overview tab content
+        overview_orders_title: "Orders",
+        overview_spent_title: "Spent",
+        overview_details_section_title: "Details",
+        overview_username_label: "Username:",
+        overview_email_label: "Email:",
+        overview_status_label: "Status:",
+        overview_contact_label: "Contact:",
+        overview_country_label: "Country:",
+        overview_account_balance_title: "Account Balance",
+        overview_credit_left: "Credit Left",
+        overview_account_balance_next_purchase: "Account balance for next purchase",
+        overview_loyalty_program_title: "Loyalty Program",
+        overview_platinum_member: "Platinum member",
+        overview_points_to_next_tier: "points to next tier",
+        overview_wishlist_title: "Wishlist",
+        overview_items_in_wishlist: "items in wishlist",
+        overview_wishlist_receive_notification: "Receive notification when items go on sale",
+        overview_coupons_title: "Coupons",
+        overview_coupons_you_win: "Coupons you win",
+        overview_coupons_use_on_next_purchase: "Use coupon on next purchase",
+        overview_orders_placed_title: "Orders placed",
+        overview_search_order_placeholder: "Search Order",
+        // Customer offcanvas form
+        offcanvas_add_customer_title: "Add New Customer",
+        offcanvas_edit_customer_title: "Edit Customer",
+        offcanvas_customer_avatar: "Customer Avatar",
+        offcanvas_customer_type: "Customer Type",
+        customer_type_individual: "Individual",
+        customer_type_company: "Company",
+        offcanvas_company_name_optional: "Company Name (Optional)",
+        offcanvas_full_name: "Full Name",
+        offcanvas_username: "Username",
+        offcanvas_email: "Email",
+        offcanvas_password: "Password",
+        offcanvas_confirm_password: "Confirm Password",
+        password_edit_note: "Leave blank to keep current password.",
+        offcanvas_contact: "Contact",
+        offcanvas_country: "Country",
+        offcanvas_upload_photo: "Upload photo",
+        offcanvas_reset_avatar: "Reset",
+        offcanvas_allowed_formats: "Allowed JPG, GIF or PNG. Max size of 800K",
+        submit_button: "Submit",
+        cancel_button: "Cancel",
+        // Orders table translations
+        th_order_id: "ORDER",
+        th_order_date: "DATE",
+        th_order_status: "STATUS",
+        th_order_spent: "SPENT",
+        th_order_actions: "ACTIONS",
+        showing_3_of_100_entries: "Showing 3 of 100 entries",
+        customers_menu_breadcrumb: "Customers",
+        // Breadcrumb translations
+        breadcrumb_dashboard: "Dashboard",
+        breadcrumb_roles_list: "Roles",
+        breadcrumb_role_create: "Create Role",
+        breadcrumb_role_edit: "Edit Role",
+        breadcrumb_users_list: "Users",
+        breadcrumb_user_create: "Create User",
+        breadcrumb_user_edit: "Edit User",
+        breadcrumb_customers_all: "All Customers",
+        breadcrumb_customer_create: "Create Customer",
+        breadcrumb_customer_edit: "Edit Customer",
+        breadcrumb_customer_details: "Customer Details",
+        close_button: "Close",
+        // Page titles
+        create_customer_page_title: "Create Customer",
+        edit_customer_page_title: "Edit Customer",
+        details_customer_page_title: "Customer Details",
+        all_customers_title: "All Customers",
+        // Tooltips
+        tooltip_view_customer_details: "View Customer Details",
+        tooltip_view_action: "View",
+        tooltip_edit_action: "Edit",
+        tooltip_deactivate_action: "Deactivate",
+        // Countries
+        select_country_option: "Select Country",
+        country_ar: "Argentina",
+        country_bo: "Bolivia",
+        country_br: "Brazil",
+        country_cl: "Chile",
+        country_co: "Colombia",
+        country_cr: "Costa Rica",
+        country_cu: "Cuba",
+        country_do: "Dominican Republic",
+        country_ec: "Ecuador",
+        country_sv: "El Salvador",
+        country_gt: "Guatemala",
+        country_hn: "Honduras",
+        country_mx: "Mexico",
+        country_ni: "Nicaragua",
+        country_pa: "Panama",
+        country_py: "Paraguay",
+        country_pe: "Peru",
+        country_pr: "Puerto Rico",
+        country_uy: "Uruguay",
+        country_ve: "Venezuela",
+        // Language selector
+        language_english: "English",
+        language_spanish: "Spanish"
     },
     es: {
         dashboard: "Tablero",
         roles_menu: "Roles",
         users_menu: "Usuarios",
         users_list_title: "Lista de Usuarios",
+        // Roles
+        role_editor: "Editor",
+        role_maintainer: "Mantenedor",
+        role_admin: "Administrador",
+        role_author: "Autor",
+        role_subscriber: "Suscriptor",
+        // Acciones
+        action_view: "Ver",
+        action_suspend: "Suspender",
         // Tarjetas de estadísticas
         card_session_title: "Sesión",
         card_session_total_users: "Usuarios Totales",
@@ -315,7 +449,153 @@ const translations = {
         admin_role: "Administrador",
         total_coach: "Total de Coaches",
         active_coaches: "Coaches Activos",
-        activity_rate: "Tasa de Actividad"
+        activity_rate: "Tasa de Actividad",
+        // Customers module
+        customers_menu: "Clientes",
+        all_customers_title: "Todos los Clientes",
+        search_order_placeholder: "Buscar Cliente",
+        add_customer_button: "Añadir Cliente",
+        // Customer table headers
+        th_customer_list_customer: "CLIENTE",
+        th_customer_list_customer_id: "ID CLIENTE",
+        th_customer_list_country: "PAÍS",
+        th_customer_list_order: "PEDIDOS",
+        th_customer_list_total_spent: "GASTO TOTAL",
+        // Customer details
+        customer_details_title_prefix: "Cliente ID #",
+        customer_details_joined_on: "Se unió el",
+        button_edit_details: "Editar Detalles",
+        button_delete_customer: "Desactivar Cliente",
+        button_deactivate_customer: "Desactivar Cliente",
+        card_upgrade_to_premium_title: "Actualizar a premium",
+        card_upgrade_to_premium_text: "Actualiza el cliente a membresía premium para acceder a funciones pro.",
+        button_upgrade_to_premium: "Actualizar a premium",
+        // Tabs
+        tab_overview: "Resumen",
+        tab_security: "Seguridad",
+        tab_address_billing: "Dirección y Facturación",
+        tab_notifications: "Notificaciones",
+        // Overview tab content
+        overview_orders_title: "Pedidos",
+        overview_spent_title: "Gastado",
+        overview_details_section_title: "Detalles",
+        overview_username_label: "Usuario:",
+        overview_email_label: "Correo:",
+        overview_status_label: "Estado:",
+        overview_contact_label: "Contacto:",
+        overview_country_label: "País:",
+        overview_account_balance_title: "Saldo de Cuenta",
+        overview_credit_left: "Crédito Restante",
+        overview_account_balance_next_purchase: "Saldo para la próxima compra",
+        overview_loyalty_program_title: "Programa de Lealtad",
+        overview_platinum_member: "Miembro Platino",
+        overview_points_to_next_tier: "puntos para el siguiente nivel",
+        overview_wishlist_title: "Lista de Deseos",
+        overview_items_in_wishlist: "artículos en lista de deseos",
+        overview_wishlist_receive_notification: "Recibir notificación cuando los artículos estén en oferta",
+        overview_coupons_title: "Cupones",
+        overview_coupons_you_win: "Cupones ganados",
+        overview_coupons_use_on_next_purchase: "Usar cupón en la próxima compra",
+        overview_orders_placed_title: "Pedidos Realizados",
+        overview_search_order_placeholder: "Buscar Pedido",
+        // Customer offcanvas form translations
+        offcanvas_add_customer_title: "Añadir Nuevo Cliente",
+        offcanvas_edit_customer_title: "Editar Cliente",
+        offcanvas_customer_avatar: "Avatar del Cliente",
+        offcanvas_avatar_upload: "Subir",
+        offcanvas_avatar_reset: "Restablecer",
+        offcanvas_avatar_allowed: "Formatos permitidos JPG, GIF o PNG. Tamaño máx. de 800K",
+        offcanvas_customer_first_name: "Nombre",
+        offcanvas_customer_last_name: "Apellido",
+        offcanvas_customer_email: "Correo Electrónico",
+        offcanvas_customer_password: "Contraseña",
+        offcanvas_customer_confirm_password: "Confirmar Contraseña",
+        password_edit_note: "Dejar en blanco para mantener la contraseña actual.",
+        offcanvas_customer_phone: "Número de Teléfono",
+        offcanvas_customer_company: "Empresa",
+        offcanvas_customer_country: "País",
+        offcanvas_customer_address: "Dirección",
+        offcanvas_customer_state: "Estado/Provincia",
+        offcanvas_customer_zip: "Código Postal",
+        offcanvas_customer_tax_id: "ID Fiscal",
+        offcanvas_customer_language: "Idioma",
+        offcanvas_customer_status: "Estado",
+        offcanvas_customer_submit: "Enviar",
+        offcanvas_customer_cancel: "Cancelar",
+        // Placeholders
+        offcanvas_customer_first_name_placeholder: "Juan",
+        offcanvas_customer_last_name_placeholder: "Pérez",
+        offcanvas_customer_email_placeholder: "juan.perez@ejemplo.com",
+        offcanvas_customer_password_placeholder: "············",
+        offcanvas_customer_confirm_password_placeholder: "············",
+        offcanvas_customer_phone_placeholder: "+1 (555) 123-4567",
+        offcanvas_customer_company_placeholder: "Mi Empresa",
+        offcanvas_customer_country_select: "Seleccionar País",
+        offcanvas_customer_address_placeholder: "Calle Principal 123",
+        offcanvas_customer_state_placeholder: "Madrid",
+        offcanvas_customer_zip_placeholder: "28001",
+        offcanvas_customer_tax_id_placeholder: "TAX-12345",
+        offcanvas_customer_language_select: "Seleccionar Idioma",
+        // Create/Edit page titles
+        create_customer_page_title: "Crear Cliente",
+        edit_customer_page_title: "Editar Cliente",
+        customers_menu_breadcrumb: "Clientes",
+        // Orders table translations
+        th_order_id: "PEDIDO",
+        th_order_date: "FECHA",
+        th_order_status: "ESTADO",
+        th_order_spent: "GASTADO",
+        th_order_actions: "ACCIONES",
+        showing_3_of_100_entries: "Mostrando 3 de 100 entradas",
+        // Breadcrumb translations
+        breadcrumb_dashboard: "Tablero",
+        breadcrumb_roles_list: "Roles",
+        breadcrumb_role_create: "Crear Rol",
+        breadcrumb_role_edit: "Editar Rol",
+        breadcrumb_users_list: "Usuarios",
+        breadcrumb_user_create: "Crear Usuario",
+        breadcrumb_user_edit: "Editar Usuario",
+        breadcrumb_customers_all: "Todos los Clientes",
+        breadcrumb_customer_create: "Crear Cliente",
+        breadcrumb_customer_edit: "Editar Cliente",
+        breadcrumb_customer_details: "Detalles del Cliente",
+        close_button: "Cerrar",
+        // Latin American Countries
+        country_ar: "Argentina",
+        country_bo: "Bolivia",
+        country_br: "Brasil",
+        country_cl: "Chile",
+        country_co: "Colombia",
+        country_cr: "Costa Rica",
+        country_cu: "Cuba",
+        country_do: "República Dominicana",
+        country_ec: "Ecuador",
+        country_sv: "El Salvador",
+        country_gt: "Guatemala",
+        country_hn: "Honduras",
+        country_mx: "México",
+        country_ni: "Nicaragua",
+        country_pa: "Panamá",
+        country_py: "Paraguay",
+        country_pe: "Perú",
+        country_pr: "Puerto Rico",
+        country_uy: "Uruguay",
+        country_ve: "Venezuela",
+        // Page titles
+        create_customer_page_title: "Crear Cliente",
+        edit_customer_page_title: "Editar Cliente",
+        details_customer_page_title: "Detalles del Cliente",
+        all_customers_title: "Todos los Clientes",
+        // Tooltips
+        tooltip_view_customer_details: "Ver Detalles del Cliente",
+        tooltip_view_action: "Ver",
+        tooltip_edit_action: "Editar",
+        tooltip_deactivate_action: "Desactivar",
+        // Countries Spanish
+        select_country_option: "Seleccionar País",
+        // Language selector
+        language_english: "Inglés",
+        language_spanish: "Español"
     }
 };
 
@@ -624,6 +904,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Skip elements that might have child elements
                     element.textContent = translation;
                     console.log(`Updated element: ${key} to ${translation}`);
+                }
+            }
+        });
+        
+        // Translate placeholders
+        const placeholderElements = document.querySelectorAll('[data-translate-placeholder-key]');
+        placeholderElements.forEach(element => {
+            const key = element.getAttribute('data-translate-placeholder-key');
+            if (translations[lang] && translations[lang][key]) {
+                element.placeholder = translations[lang][key];
+            }
+        });
+
+        // Translate tooltips
+        const tooltipElements = document.querySelectorAll('[data-translate-title-key]');
+        tooltipElements.forEach(element => {
+            const key = element.getAttribute('data-translate-title-key');
+            if (translations[lang] && translations[lang][key]) {
+                element.title = translations[lang][key];
+                // Update Bootstrap tooltip instance if it exists
+                const tooltipInstance = bootstrap.Tooltip.getInstance(element);
+                if (tooltipInstance) {
+                    tooltipInstance.setContent({
+                        '.tooltip-inner': translations[lang][key]
+                    });
                 }
             }
         });
