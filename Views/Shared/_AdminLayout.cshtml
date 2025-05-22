@@ -60,10 +60,10 @@
                 <a href="@Url.Action("Index", "Instructors")" class="list-group-item list-group-item-action" data-translate-key="coaches_menu">
                     <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Instructors</span>
                 </a>
-                <a href="@Url.Action("Create", "Users")" class="list-group-item list-group-item-action" data-translate-key="add_user">
+                <a href="@Url.Action("Create", "Users")" class="list-group-item list-group-item-action d-none" data-translate-key="add_user">
                     <i class="fas fa-user-plus fa-fw"></i><span class="sidebar-item-text">Add USER</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action" data-translate-key="profile">
+                <a href="#" class="list-group-item list-group-item-action d-none" data-translate-key="profile">
                     <i class="fas fa-user-circle fa-fw"></i><span class="sidebar-item-text">Profile</span>
                 </a>
                 
@@ -76,13 +76,13 @@
                 </a>
                 <ul class="collapse list-unstyled" id="academySubmenu">
                     <li>
-                        <a href="#" class="list-group-item list-group-item-action ps-5" data-translate-key="academy_submenu_1">
-                            <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Sub Item 1</span>
+                        <a href="#" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.topics">
+                            <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Topics</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="list-group-item list-group-item-action ps-5" data-translate-key="academy_submenu_2">
-                            <i class="fas fa-book-open fa-fw"></i><span class="sidebar-item-text">Sub Item 2</span>
+                        <a href="#" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.videoManagement">
+                            <i class="fas fa-book-open fa-fw"></i><span class="sidebar-item-text">Video Management</span>
                         </a>
                     </li>
                 </ul>
@@ -90,7 +90,7 @@
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="toolbox_academy">
                     <i class="fas fa-university fa-fw"></i><span class="sidebar-item-text">Toolbox academy</span>
                 </a>
-                <a href="@Url.Action("Analytics", "Admin")" class="list-group-item list-group-item-action" data-translate-key="website_setting">
+                <a href="@Url.Action("Analytics", "Admin")" class="list-group-item list-group-item-action d-none" data-translate-key="website_setting">
                     <i class="fas fa-chart-bar fa-fw"></i><span class="sidebar-item-text">Analytics</span>
                 </a>
                 <a href="@Url.Action("Settings", "Admin")" class="list-group-item list-group-item-action" data-translate-key="website_setting">
@@ -99,7 +99,7 @@
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="email_contents">
                     <i class="fas fa-envelope fa-fw"></i><span class="sidebar-item-text">Email Contents</span>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action mt-auto" data-translate-key="logout">
+                <a href="#" class="list-group-item list-group-item-action mt-auto d-none" data-translate-key="logout">
                     <i class="fas fa-sign-out-alt fa-fw"></i><span class="sidebar-item-text">Logout</span>
                 </a>
             </div>
