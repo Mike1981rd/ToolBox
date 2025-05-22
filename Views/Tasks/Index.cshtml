@@ -1,0 +1,1291 @@
+@model ToolBox.Models.TasksPageViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* Tasks Module - Modern Design Based on Reference Image */
+        
+        /* Header Section */
+        .tasks-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tasks-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .tasks-header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .tasks-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            color: white !important;
+        }
+
+        .tasks-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+            color: white !important;
+        }
+
+        /* Statistics Cards */
+        .stats-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: block;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Eisenhower Matrix */
+        .matrix-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            padding: 2.5rem;
+            overflow: hidden;
+        }
+
+        .matrix-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .matrix-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .matrix-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .eisenhower-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1.5rem;
+            height: 600px;
+        }
+
+        .quadrant {
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            min-height: 280px;
+        }
+
+        .quadrant:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Quadrant Specific Styles */
+        .quadrant-1 {
+            background: linear-gradient(135deg, #feb2b2 0%, #f56565 100%);
+            color: white;
+        }
+
+        .quadrant-2 {
+            background: linear-gradient(135deg, #9ae6b4 0%, #48bb78 100%);
+            color: white;
+        }
+
+        .quadrant-3 {
+            background: linear-gradient(135deg, #fbd38d 0%, #ed8936 100%);
+            color: white;
+        }
+
+        .quadrant-4 {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            color: white;
+        }
+
+        .quadrant-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .quadrant-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .quadrant-text h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            line-height: 1.2;
+        }
+
+        .quadrant-action {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quadrant-tasks {
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .quadrant-tasks::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .quadrant-tasks::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .quadrant-tasks::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        .task-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: #2d3748;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .task-card:hover {
+            background: white;
+            transform: translateX(3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .empty-quadrant {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+            padding: 2rem 1rem;
+        }
+
+        /* Task Management Panel */
+        .task-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-body {
+            padding: 2rem;
+        }
+
+        /* Add Task Form */
+        .add-task-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            background: #f7f9ff;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            margin: 0;
+        }
+
+        .checkbox-item label {
+            font-weight: 500;
+            color: #4a5568;
+            cursor: pointer;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-item.checked {
+            border-color: #667eea;
+            background: #f7f9ff;
+        }
+
+        .btn-add-task {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-add-task:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-add-task:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Task List */
+        .task-list-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .task-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .task-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            background: #f8f9fa;
+        }
+
+        .task-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-description {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .task-description.completed {
+            text-decoration: line-through;
+        }
+
+        .task-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-urgent {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge-important {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .badge-hacer {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge-programar {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .badge-delegar {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+
+        .badge-eliminar {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-task-action {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-complete {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .btn-complete:hover {
+            background: #9ae6b4;
+            transform: scale(1.1);
+        }
+
+        .btn-edit {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .btn-edit:hover {
+            background: #90cdf4;
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .btn-delete:hover {
+            background: #feb2b2;
+            transform: scale(1.1);
+        }
+
+        .empty-tasks {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 3rem 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #e9ecef;
+        }
+
+        .empty-tasks i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e0;
+        }
+
+        /* Messages */
+        .form-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .form-message.success {
+            background: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .form-message.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .task-panel {
+                position: static;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .tasks-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .eisenhower-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 1rem;
+            }
+
+            .quadrant {
+                min-height: 200px;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .task-content {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .task-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-container, .task-panel {
+                padding: 1.5rem;
+            }
+
+            .panel-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="tasks-header">
+    <div class="container">
+        <div class="tasks-header-content">
+            <h1 data-translate-key="page_titles.tasks">Gestión de Tareas</h1>
+            <p data-translate-key="tasks.subtitle">Organiza y prioriza tus tareas usando la Matriz de Eisenhower</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item">
+                <a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumbs.tasks">Tareas</li>
+        </ol>
+    </nav>
+
+    <!-- Statistics Cards -->
+    <div class="stats-section">
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <span class="stat-number" id="totalTasksCount">@Model.Statistics.TotalTasks</span>
+                <span class="stat-label" data-translate-key="tasks.totalTasks">Total de Tareas</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <span class="stat-number" id="pendingTasksCount">@Model.Statistics.PendingTasks</span>
+                <span class="stat-label" data-translate-key="tasks.pendingTasks">Pendientes</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <span class="stat-number" id="completedTasksCount">@Model.Statistics.CompletedTasks</span>
+                <span class="stat-label" data-translate-key="tasks.completedTasks">Completadas</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <span class="stat-number" id="completionRateCount">@((int)Model.Statistics.CompletionPercentage)%</span>
+                <span class="stat-label" data-translate-key="tasks.completionRate">Tasa de Finalización</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Eisenhower Matrix -->
+        <div class="matrix-container">
+            <div class="matrix-header">
+                <h2 class="matrix-title" data-translate-key="tasks.eisenhowerMatrix">
+                    <i class="fas fa-th me-2"></i>Matriz de Eisenhower
+                </h2>
+                <p class="matrix-subtitle">Organiza tus tareas por urgencia e importancia</p>
+            </div>
+            
+            <div class="eisenhower-grid">
+                <!-- Quadrant 1: Urgent & Important (DO) -->
+                <div class="quadrant quadrant-1">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">🔥</div>
+                        <div class="quadrant-text">
+                            <h3 data-translate-key="quadrants.urgentImportant">Urgente e Importante</h3>
+                            <div class="quadrant-action" data-translate-key="quadrants.doAction">HACER</div>
+                        </div>
+                    </div>
+                    <div class="quadrant-tasks" id="quadrant-urgent-important">
+                        <!-- Tasks will be populated here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quadrant 2: Not Urgent & Important (SCHEDULE) -->
+                <div class="quadrant quadrant-2">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">📅</div>
+                        <div class="quadrant-text">
+                            <h3 data-translate-key="quadrants.notUrgentImportant">No Urgente e Importante</h3>
+                            <div class="quadrant-action" data-translate-key="quadrants.scheduleAction">PROGRAMAR</div>
+                        </div>
+                    </div>
+                    <div class="quadrant-tasks" id="quadrant-not-urgent-important">
+                        <!-- Tasks will be populated here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quadrant 3: Urgent & Not Important (DELEGATE) -->
+                <div class="quadrant quadrant-3">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">👥</div>
+                        <div class="quadrant-text">
+                            <h3 data-translate-key="quadrants.urgentNotImportant">Urgente y No Importante</h3>
+                            <div class="quadrant-action" data-translate-key="quadrants.delegateAction">DELEGAR</div>
+                        </div>
+                    </div>
+                    <div class="quadrant-tasks" id="quadrant-urgent-not-important">
+                        <!-- Tasks will be populated here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quadrant 4: Not Urgent & Not Important (ELIMINATE) -->
+                <div class="quadrant quadrant-4">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">🗑️</div>
+                        <div class="quadrant-text">
+                            <h3 data-translate-key="quadrants.notUrgentNotImportant">No Urgente y No Importante</h3>
+                            <div class="quadrant-action" data-translate-key="quadrants.eliminateAction">ELIMINAR</div>
+                        </div>
+                    </div>
+                    <div class="quadrant-tasks" id="quadrant-not-urgent-not-important">
+                        <!-- Tasks will be populated here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Management Panel -->
+        <div class="task-panel">
+            <div class="panel-header">
+                <h3 class="panel-title" data-translate-key="tasks.taskManagement">
+                    <i class="fas fa-plus-circle"></i>
+                    Gestión de Tareas
+                </h3>
+            </div>
+            
+            <div class="panel-body">
+                <!-- Add Task Form -->
+                <form id="addTaskForm" class="add-task-form">
+                    <div class="form-group">
+                        <label class="form-label" data-translate-key="labels.taskDescription">Descripción de la Tarea</label>
+                        <textarea id="taskDescription" 
+                                  class="form-textarea" 
+                                  placeholder="Describe tu tarea..."
+                                  maxlength="500"
+                                  required></textarea>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox('taskUrgent')">
+                            <input type="checkbox" id="taskUrgent" name="urgent">
+                            <label for="taskUrgent" data-translate-key="labels.urgent">Urgente</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox('taskImportant')">
+                            <input type="checkbox" id="taskImportant" name="important">
+                            <label for="taskImportant" data-translate-key="labels.important">Importante</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-add-task" data-translate-key="buttons.addTask">
+                        <i class="fas fa-plus me-2"></i>Añadir Tarea
+                    </button>
+                    
+                    <div id="taskFormMessage" class="form-message" style="display: none;"></div>
+                </form>
+
+                <!-- Task List -->
+                <div class="task-list-section">
+                    <h4 class="section-title" data-translate-key="tasks.allTasks">
+                        <i class="fas fa-list"></i>
+                        Todas las Tareas
+                    </h4>
+                    
+                    <div id="taskList" class="task-list">
+                        <!-- Tasks will be populated here by JavaScript -->
+                    </div>
+                    
+                    <div id="emptyTasksMessage" class="empty-tasks" style="display: none;">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p data-translate-key="messages.noTasks">¡Aún no hay tareas. Añade una arriba!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel" data-translate-key="buttons.editTask">Editar Tarea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaskForm">
+                    <input type="hidden" id="editTaskId">
+                    <div class="form-group">
+                        <label class="form-label" data-translate-key="labels.taskDescription">Descripción de la Tarea</label>
+                        <textarea id="editTaskDescription" 
+                                  class="form-textarea" 
+                                  maxlength="500"
+                                  required></textarea>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox('editTaskUrgent')">
+                            <input type="checkbox" id="editTaskUrgent" name="urgent">
+                            <label for="editTaskUrgent" data-translate-key="labels.urgent">Urgente</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox('editTaskImportant')">
+                            <input type="checkbox" id="editTaskImportant" name="important">
+                            <label for="editTaskImportant" data-translate-key="labels.important">Importante</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="buttons.cancel">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveTaskChanges" data-translate-key="buttons.saveChanges">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enhanced Tasks Management JavaScript
+        const TasksManager = {
+            config: {
+                baseUrl: '/Tasks',
+                tasks: @Html.Raw(Json.Serialize(Model.Tasks)),
+                isLoading: false
+            },
+
+            // Initialize the module
+            init: function() {
+                console.log('Initializing Enhanced Tasks Manager...');
+                this.renderTasks();
+                this.renderQuadrants();
+                this.bindEvents();
+                this.updateCheckboxStyles();
+            },
+
+            // Bind all event handlers
+            bindEvents: function() {
+                // Add task form submission
+                $('#addTaskForm').on('submit', (e) => {
+                    e.preventDefault();
+                    this.addTask();
+                });
+
+                // Edit task modal form submission
+                $('#saveTaskChanges').on('click', () => {
+                    this.updateTask();
+                });
+
+                // Task action buttons (delegated events)
+                $(document).on('click', '.btn-edit', (e) => {
+                    e.stopPropagation();
+                    const taskId = parseInt($(e.target).closest('.task-item').data('task-id'));
+                    this.openEditModal(taskId);
+                });
+
+                $(document).on('click', '.btn-delete', (e) => {
+                    e.stopPropagation();
+                    const taskId = parseInt($(e.target).closest('.task-item').data('task-id'));
+                    this.deleteTask(taskId);
+                });
+
+                $(document).on('click', '.btn-complete', (e) => {
+                    e.stopPropagation();
+                    const taskId = parseInt($(e.target).closest('.task-item').data('task-id'));
+                    this.toggleTaskCompletion(taskId);
+                });
+
+                // Quadrant task click
+                $(document).on('click', '.task-card', (e) => {
+                    const taskId = parseInt($(e.target).data('task-id'));
+                    this.openEditModal(taskId);
+                });
+
+                // Checkbox change events
+                $('#taskUrgent, #taskImportant').on('change', () => {
+                    this.updateCheckboxStyles();
+                });
+
+                $('#editTaskUrgent, #editTaskImportant').on('change', () => {
+                    this.updateCheckboxStyles();
+                });
+            },
+
+            // Add new task
+            addTask: function() {
+                if (this.config.isLoading) return;
+
+                const description = $('#taskDescription').val().trim();
+                const isUrgent = $('#taskUrgent').is(':checked');
+                const isImportant = $('#taskImportant').is(':checked');
+
+                if (!description) {
+                    this.showFormMessage('error', 'Por favor, ingresa una descripción para la tarea.');
+                    return;
+                }
+
+                this.config.isLoading = true;
+                const $submitBtn = $('.btn-add-task');
+                const originalText = $submitBtn.html();
+                
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Añadiendo...');
+
+                const taskData = {
+                    description: description,
+                    isUrgent: isUrgent,
+                    isImportant: isImportant
+                };
+
+                $.ajax({
+                    url: `${this.config.baseUrl}/AddTask`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(taskData),
+                    success: (response) => {
+                        if (response.success) {
+                            this.config.tasks.push(response.task);
+                            this.renderTasks();
+                            this.renderQuadrants();
+                            this.clearAddTaskForm();
+                            this.showFormMessage('success', response.message);
+                            this.updateStatistics();
+                        } else {
+                            this.showFormMessage('error', response.message);
+                        }
+                    },
+                    error: () => {
+                        this.showFormMessage('error', 'Error de red. Por favor, verifica tu conexión e intenta de nuevo.');
+                    },
+                    complete: () => {
+                        this.config.isLoading = false;
+                        $submitBtn.prop('disabled', false).html(originalText);
+                    }
+                });
+            },
+
+            // Update existing task
+            updateTask: function() {
+                const taskId = parseInt($('#editTaskId').val());
+                const description = $('#editTaskDescription').val().trim();
+                const isUrgent = $('#editTaskUrgent').is(':checked');
+                const isImportant = $('#editTaskImportant').is(':checked');
+
+                if (!description) {
+                    alert('Por favor, ingresa una descripción para la tarea.');
+                    return;
+                }
+
+                const taskData = {
+                    taskId: taskId,
+                    description: description,
+                    isUrgent: isUrgent,
+                    isImportant: isImportant
+                };
+
+                $.ajax({
+                    url: `${this.config.baseUrl}/UpdateTask`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(taskData),
+                    success: (response) => {
+                        if (response.success) {
+                            // Update task in local array
+                            const taskIndex = this.config.tasks.findIndex(t => t.taskId === taskId);
+                            if (taskIndex !== -1) {
+                                this.config.tasks[taskIndex] = response.task;
+                            }
+                            
+                            this.renderTasks();
+                            this.renderQuadrants();
+                            $('#editTaskModal').modal('hide');
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: () => {
+                        alert('Error de red. Por favor, verifica tu conexión e intenta de nuevo.');
+                    }
+                });
+            },
+
+            // Delete task
+            deleteTask: function(taskId) {
+                if (!confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `${this.config.baseUrl}/DeleteTask`,
+                    method: 'POST',
+                    data: { taskId: taskId },
+                    success: (response) => {
+                        if (response.success) {
+                            // Remove task from local array
+                            this.config.tasks = this.config.tasks.filter(t => t.taskId !== taskId);
+                            this.renderTasks();
+                            this.renderQuadrants();
+                            this.updateStatistics();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: () => {
+                        alert('Error de red. Por favor, verifica tu conexión e intenta de nuevo.');
+                    }
+                });
+            },
+
+            // Toggle task completion
+            toggleTaskCompletion: function(taskId) {
+                $.ajax({
+                    url: `${this.config.baseUrl}/ToggleTaskCompletion`,
+                    method: 'POST',
+                    data: { taskId: taskId },
+                    success: (response) => {
+                        if (response.success) {
+                            // Update task in local array
+                            const taskIndex = this.config.tasks.findIndex(t => t.taskId === taskId);
+                            if (taskIndex !== -1) {
+                                this.config.tasks[taskIndex] = response.task;
+                            }
+                            
+                            this.renderTasks();
+                            this.renderQuadrants();
+                            this.updateStatistics();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: () => {
+                        alert('Error de red. Por favor, verifica tu conexión e intenta de nuevo.');
+                    }
+                });
+            },
+
+            // Open edit modal
+            openEditModal: function(taskId) {
+                const task = this.config.tasks.find(t => t.taskId === taskId);
+                if (!task) return;
+
+                $('#editTaskId').val(task.taskId);
+                $('#editTaskDescription').val(task.description);
+                $('#editTaskUrgent').prop('checked', task.isUrgent);
+                $('#editTaskImportant').prop('checked', task.isImportant);
+                
+                this.updateCheckboxStyles();
+                $('#editTaskModal').modal('show');
+            },
+
+            // Render task list
+            renderTasks: function() {
+                const $taskList = $('#taskList');
+                const $emptyMessage = $('#emptyTasksMessage');
+
+                if (!this.config.tasks.length) {
+                    $taskList.hide();
+                    $emptyMessage.show();
+                    return;
+                }
+
+                $emptyMessage.hide();
+                $taskList.show();
+
+                const tasksHtml = this.config.tasks.map(task => {
+                    const badges = [];
+                    if (task.isUrgent) badges.push('<span class="task-badge badge-urgent">URGENTE</span>');
+                    if (task.isImportant) badges.push('<span class="task-badge badge-important">IMPORTANTE</span>');
+                    
+                    const actionBadge = this.getActionBadge(task.isUrgent, task.isImportant);
+                    badges.push(actionBadge);
+
+                    const completedClass = task.isCompleted ? 'completed' : '';
+                    const completedDescClass = task.isCompleted ? 'completed' : '';
+                    const completeButtonText = task.isCompleted ? 'Marcar como pendiente' : 'Marcar como completada';
+                    const completeButtonIcon = task.isCompleted ? 'fas fa-undo' : 'fas fa-check';
+
+                    return `
+                        <div class="task-item ${completedClass}" data-task-id="${task.taskId}">
+                            <div class="task-content">
+                                <div class="task-info">
+                                    <div class="task-description ${completedDescClass}">${task.description}</div>
+                                    <div class="task-badges">
+                                        ${badges.join('')}
+                                    </div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="btn-task-action btn-complete" title="${completeButtonText}">
+                                        <i class="${completeButtonIcon}"></i>
+                                    </button>
+                                    <button class="btn-task-action btn-edit" title="Editar tarea">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-task-action btn-delete" title="Eliminar tarea">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                $taskList.html(tasksHtml);
+            },
+
+            // Render Eisenhower Matrix quadrants
+            renderQuadrants: function() {
+                // Clear all quadrants first
+                $('.quadrant-tasks').empty();
+
+                // Group tasks by quadrant
+                const quadrants = {
+                    'urgent-important': this.config.tasks.filter(t => t.isUrgent && t.isImportant),
+                    'not-urgent-important': this.config.tasks.filter(t => !t.isUrgent && t.isImportant),
+                    'urgent-not-important': this.config.tasks.filter(t => t.isUrgent && !t.isImportant),
+                    'not-urgent-not-important': this.config.tasks.filter(t => !t.isUrgent && !t.isImportant)
+                };
+
+                // Render each quadrant
+                Object.keys(quadrants).forEach(quadrantKey => {
+                    const $quadrant = $(`#quadrant-${quadrantKey}`);
+                    const tasks = quadrants[quadrantKey];
+
+                    if (!tasks.length) {
+                        $quadrant.html('<div class="empty-quadrant">No hay tareas en este cuadrante</div>');
+                        return;
+                    }
+
+                    const tasksHtml = tasks.map(task => {
+                        const completedClass = task.isCompleted ? 'completed' : '';
+                        return `
+                            <div class="task-card ${completedClass}" data-task-id="${task.taskId}" title="Click para editar">
+                                ${task.description}
+                            </div>
+                        `;
+                    }).join('');
+
+                    $quadrant.html(tasksHtml);
+                });
+            },
+
+            // Get action badge HTML
+            getActionBadge: function(isUrgent, isImportant) {
+                if (isUrgent && isImportant) return '<span class="task-badge badge-hacer">HACER</span>';
+                if (!isUrgent && isImportant) return '<span class="task-badge badge-programar">PROGRAMAR</span>';
+                if (isUrgent && !isImportant) return '<span class="task-badge badge-delegar">DELEGAR</span>';
+                return '<span class="task-badge badge-eliminar">ELIMINAR</span>';
+            },
+
+            // Update checkbox styles
+            updateCheckboxStyles: function() {
+                $('.checkbox-item').each(function() {
+                    const $checkbox = $(this).find('input[type="checkbox"]');
+                    if ($checkbox.is(':checked')) {
+                        $(this).addClass('checked');
+                    } else {
+                        $(this).removeClass('checked');
+                    }
+                });
+            },
+
+            // Clear add task form
+            clearAddTaskForm: function() {
+                $('#taskDescription').val('');
+                $('#taskUrgent').prop('checked', false);
+                $('#taskImportant').prop('checked', false);
+                this.updateCheckboxStyles();
+            },
+
+            // Show form message
+            showFormMessage: function(type, message) {
+                const $messageDiv = $('#taskFormMessage');
+                $messageDiv.removeClass('success error').addClass(type);
+                $messageDiv.text(message).show();
+                
+                setTimeout(() => {
+                    $messageDiv.fadeOut();
+                }, 4000);
+            },
+
+            // Update statistics cards
+            updateStatistics: function() {
+                const total = this.config.tasks.length;
+                const completed = this.config.tasks.filter(t => t.isCompleted).length;
+                const pending = total - completed;
+                const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                $('#totalTasksCount').text(total);
+                $('#pendingTasksCount').text(pending);
+                $('#completedTasksCount').text(completed);
+                $('#completionRateCount').text(completionRate + '%');
+            }
+        };
+
+        // Toggle checkbox function for styling
+        function toggleCheckbox(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+            TasksManager.updateCheckboxStyles();
+        }
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            TasksManager.init();
+        });
+    </script>
+}
