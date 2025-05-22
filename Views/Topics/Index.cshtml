@@ -1,0 +1,76 @@
+@* Vista: Views/Topics/Index.cshtml *@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")" data-translate-key="breadcrumb_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="@ViewBag.BreadcrumbActiveKey">Topics List</li>
+    </ol>
+</nav>
+
+<div class="card shadow-sm">
+    <div class="card-datatable table-responsive pt-0">
+        <div class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-4 col-lg-6">
+                    <div class="dataTables_filter_custom"> <!-- Contenedor para búsqueda -->
+                        <input type="search" class="form-control form-control-sm" placeholder="Search Topics..." data-translate-placeholder-key="search_topics_placeholder" id="topicsSearchInput">
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-8 col-lg-6 d-flex justify-content-center justify-content-md-end">
+                    <div class="dataTables_length me-2">
+                         <label>
+                            <select name="topicsTable_length" class="form-select form-select-sm">
+                                <option value="7">7</option> <option value="10">10</option>
+                                <option value="25">25</option> <option value="50">50</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="dt-buttons btn-group flex-wrap">
+                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#addEditTopicOffcanvas" aria-controls="addEditTopicOffcanvas" id="addNewTopicBtn">
+                            <i class="fas fa-plus me-1"></i> <span data-translate-key="buttons.addNewTopic">Add New Topic</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover dataTable no-footer dtr-column" id="topicsTable">
+                <thead>
+                    <tr>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" style="width: 18px;"><input type="checkbox" class="form-check-input"></th>
+                        <th data-translate-key="th_topic_name">TOPIC NAME</th>
+                        <th data-translate-key="th_topic_status">STATUS</th>
+                        <th data-translate-key="th_topic_actions">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="topicsTableBody">
+                    <!-- Los topics se cargarán dinámicamente via JavaScript -->
+                </tbody>
+            </table>
+            <!-- Paginación (similar a otros módulos) -->
+             <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info" id="topicsTableInfo">Showing 0 to 0 of 0 entries</div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <div class="dataTables_paginate paging_simple_numbers">
+                        <ul class="pagination justify-content-center justify-content-md-end">
+                            <li class="paginate_button page-item previous disabled"><a href="#" class="page-link">«</a></li>
+                            <li class="paginate_button page-item active"><a href="#" class="page-link">1</a></li>
+                            <li class="paginate_button page-item next disabled"><a href="#" class="page-link">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas para Añadir/Editar Topic -->
+@await Html.PartialAsync("_AddEditTopicOffcanvas")
+
+@section Scripts {
+    <script src="~/js/topics.js"></script>
+}
