@@ -1,0 +1,206 @@
+@model ToolBox.Models.WebsiteSettingsViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="@ViewBag.BreadcrumbActiveKey">Website Settings</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-12">
+        <form id="websiteSettingsForm" novalidate>
+            
+            <!-- General Site Information Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    <h5 class="mb-0" data-translate-key="sections.generalInfo">General Site Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="siteEmail" data-translate-key="labels.siteEmail">Site Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="siteEmail" name="SiteEmail" value="@Model.SiteEmail" placeholder="info@company.com" data-translate-placeholder-key="placeholders.siteEmail">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sitePhone" data-translate-key="labels.sitePhone">Site Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="sitePhone" name="SitePhone" value="@Model.SitePhone" placeholder="+1 (555) 123-4567" data-translate-placeholder-key="placeholders.sitePhone">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="siteAddress" data-translate-key="labels.siteAddress">Site Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                            <textarea class="form-control" id="siteAddress" name="SiteAddress" rows="2" placeholder="Enter your business address" data-translate-placeholder-key="placeholders.siteAddress">@Model.SiteAddress</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="footerMessage" data-translate-key="labels.footerMessage">Footer Message</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                            <textarea class="form-control" id="footerMessage" name="FooterMessage" rows="3" placeholder="Copyright message or footer text" data-translate-placeholder-key="placeholders.footerMessage">@Model.FooterMessage</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Links Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-share-alt me-2 text-info"></i>
+                    <h5 class="mb-0" data-translate-key="sections.socialMediaLinks">Social Media Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var social in Model.GetSocialMediaConfigs())
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="avatar avatar-sm me-2 bg-label-primary bg-opacity-25">
+                                            <i class="@social.Icon"></i>
+                                        </div>
+                                        <label class="form-label mb-0" for="@social.Key.ToLower()" data-translate-key="labels.@social.Name.ToLower()">@social.Name</label>
+                                    </div>
+                                    <input type="url" class="form-control" id="@social.Key.ToLower()" name="@social.Key" value="@social.Url" placeholder="https://@(social.Name.ToLower()).com/yourpage" data-translate-placeholder-key="placeholders.@(social.Name.ToLower())Url">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>
+                            <small data-translate-key="help.socialMediaLinks">Enter the complete URLs for your social media profiles. Leave empty if you don't have an account on that platform.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Site Branding Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-palette me-2 text-warning"></i>
+                    <h5 class="mb-0" data-translate-key="sections.siteBranding">Site Branding</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label" for="appLogo" data-translate-key="labels.appLogo">Application Logo</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="appLogo" name="appLogo" accept=".png,.jpg,.jpeg,.svg,.gif">
+                                    <button type="button" class="btn btn-outline-secondary" id="resetLogoBtn" data-translate-key="buttons.resetLogo">Reset to Default</button>
+                                </div>
+                                <div class="form-text" data-translate-key="help.logoUpload">
+                                    Upload a PNG logo for best quality and transparency. Recommended size: 200x60px. Max file size: 5MB.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" for="siteName" data-translate-key="labels.siteName">Site Name</label>
+                                <input type="text" class="form-control" id="siteName" name="SiteName" value="@Model.SiteName" placeholder="Your Site Name" data-translate-placeholder-key="placeholders.siteName">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" for="siteDescription" data-translate-key="labels.siteDescription">Site Description</label>
+                                <textarea class="form-control" id="siteDescription" name="SiteDescription" rows="3" placeholder="Brief description of your website" data-translate-placeholder-key="placeholders.siteDescription">@Model.SiteDescription</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <label class="form-label" data-translate-key="labels.logoPreview">Logo Preview</label>
+                                <div class="logo-preview-container bg-light border rounded p-3 mb-3" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                                    <img id="logoPreview" src="@(Model.CurrentLogoPath ?? "/img/toolbox-logo.svg")" alt="Logo Preview" style="max-width: 100%; max-height: 100px; object-fit: contain;">
+                                </div>
+                                <small class="text-muted" data-translate-key="help.logoPreview">This is how your logo will appear in the sidebar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Settings Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-cogs me-2 text-success"></i>
+                    <h5 class="mb-0" data-translate-key="sections.additionalSettings">Additional Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="timeZone" data-translate-key="labels.timeZone">Default Time Zone</label>
+                                <select class="form-select" id="timeZone" name="TimeZone">
+                                    <option value="UTC-12" selected="@(Model.TimeZone == "UTC-12")">(UTC-12:00) International Date Line West</option>
+                                    <option value="UTC-8" selected="@(Model.TimeZone == "UTC-8")">(UTC-08:00) Pacific Time</option>
+                                    <option value="UTC-5" selected="@(Model.TimeZone == "UTC-5")">(UTC-05:00) Eastern Time</option>
+                                    <option value="UTC+0" selected="@(Model.TimeZone == "UTC+0")">(UTC+00:00) Greenwich Mean Time</option>
+                                    <option value="UTC+1" selected="@(Model.TimeZone == "UTC+1")">(UTC+01:00) Central European Time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="defaultLanguage" data-translate-key="labels.defaultLanguage">Default Language</label>
+                                <select class="form-select" id="defaultLanguage" name="DefaultLanguage">
+                                    <option value="en" selected="@(Model.DefaultLanguage == "en")" data-translate-key="language_english">English</option>
+                                    <option value="es" selected="@(Model.DefaultLanguage == "es")" data-translate-key="language_spanish">Spanish</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @if (Model.LastUpdated != default(DateTime))
+                    {
+                        <div class="alert alert-light d-flex align-items-center" role="alert">
+                            <i class="fas fa-clock me-2 text-muted"></i>
+                            <div>
+                                <small class="text-muted">
+                                    <span data-translate-key="labels.lastUpdated">Last updated:</span> 
+                                    @Model.LastUpdated.ToString("MMM dd, yyyy 'at' HH:mm")
+                                    @if (!string.IsNullOrEmpty(Model.UpdatedBy))
+                                    {
+                                        <span data-translate-key="labels.by">by</span> @Model.UpdatedBy
+                                    }
+                                </small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload()" data-translate-key="buttons.cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveSettingsBtn" data-translate-key="buttons.saveSettings">
+                            <i class="fas fa-save me-1"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/website-settings.js"></script>
+}

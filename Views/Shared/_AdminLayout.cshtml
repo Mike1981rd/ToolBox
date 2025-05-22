@@ -29,7 +29,7 @@
         <div class="sidebar" id="sidebar-wrapper">
             <div class="sidebar-heading d-flex flex-column justify-content-center align-items-center">
                 <div class="logo-container">
-                    <img src="~/img/toolbox-logo.svg" alt="ToolBox Logo" class="logo">
+                    <img src="~/img/toolbox-logo.svg" alt="ToolBox Logo" class="logo" id="sidebarLogo">
                 </div>
                 <button class="btn btn-link d-md-none position-absolute top-0 end-0" id="menu-toggle" aria-expanded="true" aria-label="Close sidebar">
                     <i class="fas fa-times"></i>
@@ -93,8 +93,8 @@
                 <a href="@Url.Action("Analytics", "Admin")" class="list-group-item list-group-item-action d-none" data-translate-key="website_setting">
                     <i class="fas fa-chart-bar fa-fw"></i><span class="sidebar-item-text">Analytics</span>
                 </a>
-                <a href="@Url.Action("Settings", "Admin")" class="list-group-item list-group-item-action" data-translate-key="website_setting">
-                    <i class="fas fa-cog fa-fw"></i><span class="sidebar-item-text">Website Setting</span>
+                <a href="@Url.Action("Index", "WebsiteSettings")" class="list-group-item list-group-item-action" data-translate-key="sidebar.websiteSettings">
+                    <i class="fas fa-cog fa-fw"></i><span class="sidebar-item-text">Website Settings</span>
                 </a>
                 <a href="#" class="list-group-item list-group-item-action" data-translate-key="email_contents">
                     <i class="fas fa-envelope fa-fw"></i><span class="sidebar-item-text">Email Contents</span>
