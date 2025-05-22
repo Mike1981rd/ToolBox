@@ -1,0 +1,163 @@
+<!-- Add Habit Modal -->
+<div class="modal fade" id="addHabitModal" tabindex="-1" aria-labelledby="addHabitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addHabitModalLabel" data-translate-key="habitTracker.modal.title">Add New Habit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addHabitForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="habitName" class="form-label" data-translate-key="habitTracker.modal.name">Habit Name</label>
+                        <input type="text" class="form-control" id="habitName" name="name" required maxlength="100">
+                        <div class="form-text" data-translate-key="habitTracker.modal.nameHelp">What habit do you want to track?</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="habitDescription" class="form-label" data-translate-key="habitTracker.modal.description">Description</label>
+                        <textarea class="form-control" id="habitDescription" name="description" rows="3" maxlength="500"></textarea>
+                        <div class="form-text" data-translate-key="habitTracker.modal.descriptionHelp">Optional: Add more details about your habit</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="habitColor" class="form-label" data-translate-key="habitTracker.modal.color">Color</label>
+                        <div class="d-flex align-items-center">
+                            <input type="color" class="form-control form-control-color me-3" id="habitColor" name="color" value="#007bff" title="Choose habit color">
+                            <div class="flex-grow-1">
+                                <div class="form-text" data-translate-key="habitTracker.modal.colorHelp">Choose a color to represent this habit</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="habitCategory" class="form-label" data-translate-key="habitTracker.modal.category">Category</label>
+                                <select class="form-select" id="habitCategory" name="category">
+                                    <option value="Health" data-translate-key="habitTracker.categories.health">Health</option>
+                                    <option value="Fitness" data-translate-key="habitTracker.categories.fitness">Fitness</option>
+                                    <option value="Productivity" data-translate-key="habitTracker.categories.productivity">Productivity</option>
+                                    <option value="Learning" data-translate-key="habitTracker.categories.learning">Learning</option>
+                                    <option value="Social" data-translate-key="habitTracker.categories.social">Social</option>
+                                    <option value="Creative" data-translate-key="habitTracker.categories.creative">Creative</option>
+                                    <option value="Mindfulness" data-translate-key="habitTracker.categories.mindfulness">Mindfulness</option>
+                                    <option value="Other" data-translate-key="habitTracker.categories.other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="habitFrequency" class="form-label" data-translate-key="habitTracker.modal.frequency">Frequency</label>
+                                <select class="form-select" id="habitFrequency" name="frequency">
+                                    <option value="Daily" data-translate-key="habitTracker.frequency.daily">Daily</option>
+                                    <option value="Weekdays" data-translate-key="habitTracker.frequency.weekdays">Weekdays</option>
+                                    <option value="Weekends" data-translate-key="habitTracker.frequency.weekends">Weekends</option>
+                                    <option value="Custom" data-translate-key="habitTracker.frequency.custom">Custom</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Frequency Options (hidden by default) -->
+                    <div class="mb-3" id="customFrequencyOptions" style="display: none;">
+                        <label class="form-label" data-translate-key="habitTracker.modal.customDays">Select Days</label>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="monday" name="customDays" value="Monday">
+                                    <label class="form-check-label" for="monday" data-translate-key="days.monday">Monday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="tuesday" name="customDays" value="Tuesday">
+                                    <label class="form-check-label" for="tuesday" data-translate-key="days.tuesday">Tuesday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="wednesday" name="customDays" value="Wednesday">
+                                    <label class="form-check-label" for="wednesday" data-translate-key="days.wednesday">Wednesday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="thursday" name="customDays" value="Thursday">
+                                    <label class="form-check-label" for="thursday" data-translate-key="days.thursday">Thursday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="friday" name="customDays" value="Friday">
+                                    <label class="form-check-label" for="friday" data-translate-key="days.friday">Friday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="saturday" name="customDays" value="Saturday">
+                                    <label class="form-check-label" for="saturday" data-translate-key="days.saturday">Saturday</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sunday" name="customDays" value="Sunday">
+                                    <label class="form-check-label" for="sunday" data-translate-key="days.sunday">Sunday</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="habitReminder" name="reminder">
+                            <label class="form-check-label" for="habitReminder" data-translate-key="habitTracker.modal.reminder">
+                                Enable daily reminders
+                            </label>
+                        </div>
+                        <div class="form-text" data-translate-key="habitTracker.modal.reminderHelp">Get notified to maintain your habit streak</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="common.cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-translate-key="habitTracker.modal.addHabit">
+                        <i class="fas fa-plus me-2"></i>Add Habit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle frequency selection
+    document.getElementById('habitFrequency').addEventListener('change', function() {
+        const customOptions = document.getElementById('customFrequencyOptions');
+        if (this.value === 'Custom') {
+            customOptions.style.display = 'block';
+        } else {
+            customOptions.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    document.getElementById('addHabitForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const habitData = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            color: formData.get('color'),
+            category: formData.get('category'),
+            frequency: formData.get('frequency'),
+            reminder: formData.get('reminder') === 'on',
+            customDays: formData.getAll('customDays')
+        };
+
+        // Call the add habit function
+        if (typeof window.addNewHabit === 'function') {
+            window.addNewHabit(habitData);
+        }
+    });
+</script>

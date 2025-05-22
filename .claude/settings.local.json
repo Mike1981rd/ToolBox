@@ -6,7 +6,8 @@
       "Bash(grep:*)",
       "Bash(sed:*)",
       "Bash(rm:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(dotnet build)"
     ],
     "deny": []
   }

@@ -1,0 +1,296 @@
+@model ToolBox.Models.HabitTrackerPageViewModel
+@{
+    ViewData["Title"] = "Habit Tracker";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="habit-tracker-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Breadcrumbs -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Dashboard", "Admin")" data-translate-key="breadcrumbs.dashboard">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumbs.habitTracker">Habit Tracker</li>
+                    </ol>
+                </nav>
+
+                <!-- Enhanced Header -->
+                <div class="habit-tracker-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="habit-tracker-title" data-translate-key="habitTracker.title">Habit Tracker</h1>
+                        <button type="button" class="habit-add-button" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+                            <i class="fas fa-plus me-2"></i>
+                            <span data-translate-key="habitTracker.addHabit">Add Habit</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Tab Navigation -->
+                <ul class="nav habit-nav-tabs" id="habitTrackerTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="habit-log-tab" data-bs-toggle="tab" data-bs-target="#habit-log" type="button" role="tab" aria-controls="habit-log" aria-selected="true">
+                        <i class="fas fa-list me-2"></i>
+                        <span data-translate-key="habitTracker.tabs.habitLog">Habit Log</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="progress-chart-tab" data-bs-toggle="tab" data-bs-target="#progress-chart" type="button" role="tab" aria-controls="progress-chart" aria-selected="false">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span data-translate-key="habitTracker.tabs.progressChart">Progress Chart</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="habitTrackerTabContent">
+                <!-- Enhanced Habit Log Tab -->
+                <div class="tab-pane fade show active" id="habit-log" role="tabpanel" aria-labelledby="habit-log-tab">
+                    <div class="habit-card">
+                        <div class="habit-card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h2 class="progress-overview-title" data-translate-key="habitTracker.habitLog">Registro de Hábitos</h2>
+                                    <small class="text-muted" id="currentPeriodText">@Model.CurrentWeekStart.ToString("MMM dd") - @Model.CurrentWeekEnd.ToString("MMM dd, yyyy")</small>
+                                </div>
+                                <div class="period-filter-group">
+                                    <button type="button" class="period-filter-btn active" data-period="Last7Days" data-translate-key="habitTracker.periods.last7Days">Últimos 7 Días</button>
+                                    <button type="button" class="period-filter-btn" data-period="Last30Days" data-translate-key="habitTracker.periods.last30Days">Últimos 30 Días</button>
+                                    <button type="button" class="period-filter-btn" data-period="ThisMonth" data-translate-key="habitTracker.periods.thisMonth">Este Mes</button>
+                                    <button type="button" class="period-filter-btn" data-period="AllTime" data-translate-key="habitTracker.periods.allTime">Todo el Tiempo</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="habit-card-body">
+                            @if (Model.Habits.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="habit-table table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th data-translate-key="habitTracker.table.habit">Habit</th>
+                                                @if (Model.Habits.Any())
+                                                {
+                                                    @foreach (var day in Model.Habits.First().DailyStatus)
+                                                    {
+                                                    <th class="text-center">
+                                                        <div class="d-flex flex-column align-items-center">
+                                                            <small data-translate-key="days.@(day.DayName.ToLower().Substring(0,3))">@day.DayName.Substring(0, 3)</small>
+                                                            <small class="text-muted">@day.Date.ToString("dd")</small>
+                                                        </div>
+                                                    </th>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <!-- Default headers when no habits -->
+                                                    <th class="text-center">Mon</th>
+                                                    <th class="text-center">Tue</th>
+                                                    <th class="text-center">Wed</th>
+                                                    <th class="text-center">Thu</th>
+                                                    <th class="text-center">Fri</th>
+                                                    <th class="text-center">Sat</th>
+                                                    <th class="text-center">Sun</th>
+                                                }
+                                                <th class="text-center" data-translate-key="habitTracker.table.daysMet">Days Met</th>
+                                                <th class="text-center" data-translate-key="habitTracker.table.percentMet">% Met</th>
+                                                <th class="text-center" data-translate-key="habitTracker.table.actions">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var habit in Model.Habits)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="habit-color-indicator" style="background-color: @habit.Color;"></div>
+                                                            <div>
+                                                                <div class="fw-medium">@habit.Name</div>
+                                                                @if (!string.IsNullOrEmpty(habit.Description))
+                                                                {
+                                                                    <small class="text-muted">@habit.Description</small>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    @foreach (var day in habit.DailyStatus)
+                                                    {
+                                                        <td class="text-center">
+                                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                                <input class="form-check-input habit-checkbox" 
+                                                                       type="checkbox" 
+                                                                       data-habit-id="@habit.Id" 
+                                                                       data-date="@day.Date.ToString("yyyy-MM-dd")"
+                                                                       @(day.IsCompleted ? "checked" : "")>
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                    <td class="text-center">
+                                                        <span class="badge bg-primary habit-days-met" data-habit-id="@habit.Id">@habit.DailyStatus.Count(d => d.IsCompleted)</span>
+                                                        @if (habit.CurrentStreak > 0)
+                                                        {
+                                                            <div class="mt-1">
+                                                                <small class="text-success">
+                                                                    <i class="fas fa-fire me-1"></i>@habit.CurrentStreak
+                                                                </small>
+                                                            </div>
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex flex-column align-items-center">
+                                                            <div class="habit-progress mb-1" style="width: 60px;">
+                                                                <div class="habit-progress-bar" role="progressbar" style="width: @(habit.CompletionPercentage)%" aria-valuenow="@habit.CompletionPercentage" aria-valuemin="0" aria-valuemax="100" data-habit-id="@habit.Id"></div>
+                                                            </div>
+                                                            <small class="text-muted habit-percentage" data-habit-id="@habit.Id">@(habit.CompletionPercentage)%</small>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="habit-delete-btn" data-habit-id="@habit.Id" data-habit-name="@habit.Name">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="habit-overall-row">
+                                                <td colspan="@(Model.Habits.Any() ? Model.Habits.First().DailyStatus.Count + 1 : 8)" class="text-end fw-bold">
+                                                    <span data-translate-key="habitTracker.overallSuccessRate">Tasa de Éxito General:</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="habit-days-met" id="overallDaysMet">@(Model.Habits.Any() ? Model.Habits.Sum(h => h.DailyStatus.Count(d => d.IsCompleted)) : 0)</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <strong id="overallSuccessRate">@(Model.Habits.Any() ? Math.Round(Model.Habits.Average(h => h.CompletionPercentage), 1) : 0)%</strong>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                
+                                <!-- Save Log Button -->
+                                <div class="text-end mt-3">
+                                    <button type="button" class="habit-save-btn" id="saveLogBtn">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span data-translate-key="habitTracker.saveLog">Save Log</span>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted" data-translate-key="habitTracker.noHabits.title">No habits yet</h5>
+                                    <p class="text-muted" data-translate-key="habitTracker.noHabits.description">Start building better habits by adding your first one!</p>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+                                        <i class="fas fa-plus me-2"></i>
+                                        <span data-translate-key="habitTracker.addFirstHabit">Add Your First Habit</span>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Progress Chart Tab -->
+                <div class="tab-pane fade" id="progress-chart" role="tabpanel" aria-labelledby="progress-chart-tab">
+                    <div class="habit-card">
+                        <div class="habit-card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h2 class="progress-overview-title" data-translate-key="headings.progressSummary">Resumen de Progreso</h2>
+                                <div class="period-filter-group">
+                                    <button type="button" class="period-filter-btn active" data-period="Last7Days" data-translate-key="habitTracker.periods.last7Days">Últimos 7 Días</button>
+                                    <button type="button" class="period-filter-btn" data-period="Last30Days" data-translate-key="habitTracker.periods.last30Days">Últimos 30 Días</button>
+                                    <button type="button" class="period-filter-btn" data-period="ThisMonth" data-translate-key="habitTracker.periods.thisMonth">Este Mes</button>
+                                    <button type="button" class="period-filter-btn" data-period="AllTime" data-translate-key="habitTracker.periods.allTime">Todo el Tiempo</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="habit-card-body">
+                            @if (Model.Habits.Any())
+                            {
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="habit-chart-container">
+                                            <canvas id="habitProgressChart" class="habit-chart-canvas"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="habit-stats-container">
+                                            <div class="habit-stat-card">
+                                                <div class="habit-stat-value" id="totalHabits">@Model.Habits.Count()</div>
+                                                <p class="habit-stat-label" data-translate-key="habitTracker.stats.totalHabits">HÁBITOS TOTALES</p>
+                                            </div>
+                                            <div class="habit-stat-card">
+                                                <div class="habit-stat-value" id="avgCompletion">@(Model.Habits.Any() ? Math.Round(Model.Habits.Average(h => h.CompletionPercentage), 1) : 0)%</div>
+                                                <p class="habit-stat-label" data-translate-key="habitTracker.stats.avgCompletion">COMPLECIÓN PROMEDIO</p>
+                                            </div>
+                                            <div class="habit-stat-card">
+                                                <div class="habit-stat-value" id="bestStreak">@(Model.Habits.Any() ? Model.Habits.Max(h => h.CurrentStreak) : 0)</div>
+                                                <p class="habit-stat-label" data-translate-key="habitTracker.stats.bestStreak">MEJOR RACHA</p>
+                                            </div>
+                                            <div class="habit-stat-card">
+                                                <div class="habit-stat-value" id="activeStreaks">@Model.Habits.Count(h => h.CurrentStreak > 0)</div>
+                                                <p class="habit-stat-label" data-translate-key="habitTracker.stats.activeStreaks">RACHAS ACTIVAS</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted" data-translate-key="habitTracker.noData.title">No data to display</h5>
+                                    <p class="text-muted" data-translate-key="habitTracker.noData.description">Add some habits and start tracking to see your progress charts!</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Habit Modal -->
+@await Html.PartialAsync("_AddHabitModal")
+
+@section Scripts {
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        $(document).ready(function() {
+            console.log('Document ready, initializing habit tracker...');
+            
+            // Function to initialize when everything is ready
+            function initializeWhenReady() {
+                // Check if Chart.js is loaded
+                if (typeof Chart === 'undefined') {
+                    console.log('Chart.js not loaded, waiting...');
+                    setTimeout(initializeWhenReady, 200);
+                    return;
+                }
+                
+                // Check if our initialization function exists
+                if (typeof window.initializeHabitTracker !== 'function') {
+                    console.log('initializeHabitTracker function not found, waiting...');
+                    setTimeout(initializeWhenReady, 200);
+                    return;
+                }
+                
+                console.log('All dependencies loaded, initializing habit tracker...');
+                window.initializeHabitTracker();
+            }
+            
+            // Start the initialization process
+            initializeWhenReady();
+        });
+    </script>
+}

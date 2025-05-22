@@ -946,7 +946,78 @@ const translations = {
         "areas.relationships.description": "Your relationships with family, friends, and romantic partners",
         "areas.personal-growth.description": "Your personal development, learning, and self-improvement",
         "areas.spiritual-life.description": "Your spiritual well-being, purpose, and inner peace",
-        "areas.recreation-fun.description": "Your hobbies, leisure activities, and work-life balance"
+        "areas.recreation-fun.description": "Your hobbies, leisure activities, and work-life balance",
+        // Habit Tracker Module
+        "sidebar.habitTracker": "Habit Tracker",
+        "habitTracker.title": "Habit Tracker",
+        "habitTracker.addHabit": "Add Habit",
+        "habitTracker.tabs.habitLog": "Habit Log",
+        "habitTracker.tabs.progressChart": "Progress Chart",
+        "habitTracker.habitLog": "Habit Log",
+        "headings.progressSummary": "Progress Summary",
+        "habitTracker.currentWeek": "Current Week",
+        "habitTracker.table.habit": "Habit",
+        "habitTracker.table.daysMet": "Days Met",
+        "habitTracker.table.percentMet": "% Met",
+        "habitTracker.table.actions": "Actions",
+        "habitTracker.overallSuccessRate": "Overall Success Rate:",
+        "habitTracker.saveLog": "Save Log",
+        "breadcrumbs.habitTracker": "Habit Tracker",
+        "habitTracker.noHabits.title": "No habits yet",
+        "habitTracker.noHabits.description": "Start building better habits by adding your first one!",
+        "habitTracker.addFirstHabit": "Add Your First Habit",
+        "habitTracker.progressOverview": "Progress Overview",
+        "habitTracker.periods.last7Days": "Last 7 Days",
+        "habitTracker.periods.last30Days": "Last 30 Days",
+        "habitTracker.periods.thisMonth": "This Month",
+        "habitTracker.periods.allTime": "All Time",
+        "habitTracker.stats.title": "Statistics",
+        "habitTracker.stats.totalHabits": "TOTAL HABITS",
+        "habitTracker.stats.avgCompletion": "AVG COMPLETION",
+        "habitTracker.stats.bestStreak": "BEST STREAK", 
+        "habitTracker.stats.activeStreaks": "ACTIVE STREAKS",
+        "habitTracker.noData.title": "No data to display",
+        "habitTracker.noData.description": "Add some habits and start tracking to see your progress charts!",
+        "habitTracker.modal.title": "Add New Habit",
+        "habitTracker.modal.name": "Habit Name",
+        "habitTracker.modal.nameHelp": "What habit do you want to track?",
+        "habitTracker.modal.description": "Description",
+        "habitTracker.modal.descriptionHelp": "Optional: Add more details about your habit",
+        "habitTracker.modal.color": "Color",
+        "habitTracker.modal.colorHelp": "Choose a color to represent this habit",
+        "habitTracker.modal.category": "Category",
+        "habitTracker.modal.frequency": "Frequency",
+        "habitTracker.modal.customDays": "Select Days",
+        "habitTracker.modal.reminder": "Enable daily reminders",
+        "habitTracker.modal.reminderHelp": "Get notified to maintain your habit streak",
+        "habitTracker.modal.addHabit": "Add Habit",
+        "habitTracker.categories.health": "Health",
+        "habitTracker.categories.fitness": "Fitness",
+        "habitTracker.categories.productivity": "Productivity",
+        "habitTracker.categories.learning": "Learning",
+        "habitTracker.categories.social": "Social",
+        "habitTracker.categories.creative": "Creative",
+        "habitTracker.categories.mindfulness": "Mindfulness",
+        "habitTracker.categories.other": "Other",
+        "habitTracker.frequency.daily": "Daily",
+        "habitTracker.frequency.weekdays": "Weekdays",
+        "habitTracker.frequency.weekends": "Weekends",
+        "habitTracker.frequency.custom": "Custom",
+        "days.monday": "Monday",
+        "days.tuesday": "Tuesday",
+        "days.wednesday": "Wednesday",
+        "days.thursday": "Thursday",
+        "days.friday": "Friday",
+        "days.saturday": "Saturday",
+        "days.sunday": "Sunday",
+        "days.mon": "Mon",
+        "days.tue": "Tue", 
+        "days.wed": "Wed",
+        "days.thu": "Thu",
+        "days.fri": "Fri",
+        "days.sat": "Sat",
+        "days.sun": "Sun",
+        "common.cancel": "Cancel"
     },
     es: {
         dashboard: "Tablero",
@@ -1922,7 +1993,78 @@ const translations = {
         "areas.relationships.description": "Tus relaciones con familia, amigos y parejas románticas",
         "areas.personal-growth.description": "Tu desarrollo personal, aprendizaje y automejora",
         "areas.spiritual-life.description": "Tu bienestar espiritual, propósito y paz interior",
-        "areas.recreation-fun.description": "Tus pasatiempos, actividades de ocio y equilibrio trabajo-vida"
+        "areas.recreation-fun.description": "Tus pasatiempos, actividades de ocio y equilibrio trabajo-vida",
+        // Habit Tracker Module
+        "sidebar.habitTracker": "Rastreador de Hábitos",
+        "habitTracker.title": "Rastreador de Hábitos",
+        "habitTracker.addHabit": "Añadir Hábito",
+        "habitTracker.tabs.habitLog": "Registro de Hábitos",
+        "habitTracker.tabs.progressChart": "Gráfico de Progreso",
+        "habitTracker.habitLog": "Registro de Hábitos",
+        "headings.progressSummary": "Resumen de Progreso",
+        "habitTracker.currentWeek": "Semana Actual",
+        "habitTracker.table.habit": "Hábito",
+        "habitTracker.table.daysMet": "Días Cumplidos",
+        "habitTracker.table.percentMet": "% Cumplido",
+        "habitTracker.table.actions": "Acciones",
+        "habitTracker.overallSuccessRate": "Tasa de Éxito General:",
+        "habitTracker.saveLog": "Guardar Registro",
+        "breadcrumbs.habitTracker": "Rastreador de Hábitos",
+        "habitTracker.noHabits.title": "Aún no hay hábitos",
+        "habitTracker.noHabits.description": "¡Comienza a construir mejores hábitos añadiendo tu primero!",
+        "habitTracker.addFirstHabit": "Añadir Tu Primer Hábito",
+        "habitTracker.progressOverview": "Resumen de Progreso",
+        "habitTracker.periods.last7Days": "Últimos 7 Días",
+        "habitTracker.periods.last30Days": "Últimos 30 Días",
+        "habitTracker.periods.thisMonth": "Este Mes",
+        "habitTracker.periods.allTime": "Todo el Tiempo",
+        "habitTracker.stats.title": "Estadísticas",
+        "habitTracker.stats.totalHabits": "Hábitos Totales",
+        "habitTracker.stats.avgCompletion": "Compleción Promedio",
+        "habitTracker.stats.bestStreak": "Mejor Racha",
+        "habitTracker.stats.activeStreaks": "Rachas Activas",
+        "habitTracker.noData.title": "No hay datos para mostrar",
+        "habitTracker.noData.description": "¡Añade algunos hábitos y comienza a rastrear para ver tus gráficos de progreso!",
+        "habitTracker.modal.title": "Añadir Nuevo Hábito",
+        "habitTracker.modal.name": "Nombre del Hábito",
+        "habitTracker.modal.nameHelp": "¿Qué hábito quieres rastrear?",
+        "habitTracker.modal.description": "Descripción",
+        "habitTracker.modal.descriptionHelp": "Opcional: Añade más detalles sobre tu hábito",
+        "habitTracker.modal.color": "Color",
+        "habitTracker.modal.colorHelp": "Elige un color para representar este hábito",
+        "habitTracker.modal.category": "Categoría",
+        "habitTracker.modal.frequency": "Frecuencia",
+        "habitTracker.modal.customDays": "Seleccionar Días",
+        "habitTracker.modal.reminder": "Habilitar recordatorios diarios",
+        "habitTracker.modal.reminderHelp": "Recibe notificaciones para mantener tu racha de hábitos",
+        "habitTracker.modal.addHabit": "Añadir Hábito",
+        "habitTracker.categories.health": "Salud",
+        "habitTracker.categories.fitness": "Ejercicio",
+        "habitTracker.categories.productivity": "Productividad",
+        "habitTracker.categories.learning": "Aprendizaje",
+        "habitTracker.categories.social": "Social",
+        "habitTracker.categories.creative": "Creativo",
+        "habitTracker.categories.mindfulness": "Atención Plena",
+        "habitTracker.categories.other": "Otro",
+        "habitTracker.frequency.daily": "Diario",
+        "habitTracker.frequency.weekdays": "Días de Semana",
+        "habitTracker.frequency.weekends": "Fines de Semana",
+        "habitTracker.frequency.custom": "Personalizado",
+        "days.monday": "Lunes",
+        "days.tuesday": "Martes",
+        "days.wednesday": "Miércoles",
+        "days.thursday": "Jueves",
+        "days.friday": "Viernes",
+        "days.saturday": "Sábado",
+        "days.sunday": "Domingo",
+        "days.mon": "Lun",
+        "days.tue": "Mar", 
+        "days.wed": "Mié",
+        "days.thu": "Jue",
+        "days.fri": "Vie",
+        "days.sat": "Sáb",
+        "days.sun": "Dom",
+        "common.cancel": "Cancelar"
     }
 };
 
@@ -2381,3 +2523,679 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+/**
+ * Habit Tracker Module
+ * Handles habit tracking functionality, chart visualization, and data persistence
+ */
+
+// Global variables for habit tracker
+let habitProgressChart = null;
+let currentChartPeriod = 'Last7Days';
+
+/**
+ * Initialize habit tracker functionality
+ */
+window.initializeHabitTracker = function() {
+    console.log('Initializing Habit Tracker...');
+    
+    // Initialize event listeners
+    initializeHabitCheckboxes();
+    initializeDeleteButtons();
+    initializeChartPeriodFilters();
+    initializeLogPeriodFilters();
+    initializeSaveLogButton();
+    initializeTabSwitching();
+    
+    // Don't initialize chart immediately, wait for tab switch
+    console.log('Habit Tracker initialization complete');
+};
+
+/**
+ * Initialize tab switching logic
+ */
+function initializeTabSwitching() {
+    const chartTab = document.getElementById('progress-chart-tab');
+    if (chartTab) {
+        chartTab.addEventListener('shown.bs.tab', function() {
+            console.log('Chart tab shown, initializing chart...');
+            // Delay to ensure the tab content is visible
+            setTimeout(() => {
+                initializeChart();
+                updateChart();
+            }, 100);
+        });
+    }
+}
+
+/**
+ * Initialize habit completion checkboxes
+ */
+function initializeHabitCheckboxes() {
+    const checkboxes = document.querySelectorAll('.habit-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const habitId = this.getAttribute('data-habit-id');
+            const date = this.getAttribute('data-date');
+            const isCompleted = this.checked;
+            
+            // Save habit log entry
+            saveHabitLog(habitId, date, isCompleted);
+        });
+    });
+}
+
+/**
+ * Initialize delete habit buttons
+ */
+function initializeDeleteButtons() {
+    const deleteButtons = document.querySelectorAll('.habit-delete-btn');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const habitId = this.getAttribute('data-habit-id');
+            const habitName = this.getAttribute('data-habit-name');
+            
+            // Show confirmation dialog
+            if (confirm(`Are you sure you want to delete the habit "${habitName}"? This action cannot be undone.`)) {
+                deleteHabit(habitId);
+            }
+        });
+    });
+}
+
+/**
+ * Initialize chart period filter buttons (new design)
+ */
+function initializeChartPeriodFilters() {
+    const periodButtons = document.querySelectorAll('#progress-chart .period-filter-btn');
+    
+    periodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            periodButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update current period and chart
+            currentChartPeriod = this.getAttribute('data-period');
+            updateChart();
+        });
+    });
+}
+
+/**
+ * Initialize log period filter buttons (new design)
+ */
+function initializeLogPeriodFilters() {
+    const periodButtons = document.querySelectorAll('#habit-log .period-filter-btn');
+    
+    periodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            periodButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update log period and sync with chart
+            const period = this.getAttribute('data-period');
+            updateLogPeriod(period);
+            currentChartPeriod = period;
+            updateChart();
+        });
+    });
+}
+
+/**
+ * Initialize save log button
+ */
+function initializeSaveLogButton() {
+    const saveLogBtn = document.getElementById('saveLogBtn');
+    if (saveLogBtn) {
+        saveLogBtn.addEventListener('click', function() {
+            saveAllHabitLogs();
+        });
+    }
+}
+
+/**
+ * Initialize the habit progress chart with enhanced clarity and design
+ */
+function initializeChart() {
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.log('Chart.js not loaded yet, retrying in 100ms...');
+        setTimeout(initializeChart, 100);
+        return;
+    }
+    
+    const canvas = document.getElementById('habitProgressChart');
+    if (!canvas) {
+        console.log('Chart canvas not found');
+        return;
+    }
+    
+    // Destroy existing chart if it exists
+    if (habitProgressChart) {
+        habitProgressChart.destroy();
+    }
+    
+    // Set high resolution for crisp rendering
+    const ctx = canvas.getContext('2d');
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    
+    // Set canvas size for high-DPI displays
+    const rect = canvas.parentNode.getBoundingClientRect();
+    canvas.width = rect.width * devicePixelRatio;
+    canvas.height = rect.height * devicePixelRatio;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    
+    // Enhanced color scheme - elegant purple
+    const primaryPurple = '#6366f1';
+    const lightPurple = 'rgba(163, 180, 252, 0.3)';
+    const borderPurple = '#4338ca';
+    
+    habitProgressChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Tasa de Compleción (%)',
+                data: [],
+                backgroundColor: lightPurple,
+                borderColor: primaryPurple,
+                borderWidth: 3,
+                pointBackgroundColor: primaryPurple,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: borderPurple,
+                pointHoverRadius: 7,
+                pointHoverBorderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: devicePixelRatio,
+            animation: {
+                duration: 800,
+                easing: 'easeInOutQuart'
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    min: 0,
+                    ticks: {
+                        stepSize: 20,
+                        color: '#64748b',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        backdropColor: 'transparent',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: '#e2e8f0',
+                        lineWidth: 1
+                    },
+                    angleLines: {
+                        color: '#e2e8f0',
+                        lineWidth: 1
+                    },
+                    pointLabels: {
+                        color: '#1e293b',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: 10
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: primaryPurple,
+                    borderWidth: 2,
+                    cornerRadius: 8,
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: '600'
+                    },
+                    bodyFont: {
+                        size: 13,
+                        weight: '500'
+                    },
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        label: function(context) {
+                            return `Compleción: ${context.parsed.r}%`;
+                        }
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.2
+                }
+            }
+        }
+    });
+    
+    console.log('Habit tracker chart initialized successfully with enhanced clarity');
+}
+
+/**
+ * Update the chart with current period data
+ */
+function updateChart() {
+    console.log('updateChart called, habitProgressChart exists:', !!habitProgressChart);
+    
+    if (!habitProgressChart) {
+        console.log('Chart not initialized, initializing now...');
+        initializeChart();
+        // Retry after initialization
+        setTimeout(updateChart, 100);
+        return;
+    }
+    
+    console.log('Fetching chart data for period:', currentChartPeriod);
+    
+    // Fetch chart data from server
+    fetch(`/HabitTracker/GetHabitChartData?period=${currentChartPeriod}`)
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Chart data received:', data);
+            
+            if (data.success === false) {
+                throw new Error(data.message || 'Failed to get chart data');
+            }
+            
+            // Update chart data
+            const labels = data.labels || [];
+            const completionRates = data.completionRates || [];
+            const colors = data.colors || [];
+            
+            console.log('Updating chart with:', { labels, completionRates, colors });
+            
+            habitProgressChart.data.labels = labels;
+            habitProgressChart.data.datasets[0].data = completionRates;
+            
+            // Handle colors
+            if (colors.length > 0) {
+                habitProgressChart.data.datasets[0].backgroundColor = colors.map(color => color + '33');
+                habitProgressChart.data.datasets[0].borderColor = colors;
+                habitProgressChart.data.datasets[0].pointBackgroundColor = colors;
+            } else {
+                // Default colors when no data
+                habitProgressChart.data.datasets[0].backgroundColor = 'rgba(54, 162, 235, 0.2)';
+                habitProgressChart.data.datasets[0].borderColor = 'rgba(54, 162, 235, 1)';
+                habitProgressChart.data.datasets[0].pointBackgroundColor = 'rgba(54, 162, 235, 1)';
+            }
+            
+            habitProgressChart.update();
+            console.log('Chart updated successfully');
+            
+            // Update statistics
+            updateStatistics(data);
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+            showToast('Error loading chart data: ' + error.message, 'error');
+        });
+}
+
+/**
+ * Update statistics display
+ */
+function updateStatistics(data) {
+    const totalHabitsElement = document.getElementById('totalHabits');
+    const avgCompletionElement = document.getElementById('avgCompletion');
+    const bestStreakElement = document.getElementById('bestStreak');
+    const activeStreaksElement = document.getElementById('activeStreaks');
+    
+    if (totalHabitsElement) totalHabitsElement.textContent = data.totalHabits;
+    if (avgCompletionElement) avgCompletionElement.textContent = `${data.averageCompletion}%`;
+    if (bestStreakElement) bestStreakElement.textContent = data.bestStreak;
+    if (activeStreaksElement) activeStreaksElement.textContent = data.activeStreaks;
+}
+
+/**
+ * Save habit log entry
+ */
+function saveHabitLog(habitId, date, isCompleted) {
+    const formData = new FormData();
+    formData.append('habitId', habitId);
+    formData.append('date', date);
+    formData.append('isCompleted', isCompleted);
+    
+    fetch('/HabitTracker/SaveHabitLog', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update progress display for this habit
+            updateHabitProgress(habitId, data.completionPercentage, data.currentStreak);
+            
+            // Update chart if we're on the chart tab
+            if (document.getElementById('progress-chart-tab').classList.contains('active')) {
+                updateChart();
+            }
+            
+            showToast('Habit updated successfully', 'success');
+        } else {
+            showToast('Error updating habit', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving habit log:', error);
+        showToast('Error updating habit', 'error');
+    });
+}
+
+/**
+ * Update habit progress display
+ */
+function updateHabitProgress(habitId, completionPercentage, currentStreak) {
+    const habitRow = document.querySelector(`tr:has(.habit-checkbox[data-habit-id="${habitId}"])`);
+    if (!habitRow) return;
+    
+    // Update days met badge
+    const daysMet = habitRow.querySelectorAll(`.habit-checkbox[data-habit-id="${habitId}"]:checked`).length;
+    const daysMetBadge = habitRow.querySelector('.habit-days-met');
+    if (daysMetBadge) {
+        daysMetBadge.textContent = daysMet;
+    }
+    
+    // Update progress bar
+    const progressBar = habitRow.querySelector('.habit-progress-bar');
+    if (progressBar) {
+        progressBar.style.width = `${completionPercentage}%`;
+        progressBar.setAttribute('aria-valuenow', completionPercentage);
+    }
+    
+    // Update percentage text
+    const percentageText = habitRow.querySelector('.habit-percentage');
+    if (percentageText) {
+        percentageText.textContent = `${completionPercentage}%`;
+    }
+    
+    // Update streak display
+    const streakElement = habitRow.querySelector('.text-success');
+    if (streakElement) {
+        if (currentStreak > 0) {
+            streakElement.innerHTML = `<i class="fas fa-fire me-1"></i>${currentStreak}`;
+            streakElement.style.display = 'block';
+        } else {
+            streakElement.style.display = 'none';
+        }
+    }
+    
+    // Update overall success rate
+    updateOverallSuccessRate();
+}
+
+/**
+ * Update log period display and data
+ */
+function updateLogPeriod(period) {
+    // This would typically fetch new data from server
+    // For now, we'll just update the period text
+    const periodText = document.getElementById('currentPeriodText');
+    if (periodText) {
+        let dateText = '';
+        const today = new Date();
+        
+        switch(period) {
+            case 'Last7Days':
+                const sevenDaysAgo = new Date(today);
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                dateText = `${sevenDaysAgo.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${today.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+                break;
+            case 'Last30Days':
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                dateText = `${thirtyDaysAgo.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${today.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+                break;
+            case 'ThisMonth':
+                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                dateText = `${firstDayOfMonth.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${today.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+                break;
+            case 'AllTime':
+                dateText = 'All Time';
+                break;
+        }
+        
+        periodText.textContent = dateText;
+    }
+}
+
+/**
+ * Update overall success rate
+ */
+function updateOverallSuccessRate() {
+    const habitRows = document.querySelectorAll('tbody tr');
+    let totalDaysMet = 0;
+    let totalPercentage = 0;
+    let habitCount = 0;
+    
+    habitRows.forEach(row => {
+        const daysMetBadge = row.querySelector('.habit-days-met');
+        const percentageText = row.querySelector('.habit-percentage');
+        
+        if (daysMetBadge && percentageText) {
+            totalDaysMet += parseInt(daysMetBadge.textContent) || 0;
+            totalPercentage += parseInt(percentageText.textContent.replace('%', '')) || 0;
+            habitCount++;
+        }
+    });
+    
+    // Update overall days met
+    const overallDaysMetElement = document.getElementById('overallDaysMet');
+    if (overallDaysMetElement) {
+        overallDaysMetElement.textContent = totalDaysMet;
+    }
+    
+    // Update overall success rate
+    const overallSuccessRateElement = document.getElementById('overallSuccessRate');
+    if (overallSuccessRateElement && habitCount > 0) {
+        const avgPercentage = Math.round(totalPercentage / habitCount * 10) / 10;
+        overallSuccessRateElement.textContent = `${avgPercentage}%`;
+    }
+}
+
+/**
+ * Save all habit logs
+ */
+function saveAllHabitLogs() {
+    const checkboxes = document.querySelectorAll('.habit-checkbox');
+    const logEntries = [];
+    
+    checkboxes.forEach(checkbox => {
+        logEntries.push({
+            habitId: checkbox.getAttribute('data-habit-id'),
+            date: checkbox.getAttribute('data-date'),
+            isCompleted: checkbox.checked
+        });
+    });
+    
+    const formData = new FormData();
+    formData.append('logEntries', JSON.stringify(logEntries));
+    
+    // Show loading state
+    const saveLogBtn = document.getElementById('saveLogBtn');
+    const originalText = saveLogBtn.innerHTML;
+    saveLogBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    saveLogBtn.disabled = true;
+    
+    fetch('/HabitTracker/SaveAllHabitLogs', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('All habit logs saved successfully', 'success');
+            
+            // Update chart if we're on the chart tab
+            if (document.getElementById('progress-chart-tab').classList.contains('active')) {
+                updateChart();
+            }
+        } else {
+            showToast('Error saving habit logs', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving habit logs:', error);
+        showToast('Error saving habit logs', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        saveLogBtn.innerHTML = originalText;
+        saveLogBtn.disabled = false;
+    });
+}
+
+/**
+ * Add new habit
+ */
+window.addNewHabit = function(habitData) {
+    const formData = new FormData();
+    Object.keys(habitData).forEach(key => {
+        if (Array.isArray(habitData[key])) {
+            habitData[key].forEach(value => formData.append(key, value));
+        } else {
+            formData.append(key, habitData[key]);
+        }
+    });
+    
+    fetch('/HabitTracker/AddHabit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addHabitModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('addHabitForm').reset();
+            
+            // Reload page to show new habit
+            window.location.reload();
+            
+            showToast('Habit added successfully', 'success');
+        } else {
+            showToast(data.message || 'Error adding habit', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding habit:', error);
+        showToast('Error adding habit', 'error');
+    });
+};
+
+/**
+ * Delete habit
+ */
+function deleteHabit(habitId) {
+    const formData = new FormData();
+    formData.append('id', habitId);
+    
+    fetch('/HabitTracker/DeleteHabit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove habit row from table  
+            const habitRow = document.querySelector(`[data-habit-id="${habitId}"]`).closest('tr');
+            if (habitRow) {
+                habitRow.remove();
+            }
+            
+            // Update chart
+            updateChart();
+            
+            showToast('Habit deleted successfully', 'success');
+        } else {
+            showToast(data.message || 'Error deleting habit', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting habit:', error);
+        showToast('Error deleting habit', 'error');
+    });
+}
+
+/**
+ * Show toast notification
+ */
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-${type === 'success' ? 'check-circle text-success' : type === 'error' ? 'exclamation-circle text-danger' : 'info-circle text-info'} me-2"></i>
+                <strong class="me-auto">Habit Tracker</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    // Initialize and show toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
