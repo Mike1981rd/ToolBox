@@ -1,94 +1,219 @@
-@model ToolBox.Models.User
+@model ToolBox.Models.ViewModels.UserEditViewModel
 
 @{
-    ViewData["Title"] = "Edit User";
+    ViewData["Title"] = "Editar Usuario";
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-4">Edit User</h1>
-            <p class="lead">Modify user information</p>
-        </div>
-        <div class="col-auto d-flex align-items-center">
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Back to List
-            </a>
-        </div>
-    </div>
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Users" asp-action="Index" data-translate-key="breadcrumb_users_list">Usuarios</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_edit_user">Editar Usuario</li>
+    </ol>
+</nav>
 
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-xl-8 col-lg-7">
             <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" data-translate-key="edit_user_title">Editar Usuario</h5>
+                </div>
                 <div class="card-body">
-                    <form asp-action="Edit">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
                         <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="CreatedAt" />
                         
-                        <div class="mb-3">
-                            <label asp-for="Name" class="form-label">Full Name</label>
-                            <input asp-for="Name" class="form-control" placeholder="Enter user's full name" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                        <!-- Avatar Section -->
+                        <div class="mb-4 text-center">
+                            <label class="form-label" data-translate-key="user_avatar">Avatar del Usuario</label>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="me-3">
+                                    @if (!string.IsNullOrEmpty(Model.ExistingAvatarUrl))
+                                    {
+                                        <img src="@Model.ExistingAvatarUrl" alt="Avatar actual" 
+                                             class="img-fluid rounded" 
+                                             id="userAvatarPreview" 
+                                             style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #dee2e6;">
+                                    }
+                                    else
+                                    {
+                                        <img src="/img/default-avatar.png" alt="Avatar por defecto" 
+                                             class="img-fluid rounded" 
+                                             id="userAvatarPreview" 
+                                             style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #dee2e6;">
+                                    }
+                                </div>
+                                <div>
+                                    <label for="AvatarFile" class="btn btn-primary btn-sm mb-2 d-block">
+                                        <i class="fas fa-upload me-1"></i> <span data-translate-key="upload_new_photo">Subir nueva foto</span>
+                                    </label>
+                                    <input type="file" asp-for="AvatarFile" class="d-none" accept="image/*" id="AvatarFile">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm d-block w-100" id="resetAvatarButton">
+                                        <i class="fas fa-trash-alt me-1"></i> <span data-translate-key="reset_avatar">Restablecer</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-muted small mt-2" data-translate-key="avatar_allowed_formats">JPG, GIF o PNG permitidos. Tamaño máximo de 800K</p>
+                            <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                        </div>
+
+                        <!-- User Info Fields -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label" data-translate-key="form_full_name">Nombre Completo</label>
+                                <input asp-for="FullName" class="form-control" placeholder="Juan Pérez" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="UserName" class="form-label" data-translate-key="form_username">Nombre de Usuario</label>
+                                <input asp-for="UserName" class="form-control" placeholder="juanperez" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label asp-for="Email" class="form-label" data-translate-key="form_email">Correo Electrónico</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="juan@ejemplo.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- Password Change Section -->
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span data-translate-key="password_change_info">Deja los campos de contraseña vacíos si no deseas cambiarla.</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="NewPassword" class="form-label" data-translate-key="form_new_password">Nueva Contraseña</label>
+                                <div class="input-group">
+                                    <input asp-for="NewPassword" class="form-control" placeholder="••••••••" />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="NewPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmNewPassword" class="form-label" data-translate-key="form_confirm_new_password">Confirmar Nueva Contraseña</label>
+                                <div class="input-group">
+                                    <input asp-for="ConfirmNewPassword" class="form-control" placeholder="••••••••" />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                            </div>
+
+                            <!-- Contact & Company -->
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label" data-translate-key="form_phone">Teléfono</label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="+1 (555) 123-4567" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CompanyName" class="form-label" data-translate-key="form_company">Empresa</label>
+                                <input asp-for="CompanyName" class="form-control" placeholder="Mi Empresa S.A." />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+
+                            <!-- Tax ID & Country -->
+                            <div class="col-md-6">
+                                <label asp-for="TaxId" class="form-label" data-translate-key="form_tax_id">ID Fiscal</label>
+                                <input asp-for="TaxId" class="form-control" />
+                                <span asp-validation-for="TaxId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Country" class="form-label" data-translate-key="form_country">País</label>
+                                <input asp-for="Country" class="form-control" />
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+
+                            <!-- Role & Billing Method -->
+                            <div class="col-md-6">
+                                <label asp-for="RoleId" class="form-label" data-translate-key="form_role">Rol</label>
+                                <select asp-for="RoleId" asp-items="Model.AvailableRoles" class="form-select">
+                                    <option value="" data-translate-key="form_select_role">-- Seleccionar Rol --</option>
+                                </select>
+                                <span asp-validation-for="RoleId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="BillingMethod" class="form-label" data-translate-key="form_billing_method">Método de Facturación</label>
+                                <select asp-for="BillingMethod" class="form-select">
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="Auto Debit" data-translate-key="payment_auto_debit">Débito Automático</option>
+                                    <option value="Manual - Paypal" data-translate-key="payment_manual_paypal">Manual - Paypal</option>
+                                    <option value="Manual - Credit Card" data-translate-key="payment_manual_cc">Manual - Tarjeta de Crédito</option>
+                                    <option value="Manual - Bank Transfer" data-translate-key="payment_manual_bank">Manual - Transferencia Bancaria</option>
+                                </select>
+                                <span asp-validation-for="BillingMethod" class="text-danger"></span>
+                            </div>
+
+                            <!-- Language -->
+                            <div class="col-md-6">
+                                <label asp-for="Language" class="form-label" data-translate-key="form_language">Idioma</label>
+                                <select asp-for="Language" class="form-select">
+                                    <option value="en" data-translate-key="language_english">Inglés</option>
+                                    <option value="es" data-translate-key="language_spanish">Español</option>
+                                </select>
+                                <span asp-validation-for="Language" class="text-danger"></span>
+                            </div>
+
+                            <!-- Status & 2FA -->
+                            <div class="col-md-6">
+                                <label class="form-label" data-translate-key="form_status">Estado</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsActive" class="form-check-input" />
+                                    <label asp-for="IsActive" class="form-check-label" data-translate-key="form_status_active">Activo</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input asp-for="IsTwoFactorEnabled" class="form-check-input" />
+                                    <label asp-for="IsTwoFactorEnabled" class="form-check-label" data-translate-key="form_2fa">
+                                        Habilitar Autenticación de Dos Factores
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">Email Address</label>
-                            <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Role" class="form-label">User Role</label>
-                            <select asp-for="Role" class="form-select">
-                                <option value="">-- Select Role --</option>
-                                <option value="Admin">Administrator</option>
-                                <option value="User">Regular User</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Guest">Guest</option>
-                            </select>
-                            <span asp-validation-for="Role" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input asp-for="IsActive" class="form-check-input" />
-                            <label asp-for="IsActive" class="form-check-label">Active User</label>
-                            <span asp-validation-for="IsActive" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Created At</label>
-                            <input class="form-control" value="@Model.CreatedAt.ToString("g")" disabled />
-                            <small class="text-muted">This field cannot be edited</small>
-                        </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> Save Changes
+                                <i class="fas fa-save me-1"></i> <span data-translate-key="form_button_save">Guardar Cambios</span>
                             </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <a asp-action="Index" class="btn btn-outline-secondary" data-translate-key="form_button_cancel">Cancelar</a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        
+        <!-- Side Information Panel -->
+        <div class="col-xl-4 col-lg-5">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">Information</h5>
+                    <h5 class="card-title mb-0" data-translate-key="info_panel_title">Información</h5>
                 </div>
                 <div class="card-body">
-                    <p>Update the user's information as needed. Please note:</p>
+                    <p data-translate-key="info_panel_description">Actualiza la información del usuario según sea necesario. Ten en cuenta:</p>
                     <ul>
-                        <li>The user ID cannot be changed</li>
-                        <li>Creation date is preserved</li>
-                        <li>Changing a role will affect user permissions</li>
+                        <li data-translate-key="info_panel_id">El ID del usuario no se puede cambiar</li>
+                        <li data-translate-key="info_panel_password">La contraseña solo se actualiza si ingresas una nueva</li>
+                        <li data-translate-key="info_panel_role">Cambiar el rol afectará los permisos del usuario</li>
+                        <li data-translate-key="info_panel_avatar">El avatar anterior se eliminará al subir uno nuevo</li>
                     </ul>
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        Deactivating a user will prevent them from logging in but will not delete their account.
+                        <span data-translate-key="info_panel_warning">Desactivar un usuario impedirá que inicie sesión pero no eliminará su cuenta.</span>
                     </div>
                 </div>
             </div>
@@ -98,4 +223,63 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Avatar preview
+            const avatarInput = document.getElementById('AvatarFile');
+            const avatarPreview = document.getElementById('userAvatarPreview');
+            const resetButton = document.getElementById('resetAvatarButton');
+            const originalSrc = avatarPreview.src;
+
+            if (avatarInput) {
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 800 * 1024) {
+                            alert('El archivo es demasiado grande. El tamaño máximo permitido es 800KB.');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            avatarPreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    avatarPreview.src = originalSrc;
+                    if (avatarInput) avatarInput.value = '';
+                });
+            }
+
+            // Password visibility toggles
+            const toggleNewPassword = document.getElementById('toggleNewPassword');
+            const newPasswordInput = document.getElementById('NewPassword');
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            const confirmPasswordInput = document.getElementById('ConfirmNewPassword');
+
+            if (toggleNewPassword && newPasswordInput) {
+                toggleNewPassword.addEventListener('click', function() {
+                    const type = newPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    newPasswordInput.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+
+            if (toggleConfirmPassword && confirmPasswordInput) {
+                toggleConfirmPassword.addEventListener('click', function() {
+                    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    confirmPasswordInput.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
 }

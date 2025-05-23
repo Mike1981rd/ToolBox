@@ -39,48 +39,60 @@ namespace ToolBox.Data
             {
                 new User
                 {
-                    Name = "John Smith",
+                    FullName = "John Smith",
+                    UserName = "jsmith",
                     Email = "admin@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = adminRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-6)
                 },
                 new User
                 {
-                    Name = "Jane Doe",
+                    FullName = "Jane Doe",
+                    UserName = "jdoe",
                     Email = "jane.doe@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = managerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-4)
                 },
                 new User
                 {
-                    Name = "Robert Johnson",
+                    FullName = "Robert Johnson",
+                    UserName = "rjohnson",
                     Email = "robert.johnson@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = userRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-2)
                 },
                 new User
                 {
-                    Name = "Maria Garcia",
+                    FullName = "Maria Garcia",
+                    UserName = "mgarcia",
                     Email = "maria.garcia@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = userRole.Id,
                     IsActive = false,
                     CreatedAt = DateTime.UtcNow.AddMonths(-1)
                 },
                 new User
                 {
-                    Name = "David Lee",
+                    FullName = "David Lee",
+                    UserName = "dlee",
                     Email = "david.lee@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = developerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-15)
                 },
                 new User
                 {
-                    Name = "Sarah Wilson",
+                    FullName = "Sarah Wilson",
+                    UserName = "swilson",
                     Email = "sarah.wilson@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                     RoleId = testerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-7)

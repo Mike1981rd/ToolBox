@@ -6,7 +6,7 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body flex-grow-1">
-        <form class="add-new-user needs-validation pt-0" id="addNewUserForm" novalidate>
+        <form class="add-new-user needs-validation pt-0" id="addNewUserForm" novalidate enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             
             <!-- User Avatar - Improved Layout -->
@@ -25,7 +25,7 @@
                         <label for="uploadAvatarInput" class="btn btn-primary btn-sm mb-2 d-block" data-translate-key="offcanvas_upload_new_photo">
                             <i class="fas fa-upload me-1"></i> Upload new photo
                         </label>
-                        <input type="file" id="uploadAvatarInput" class="d-none" accept="image/*">
+                        <input type="file" id="uploadAvatarInput" name="avatarFile" class="d-none" accept="image/*">
                         <button type="button" class="btn btn-outline-secondary btn-sm d-block w-100" id="resetAvatarButton" data-translate-key="offcanvas_reset_avatar">
                             <i class="fas fa-trash-alt me-1"></i> Reset
                         </button>
@@ -122,30 +122,21 @@
                 </div>
             </div>
 
-            <!-- Role & Plan -->
+            <!-- Role -->
             <div class="row g-3">
-                <div class="col-md-6 mb-3">
+                <div class="col-12 mb-3">
                     <label for="user-role" class="form-label" data-translate-key="form_role">User Role</label>
                     <select class="form-select" id="user-role" name="role" required>
                         <option value="" data-translate-key="form_select_role">Select Role</option>
-                        <option value="Admin" data-translate-key="role_admin">Admin</option>
-                        <option value="Editor" data-translate-key="role_editor">Editor</option>
-                        <option value="Author" data-translate-key="role_author">Author</option>
-                        <option value="Maintainer" data-translate-key="role_maintainer">Maintainer</option>
-                        <option value="Subscriber" data-translate-key="role_subscriber">Subscriber</option>
+                        @if (ViewBag.AvailableRoles != null)
+                        {
+                            @foreach (var role in ViewBag.AvailableRoles as IEnumerable<ToolBox.Models.Role>)
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
+                        }
                     </select>
                     <div class="invalid-feedback" data-translate-key="form_feedback_role">Please select a role</div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="user-plan" class="form-label" data-translate-key="form_plan">Select Plan</label>
-                    <select class="form-select" id="user-plan" name="plan" required>
-                        <option value="" data-translate-key="form_select_plan">Select Plan</option>
-                        <option value="Basic" data-translate-key="plan_basic">Basic</option>
-                        <option value="Team" data-translate-key="plan_team">Team</option>
-                        <option value="Company" data-translate-key="plan_company">Company</option>
-                        <option value="Enterprise" data-translate-key="plan_enterprise">Enterprise</option>
-                    </select>
-                    <div class="invalid-feedback" data-translate-key="form_feedback_plan">Please select a plan</div>
                 </div>
             </div>
 

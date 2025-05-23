@@ -26,8 +26,14 @@ namespace ToolBox.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<User> Users { get; set; }
+        public virtual ICollection<User> Users { get; set; }
 
-        public ICollection<RolePermission> RolePermissions { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; }
+
+        public Role()
+        {
+            Users = new HashSet<User>();
+            RolePermissions = new HashSet<RolePermission>();
+        }
     }
 }

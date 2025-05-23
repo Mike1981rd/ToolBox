@@ -51,7 +51,17 @@ namespace ToolBox.Data
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
-                .IsRequired(false); // Makes RoleId optional (nullable)
+                .IsRequired(false) // Makes RoleId optional (nullable)
+                .OnDelete(DeleteBehavior.SetNull); // If a Role is deleted, RoleId in User is set to null
+
+            // User unique indexes - COMENTADO TEMPORALMENTE
+            // modelBuilder.Entity<User>()
+            //     .HasIndex(u => u.UserName)
+            //     .IsUnique();
+
+            // modelBuilder.Entity<User>()
+            //     .HasIndex(u => u.Email)
+            //     .IsUnique();
 
             // Seed Permissions data
             SeedPermissions(modelBuilder);

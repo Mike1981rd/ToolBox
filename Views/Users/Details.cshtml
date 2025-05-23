@@ -9,7 +9,7 @@
     <div class="row mb-4">
         <div class="col">
             <h1 class="display-4">User Details</h1>
-            <p class="lead">Viewing complete information for @Model.Name</p>
+            <p class="lead">Viewing complete information for @Model.FullName</p>
         </div>
         <div class="col-auto d-flex align-items-center">
             <a asp-action="Index" class="btn btn-outline-secondary">
@@ -28,7 +28,7 @@
                     <div class="row mb-4">
                         <div class="col-md-3 text-center">
                             <div class="mb-3">
-                                <img src="https://via.placeholder.com/150x150/DFE3E7/8C98A4?text=Avatar" alt="@Model.Name" class="img-thumbnail rounded-circle shadow-sm" />
+                                <img src="https://via.placeholder.com/150x150/DFE3E7/8C98A4?text=Avatar" alt="@Model.FullName" class="img-thumbnail rounded-circle shadow-sm" />
                             </div>
                             <div class="mb-2">
                                 @if (Model.IsActive)
@@ -50,7 +50,7 @@
                                 <dd class="col-sm-8">@Html.DisplayFor(model => model.Id)</dd>
                                 
                                 <dt class="col-sm-4">Full Name</dt>
-                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Name)</dd>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.FullName)</dd>
                                 
                                 <dt class="col-sm-4">Email Address</dt>
                                 <dd class="col-sm-8">

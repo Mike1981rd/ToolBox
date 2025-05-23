@@ -14,11 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('add-user-password');
     const confirmPasswordInput = document.getElementById('add-user-confirm-password');
     
-    // Avatar por defecto con mayor calidad para evitar errores de carga
-    const defaultAvatarUrl = 'https://via.placeholder.com/250x250/DFE3E7/8C98A4?text=User';
-    
-    // Imagen fallback local en caso de problemas de red
-    const fallbackAvatarUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI0RGRTNFNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM4Qzk4QTQiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+    // Avatar por defecto local
+    const defaultAvatarUrl = '/img/default-avatar.png';
     
     // 1. Avatar Upload Preview - Mejorado
     if (uploadAvatarInput && userAvatarPreview) {
@@ -39,13 +36,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    userAvatarPreview.src = e.target.result;
-                    userAvatarPreview.classList.add('avatar-highlight'); // Opcional: efecto visual
-                    setTimeout(() => userAvatarPreview.classList.remove('avatar-highlight'), 500);
+                // Usar URL.createObjectURL para mejor rendimiento
+                const objectUrl = URL.createObjectURL(file);
+                userAvatarPreview.src = objectUrl;
+                userAvatarPreview.classList.add('avatar-highlight'); // Opcional: efecto visual
+                setTimeout(() => userAvatarPreview.classList.remove('avatar-highlight'), 500);
+                
+                // Limpiar el objeto URL cuando se cambie la imagen
+                userAvatarPreview.onload = function() {
+                    URL.revokeObjectURL(objectUrl);
                 };
-                reader.readAsDataURL(file);
             }
         });
     }
@@ -53,12 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. Reset Avatar to Default
     if (resetAvatarButton && userAvatarPreview) {
         resetAvatarButton.addEventListener('click', function() {
-            // Intentar usar la URL externa primero, con fallback automático
+            // Usar la imagen por defecto local
             userAvatarPreview.src = defaultAvatarUrl;
-            userAvatarPreview.onerror = function() {
-                this.onerror = null; // Evitar bucle infinito
-                this.src = fallbackAvatarUrl;
-            };
             
             if (uploadAvatarInput) {
                 uploadAvatarInput.value = ''; // Limpiar input file
@@ -89,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 4. Form Validation - Mejorado
     if (addUserForm) {
+        // Plan field removed - no longer needed
+        
         // Check passwords match
         addUserForm.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -107,43 +105,58 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // If form is valid
             if (this.checkValidity()) {
-                // Aquí se enviaría el formulario en una implementación real
-                console.log('Form submitted successfully');
+                // Preparar los datos del formulario
+                const formData = new FormData();
+                formData.append('FullName', document.getElementById('add-user-fullname').value);
+                formData.append('UserName', document.getElementById('add-user-username').value);
+                formData.append('Email', document.getElementById('add-user-email').value);
+                formData.append('Password', document.getElementById('add-user-password').value);
+                formData.append('ConfirmPassword', document.getElementById('add-user-confirm-password').value);
+                formData.append('RoleId', document.getElementById('user-role').value || '');
+                formData.append('PhoneNumber', document.getElementById('add-user-contact').value || '');
+                formData.append('CompanyName', document.getElementById('add-user-company').value || '');
+                formData.append('Country', document.getElementById('country').value || '');
+                formData.append('TaxId', document.getElementById('taxId').value || '');
+                formData.append('BillingMethod', document.getElementById('billingMethod').value || '');
+                formData.append('Language', document.getElementById('language').value || '');
+                formData.append('IsActive', document.getElementById('activeStatus').checked);
+                formData.append('IsTwoFactorEnabled', document.getElementById('twoFactorAuth').checked);
                 
-                // Creamos un objeto para simular los datos del formulario
-                const formData = {
-                    fullName: document.getElementById('add-user-fullname').value,
-                    username: document.getElementById('add-user-username').value,
-                    email: document.getElementById('add-user-email').value,
-                    role: document.getElementById('user-role').value,
-                    plan: document.getElementById('user-plan').value,
-                    status: document.getElementById('activeStatus').checked ? 'Active' : 'Inactive'
-                };
-                console.log('User data:', formData);
-                
-                // Cerrar el offcanvas
-                const offcanvasElement = document.getElementById('addUserOffcanvas');
-                const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
-                if (offcanvasInstance) {
-                    offcanvasInstance.hide();
+                // Agregar el archivo de avatar si existe
+                const avatarInput = document.getElementById('uploadAvatarInput');
+                if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                    formData.append('AvatarFile', avatarInput.files[0]);
                 }
                 
-                // Reset the form
-                this.reset();
-                this.classList.remove('was-validated');
-                if (userAvatarPreview) {
-                    // Establecemos la imagen por defecto con fallback automático
-                    userAvatarPreview.src = defaultAvatarUrl;
-                    userAvatarPreview.onerror = function() {
-                        this.onerror = null; // Evitar bucle infinito
-                        this.src = fallbackAvatarUrl;
-                    };
-                }
+                // Obtener el token antiforgery
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                formData.append('__RequestVerificationToken', token);
                 
-                // Mostrar notificación de éxito (conectaría con un sistema de toasts en implementación real)
-                alert('User added successfully!');
-                
-                // En una implementación real, aquí se recargaría la tabla o se añadiría el usuario a la tabla existente
+                // Enviar la petición al servidor
+                fetch('/Users/Create', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        // Si hay redirección, probablemente el usuario se creó exitosamente
+                        window.location.href = response.url;
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(html => {
+                    if (html) {
+                        // Si hay HTML, probablemente hay errores de validación
+                        // Por ahora, mostrar alerta simple
+                        alert('Error al crear el usuario. Por favor revise los datos.');
+                        console.error('Validation errors occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ocurrió un error al crear el usuario.');
+                });
             }
         });
         
