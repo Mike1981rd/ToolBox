@@ -123,10 +123,82 @@ namespace ToolBox.Services
             throw new NotImplementedException();
         }
 
+        public async Task<(bool Success, string NewStatusMessage, bool NewIsActiveState)> ToggleUserStatusAsync(int userId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return (false, "Usuario no encontrado.", false);
+                }
+
+                // Cambiar el estado
+                user.IsActive = !user.IsActive;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                _context.Users.Update(user);
+                int changes = await _context.SaveChangesAsync();
+
+                if (changes > 0)
+                {
+                    await transaction.CommitAsync();
+                    string newStatusMessage = user.IsActive ? "Activo" : "Inactivo";
+                    return (true, newStatusMessage, user.IsActive);
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                    return (false, "No se pudo actualizar el estado del usuario.", user.IsActive);
+                }
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"Error en ToggleUserStatusAsync: {ex.Message}");
+                return (false, "Error al actualizar el estado del usuario.", false);
+            }
+        }
+
         public async Task<IEnumerable<User>> GetAllUsersAsync(string? roleFilter = null, string? statusFilter = null, string? searchTerm = null)
         {
-            // TODO: Implementar consulta con filtros opcionales
-            return await _context.Users.Include(u => u.Role).ToListAsync(); // Carga básica por ahora
+            var query = _context.Users.Include(u => u.Role).AsQueryable();
+
+            // Filtrar por estado si se proporciona
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (statusFilter.ToLower() == "active")
+                {
+                    query = query.Where(u => u.IsActive);
+                }
+                else if (statusFilter.ToLower() == "inactive")
+                {
+                    query = query.Where(u => !u.IsActive);
+                }
+            }
+
+            // Filtrar por rol si se proporciona
+            if (!string.IsNullOrEmpty(roleFilter) && int.TryParse(roleFilter, out int roleId))
+            {
+                query = query.Where(u => u.RoleId == roleId);
+            }
+
+            // Filtrar por término de búsqueda si se proporciona
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(u => 
+                    u.FullName.ToLower().Contains(searchTerm) ||
+                    u.Email.ToLower().Contains(searchTerm) ||
+                    u.UserName.ToLower().Contains(searchTerm)
+                );
+            }
+
+            // Ordenar por fecha de creación descendente (más recientes primero)
+            query = query.OrderByDescending(u => u.CreatedAt);
+
+            return await query.ToListAsync();
         }
         
         public async Task<User> GetUserByIdAsync(int userId)

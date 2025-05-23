@@ -33,6 +33,8 @@ namespace ToolBox.Controllers
         // GET: Users
         public async Task<IActionResult> Index(string? roleFilter = null, string? statusFilter = null, string? searchTerm = null)
         {
+            // Por defecto mostrar usuarios activos
+            statusFilter = statusFilter ?? "active";
             var users = await _userService.GetAllUsersAsync(roleFilter, statusFilter, searchTerm);
             var userViewModels = users.Select(u => new UserListItemViewModel
             {
@@ -51,7 +53,10 @@ namespace ToolBox.Controllers
             ViewBag.Roles = new SelectList(roles, "Id", "Name", roleFilter);
             // También pasamos los roles para el offcanvas de crear usuario
             ViewBag.AvailableRoles = roles;
-            // ViewBag.Statuses = ... (lista de estados para el filtro)
+            // Pasar los filtros actuales a la vista para mantener la selección
+            ViewBag.CurrentRoleFilter = roleFilter;
+            ViewBag.CurrentStatusFilter = statusFilter ?? "active"; // Por defecto active
+            ViewBag.CurrentSearchTerm = searchTerm;
             
             return View(userViewModels);
         }
@@ -385,33 +390,58 @@ namespace ToolBox.Controllers
             return View(model);
         }
 
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        // GET: Users/Delete/5 - DESHABILITADO: Ahora usamos ToggleStatus
+        // public async Task<IActionResult> Delete(int? id)
+        // {
+        //     if (id == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //     var user = await _context.Users
+        //         .FirstOrDefaultAsync(m => m.Id == id);
+        //     if (user == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            return View(user);
-        }
+        //     return View(user);
+        // }
 
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Users/Delete/5 - DESHABILITADO: Ahora usamos ToggleStatus
+        // [HttpPost, ActionName("Delete")]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> DeleteConfirmed(int id)
+        // {
+        //     var user = await _context.Users.FindAsync(id);
+        //     _context.Users.Remove(user);
+        //     await _context.SaveChangesAsync();
+        //     return RedirectToAction(nameof(Index));
+        // }
+
+        // POST: Users/ToggleStatus/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ToggleStatus(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var (success, newStatusMessage, newIsActiveState) = await _userService.ToggleUserStatusAsync(id);
+
+            if (success)
+            {
+                return Json(new { 
+                    success = true, 
+                    message = $"El estado del usuario ha sido cambiado a '{newStatusMessage}'.",
+                    newIsActiveState = newIsActiveState,
+                    newStatusMessage = newStatusMessage
+                });
+            }
+            else
+            {
+                return Json(new { 
+                    success = false, 
+                    message = newStatusMessage 
+                });
+            }
         }
 
         private bool UserExists(int id)

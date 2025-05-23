@@ -20,6 +20,9 @@ namespace ToolBox.Interfaces
         
         Task<bool> DeleteUserAsync(int userId);
 
+        // Método para cambiar estado del usuario
+        Task<(bool Success, string NewStatusMessage, bool NewIsActiveState)> ToggleUserStatusAsync(int userId);
+
         // Métodos de validación
         Task<bool> IsEmailTakenAsync(string email, int? currentUserId = null);
         Task<bool> IsUserNameTakenAsync(string userName, int? currentUserId = null);

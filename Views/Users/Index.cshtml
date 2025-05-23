@@ -67,22 +67,37 @@
         <div class="row g-3 mb-4">
             <div class="col-md-4">
                 <label class="form-label" for="selectRole" data-translate-key="filter_select_role">Select Role</label>
-                <select id="selectRole" class="form-select">
+                <select id="selectRole" class="form-select filter-select">
                     <option value="" data-translate-key="all_option">All</option>
                     @if (ViewBag.AvailableRoles != null)
                     {
                         @foreach (var role in ViewBag.AvailableRoles as IEnumerable<ToolBox.Models.Role>)
                         {
-                            <option value="@role.Id">@role.Name</option>
+                            @if (ViewBag.CurrentRoleFilter == role.Id.ToString())
+                            {
+                                <option value="@role.Id" selected>@role.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
                         }
                     }
                 </select>
             </div>
             <div class="col-md-4">
                 <label class="form-label" for="selectStatus" data-translate-key="filter_select_status">Select Status</label>
-                <select id="selectStatus" class="form-select">
-                    <option value="Active" selected data-translate-key="status_active">Active</option>
-                    <option value="Inactive" data-translate-key="status_inactive">Inactive</option>
+                <select id="selectStatus" class="form-select filter-select">
+                    @if (ViewBag.CurrentStatusFilter == "active")
+                    {
+                        <option value="active" selected data-translate-key="status_active">Active</option>
+                        <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                    }
+                    else
+                    {
+                        <option value="active" data-translate-key="status_active">Active</option>
+                        <option value="inactive" selected data-translate-key="status_inactive">Inactive</option>
+                    }
                 </select>
             </div>
         </div>
@@ -192,12 +207,38 @@
                                 </td>
                                 <td>
                                     <div class="d-inline-block text-nowrap">
-                                        <a href="@Url.Action("Edit", new { id = user.Id })" class="btn btn-sm btn-icon"><i class="fas fa-edit"></i></a>
-                                        <a href="@Url.Action("Delete", new { id = user.Id })" class="btn btn-sm btn-icon delete-record"><i class="fas fa-trash-alt"></i></a>
-                                        <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                        <a href="@Url.Action("Edit", new { id = user.Id })" class="btn btn-sm btn-icon" title="Editar Usuario">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        
+                                        @if (user.IsActive)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-icon text-warning toggle-status-btn" 
+                                                    title="Desactivar Usuario"
+                                                    data-user-id="@user.Id"
+                                                    data-user-name="@user.FullName"
+                                                    data-current-status="active"
+                                                    data-action="deactivate">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-icon text-success toggle-status-btn" 
+                                                    title="Activar Usuario"
+                                                    data-user-id="@user.Id"
+                                                    data-user-name="@user.FullName"
+                                                    data-current-status="inactive"
+                                                    data-action="activate">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        }
+                                        
+                                        <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
                                         <div class="dropdown-menu dropdown-menu-end m-0">
                                             <a href="@Url.Action("Details", new { id = user.Id })" class="dropdown-item" data-translate-key="action_view">View</a>
-                                            <a href="javascript:;" class="dropdown-item" data-translate-key="action_suspend">Suspend</a>
                                         </div>
                                     </div>
                                 </td>
@@ -237,9 +278,269 @@
     </div>
 </div>
 
+<!-- Token CSRF para peticiones AJAX -->
+@Html.AntiForgeryToken()
+
+<!-- Modal de Confirmación para Cambio de Estado -->
+<div class="modal fade" id="confirmStatusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmStatusModalTitle">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <span data-translate-key="confirm_status_change">Confirmar Cambio de Estado</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmStatusMessage"></p>
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <div id="statusChangeWarning"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="cancel_button">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusBtn">
+                    <span data-translate-key="confirm_button">Confirmar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para Notificaciones -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2" id="toastIcon"></i>
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Incluir Offcanvas para añadir nuevos usuarios -->
 @await Html.PartialAsync("_AddUserOffcanvas")
 
 @section Scripts {
     <script src="~/js/users-script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar cambios en los filtros
+            const roleFilter = document.getElementById('selectRole');
+            const statusFilter = document.getElementById('selectStatus');
+            const searchInput = document.querySelector('input[aria-controls="DataTables_Table_0"]');
+            
+            function applyFilters() {
+                const params = new URLSearchParams();
+                
+                // Obtener valores de los filtros
+                const roleValue = roleFilter.value;
+                const statusValue = statusFilter.value;
+                const searchValue = searchInput ? searchInput.value : '';
+                
+                // Agregar parámetros si tienen valor
+                if (roleValue) params.append('roleFilter', roleValue);
+                if (statusValue) params.append('statusFilter', statusValue);
+                if (searchValue) params.append('searchTerm', searchValue);
+                
+                // Redirigir con los nuevos parámetros
+                window.location.href = '@Url.Action("Index", "Users")' + (params.toString() ? '?' + params.toString() : '');
+            }
+            
+            // Agregar event listeners
+            if (roleFilter) {
+                roleFilter.addEventListener('change', applyFilters);
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', applyFilters);
+            }
+            
+            // Para el campo de búsqueda, usar un timeout para evitar múltiples solicitudes
+            let searchTimeout;
+            if (searchInput) {
+                // Establecer el valor actual de búsqueda si existe
+                const currentSearchTerm = '@(ViewBag.CurrentSearchTerm ?? "")';
+                if (currentSearchTerm) {
+                    searchInput.value = currentSearchTerm;
+                }
+                
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(applyFilters, 500); // Esperar 500ms después de dejar de escribir
+                });
+                
+                // También manejar Enter
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        clearTimeout(searchTimeout);
+                        applyFilters();
+                    }
+                });
+            }
+            
+            // Manejar botones de cambio de estado con delegación de eventos
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
+            const statusChangeForm = document.getElementById('statusChangeForm');
+            
+            // Variable para almacenar el botón actual
+            let currentToggleButton = null;
+            
+            // Usar delegación de eventos para manejar botones dinámicos
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.toggle-status-btn')) {
+                    const button = e.target.closest('.toggle-status-btn');
+                    currentToggleButton = button; // Guardar referencia al botón
+                    const userId = button.dataset.userId;
+                    const userName = button.dataset.userName;
+                    const currentStatus = button.dataset.currentStatus;
+                    const action = button.dataset.action;
+                    
+                    // Configurar el mensaje del modal
+                    const message = document.getElementById('confirmStatusMessage');
+                    const warning = document.getElementById('statusChangeWarning');
+                    
+                    if (action === 'deactivate') {
+                        message.innerHTML = `¿Está seguro de que desea <strong class="text-warning">desactivar</strong> al usuario <strong>${userName}</strong>?`;
+                        warning.textContent = 'El usuario no podrá acceder al sistema hasta que sea activado nuevamente.';
+                    } else {
+                        message.innerHTML = `¿Está seguro de que desea <strong class="text-success">activar</strong> al usuario <strong>${userName}</strong>?`;
+                        warning.textContent = 'El usuario podrá acceder al sistema con sus credenciales.';
+                    }
+                    
+                    // Configurar el botón de confirmación con el userId
+                    document.getElementById('confirmStatusBtn').dataset.userId = userId;
+                    
+                    // Mostrar el modal
+                    confirmModal.show();
+                }
+            });
+            
+            // Manejar el clic en el botón de confirmación
+            document.getElementById('confirmStatusBtn').addEventListener('click', async function() {
+                const userId = this.dataset.userId;
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('__RequestVerificationToken', token);
+                    
+                    const response = await fetch(`@Url.Action("ToggleStatus", "Users")/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Obtener el filtro actual de estado
+                        const currentFilter = document.getElementById('selectStatus').value;
+                        const row = currentToggleButton.closest('tr');
+                        
+                        // Si el usuario ya no coincide con el filtro actual, remover la fila con animación
+                        if ((currentFilter === 'active' && !result.newIsActiveState) || 
+                            (currentFilter === 'inactive' && result.newIsActiveState)) {
+                            
+                            // Animar la fila antes de removerla
+                            row.style.transition = 'opacity 0.3s ease-out';
+                            row.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                row.remove();
+                                
+                                // Verificar si ya no hay más usuarios en la tabla
+                                const tbody = document.querySelector('.table tbody');
+                                if (tbody.querySelectorAll('tr').length === 0) {
+                                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay usuarios ' + 
+                                                    (currentFilter === 'active' ? 'activos' : 'inactivos') + '</td></tr>';
+                                }
+                            }, 300);
+                            
+                        } else {
+                            // Actualizar el botón y el badge de estado
+                            const statusBadge = row.querySelector('.badge');
+                            
+                            if (result.newIsActiveState) {
+                                // El usuario ahora está activo
+                                currentToggleButton.className = 'btn btn-sm btn-icon text-warning toggle-status-btn';
+                                currentToggleButton.title = 'Desactivar Usuario';
+                                currentToggleButton.dataset.currentStatus = 'active';
+                                currentToggleButton.dataset.action = 'deactivate';
+                                currentToggleButton.innerHTML = '<i class="fas fa-user-slash"></i>';
+                                
+                                statusBadge.className = 'badge bg-success-subtle text-success-emphasis';
+                                statusBadge.textContent = 'Active';
+                            } else {
+                                // El usuario ahora está inactivo
+                                currentToggleButton.className = 'btn btn-sm btn-icon text-success toggle-status-btn';
+                                currentToggleButton.title = 'Activar Usuario';
+                                currentToggleButton.dataset.currentStatus = 'inactive';
+                                currentToggleButton.dataset.action = 'activate';
+                                currentToggleButton.innerHTML = '<i class="fas fa-user-check"></i>';
+                                
+                                statusBadge.className = 'badge bg-secondary-subtle text-secondary-emphasis';
+                                statusBadge.textContent = 'Inactive';
+                            }
+                        }
+                        
+                        showToast(result.message, 'success');
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                    
+                    // Cerrar el modal
+                    confirmModal.hide();
+                    
+                } catch (error) {
+                    showToast('Error al cambiar el estado del usuario', 'error');
+                    confirmModal.hide();
+                }
+            });
+            
+            // Función para mostrar notificaciones toast
+            function showToast(message, type = 'success') {
+                const toastElement = document.getElementById('notificationToast');
+                const toastIcon = document.getElementById('toastIcon');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                // Configurar el ícono y estilo según el tipo
+                if (type === 'success') {
+                    toastIcon.className = 'fas fa-check-circle text-white me-2';
+                    toastElement.className = 'toast align-items-center border-0 bg-success text-white';
+                } else if (type === 'error') {
+                    toastIcon.className = 'fas fa-times-circle text-white me-2';
+                    toastElement.className = 'toast align-items-center border-0 bg-danger text-white';
+                }
+                
+                toastMessage.textContent = message;
+                
+                const toast = new bootstrap.Toast(toastElement, {
+                    autohide: true,
+                    delay: 3000
+                });
+                toast.show();
+            }
+            
+            // Manejar mensajes de éxito/error de TempData
+            @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+            {
+                <text>
+                showToast('@Html.Raw(TempData["SuccessMessage"])', 'success');
+                </text>
+            }
+            
+            @if (!string.IsNullOrEmpty(TempData["ErrorMessage"]?.ToString()))
+            {
+                <text>
+                showToast('@Html.Raw(TempData["ErrorMessage"])', 'error');
+                </text>
+            }
+        });
+    </script>
 }
