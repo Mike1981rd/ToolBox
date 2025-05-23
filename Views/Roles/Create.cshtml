@@ -1,0 +1,209 @@
+@model ToolBox.Models.ViewModels.RoleCreateViewModel
+
+@{
+    ViewData["Title"] = "Crear Nuevo Rol";
+    Layout = "_AdminLayout";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Roles" asp-action="Index" data-translate-key="roles_menu">Roles</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="create_new_role">Create New Role</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" asp-action="Create">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Información del Rol -->
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3" data-translate-key="role_information">Role Information</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label" data-translate-key="role_name">Role Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter role name" data-translate-placeholder-key="role_name_placeholder" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"><span data-translate-key="description">Description</span> <span class="text-muted" data-translate-key="optional">(Optional)</span></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter optional description" data-translate-placeholder-key="description_placeholder"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AssignedDashboard" class="form-label" data-translate-key="assigned_dashboard">Assigned Dashboard</label>
+                            <select asp-for="AssignedDashboard" class="form-select">
+                                <option value="" data-translate-key="select_dashboard">Select Dashboard</option>
+                                <option value="Admin" data-translate-key="admin_dashboard">Admin Dashboard</option>
+                                <option value="Coach" data-translate-key="coach_dashboard">Coach Dashboard</option>
+                                <option value="Client" data-translate-key="client_dashboard">Client Dashboard</option>
+                            </select>
+                            <span asp-validation-for="AssignedDashboard" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Permisos del Rol -->
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3" data-translate-key="role_permissions">Role Permissions</h5>
+                        <p class="text-muted" data-translate-key="select_permissions_message">Select the permissions you want to assign to this role.</p>
+
+                        @if (Model.AvailablePermissions != null && Model.AvailablePermissions.Any())
+                        {
+                            var permissionsByModule = Model.AvailablePermissions.GroupBy(p => p.ModuleName);
+
+                            foreach (var moduleGroup in permissionsByModule.OrderBy(g => g.Key))
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">@moduleGroup.Key</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            @foreach (var permission in moduleGroup.OrderBy(p => p.ActionName))
+                                            {
+                                                <div class="col-md-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               name="SelectedPermissionIds" 
+                                                               value="@permission.Id" 
+                                                               id="perm_@permission.Id">
+                                                        <label class="form-check-label" for="perm_@permission.Id">
+                                                            <strong>@permission.ActionName</strong>
+                                                            @if (!string.IsNullOrEmpty(permission.Description))
+                                                            {
+                                                                <br />
+                                                                <small class="text-muted">@permission.Description</small>
+                                                            }
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span data-translate-key="no_permissions_available">No permissions available to assign.</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i><span data-translate-key="create_role_button">Create Role</span>
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i><span data-translate-key="cancel_button">Cancel</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral informativo -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i><span data-translate-key="information">Information</span></h6>
+            </div>
+            <div class="card-body">
+                <h6 data-translate-key="about_roles">About Roles</h6>
+                <p class="small text-muted" data-translate-key="about_roles_description">
+                    Roles define what actions users can perform in the system. 
+                    Each role has a specific set of permissions that determine access 
+                    to different modules and functionalities.
+                </p>
+                
+                <h6 class="mt-3" data-translate-key="available_dashboards">Available Dashboards</h6>
+                <ul class="small text-muted">
+                    <li><strong data-translate-key="admin">Admin:</strong> <span data-translate-key="admin_dashboard_description">Full panel with all functionalities</span></li>
+                    <li><strong data-translate-key="coach">Coach:</strong> <span data-translate-key="coach_dashboard_description">Panel for trainers and managers</span></li>
+                    <li><strong data-translate-key="client">Client:</strong> <span data-translate-key="client_dashboard_description">Panel for end clients</span></li>
+                </ul>
+                
+                <h6 class="mt-3" data-translate-key="permission_types">Permission Types</h6>
+                <ul class="small text-muted mb-0">
+                    <li><strong data-translate-key="read">Read:</strong> <span data-translate-key="read_permission_description">Allows viewing information</span></li>
+                    <li><strong data-translate-key="write">Write:</strong> <span data-translate-key="write_permission_description">Allows editing existing information</span></li>
+                    <li><strong data-translate-key="create">Create:</strong> <span data-translate-key="create_permission_description">Allows creating new information</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Ensure translations are applied when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get saved language from localStorage
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            console.log('Current language:', savedLanguage);
+            
+            // Check if translations are loaded
+            if (typeof translations !== 'undefined') {
+                console.log('Translations object found');
+                // The initLanguage function in admin-script.js should already handle this
+                // but we can force a re-translation if needed
+                if (typeof setLanguage === 'function') {
+                    console.log('Applying translations for language:', savedLanguage);
+                    // The language should already be set, but we can log for debugging
+                }
+            } else {
+                console.error('Translations object not found');
+            }
+            
+            // Remove validation from Description field after a short delay to ensure the form is fully initialized
+            setTimeout(function() {
+                // Remove validation attributes
+                $('#Description').removeAttr('data-val-required');
+                $('#Description').removeAttr('aria-required');
+                $('#Description').removeAttr('required');
+                
+                // Remove from jQuery validator if it exists
+                if ($.validator && $.validator.unobtrusive) {
+                    var $form = $('#Description').closest('form');
+                    var validator = $form.data('validator');
+                    
+                    if (validator && validator.settings && validator.settings.rules) {
+                        // Remove Description from rules
+                        delete validator.settings.rules.Description;
+                        
+                        // Remove from error list if present
+                        if (validator.errorList) {
+                            validator.errorList = validator.errorList.filter(function(error) {
+                                return error.element.name !== 'Description';
+                            });
+                        }
+                    }
+                }
+                
+                // Clear any existing validation messages
+                $('#Description').removeClass('input-validation-error');
+                $('span[data-valmsg-for="Description"]').empty().removeClass('field-validation-error');
+            }, 100);
+        });
+    </script>
+    
+    <script>
+        // Script opcional para "Seleccionar todos" los permisos de un módulo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aquí podrías agregar lógica para facilitar la selección masiva de permisos
+        });
+    </script>
+}

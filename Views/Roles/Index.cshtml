@@ -1,3 +1,5 @@
+@model IEnumerable<ToolBox.Models.ViewModels.RoleListItemViewModel>
+
 @{
     ViewData["Title"] = "Roles";
     Layout = "_AdminLayout";
@@ -16,6 +18,44 @@
 
 <!-- Role Cards Section -->
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    @foreach (var role in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="card-subtitle text-muted">
+                            <span data-translate-key="total_users_role_prefix">Total</span> 
+                            <span>0</span> 
+                            <span data-translate-key="users_suffix">users</span>
+                        </h6>
+                        <a asp-controller="Roles" asp-action="Edit" asp-route-id="@role.Id" class="text-primary small" data-translate-key="edit_role_link">Edit Role</a>
+                    </div>
+                    <h5 class="card-title mb-3">@role.Name</h5>
+                    @if (!string.IsNullOrEmpty(role.Description))
+                    {
+                        <p class="small text-muted mb-2">@role.Description</p>
+                    }
+                    <div class="d-flex align-items-center">
+                        <div class="small">
+                            <span class="badge bg-info">@role.AssignedDashboard</span>
+                            @if (role.IsActive)
+                            {
+                                <span class="badge bg-success ms-1" data-translate-key="status_active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary ms-1" data-translate-key="status_inactive">Inactive</span>
+                            }
+                        </div>
+                        <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Comment out hardcoded cards
     <!-- Administrator Role Card -->
     <div class="col">
         <div class="card h-100 shadow-sm">
@@ -103,37 +143,21 @@
         </div>
     </div>
 
-    <!-- Restricted User Role Card -->
-    <div class="col">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="card-subtitle text-muted" data-translate-key="total_users_role_prefix">Total 2 users</h6>
-                    <a href="#" class="text-primary small" data-translate-key="edit_role_link">Edit Role</a>
-                </div>
-                <h5 class="card-title mb-3" data-role-name="Restricted User">Restricted User</h5>
-                <div class="d-flex align-items-center">
-                    <div class="avatar-group">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFQTU0NTUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPktNPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRjlGNDMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPkxHPC90ZXh0Pjwvc3ZnPg==" alt="User" class="avatar rounded-circle">
-                    </div>
-                    <a href="#" class="ms-auto"><i class="fas fa-copy text-muted"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
+    @* End of commented hardcoded cards *@
 
     <!-- Add New Role Card -->
     <div class="col">
-        <div class="card h-100 shadow-sm add-role-card" data-bs-toggle="modal" data-bs-target="#addRoleModal" style="cursor:pointer;">
-            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
-                <div class="mb-3">
-                    <i class="fas fa-plus-circle fa-3x text-primary"></i>
+        <a asp-controller="Roles" asp-action="Create" class="text-decoration-none">
+            <div class="card h-100 shadow-sm add-role-card" style="cursor:pointer;">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                    <div class="mb-3">
+                        <i class="fas fa-plus-circle fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title" data-translate-key="add_new_role_card_title">Add New Role</h5>
+                    <p class="card-text small text-muted" data-translate-key="add_new_role_card_text">Add new role, if it doesn't exist.</p>
                 </div>
-                <h5 class="card-title" data-translate-key="add_new_role_card_title">Add New Role</h5>
-                <p class="card-text small text-muted" data-translate-key="add_new_role_card_text">Add new role, if it doesn't exist.</p>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 

@@ -25,13 +25,23 @@ namespace ToolBox.Data
 
         private static void SeedUsers(ApplicationDbContext context)
         {
+            // First, create roles
+            var adminRole = new Role { Name = "Admin", Description = "Administrator role", AssignedDashboard = "Admin" };
+            var managerRole = new Role { Name = "Manager", Description = "Manager role", AssignedDashboard = "Admin" };
+            var userRole = new Role { Name = "User", Description = "Regular user role", AssignedDashboard = "Client" };
+            var developerRole = new Role { Name = "Developer", Description = "Developer role", AssignedDashboard = "Admin" };
+            var testerRole = new Role { Name = "Tester", Description = "Tester role", AssignedDashboard = "Admin" };
+
+            context.Roles.AddRange(adminRole, managerRole, userRole, developerRole, testerRole);
+            context.SaveChanges();
+
             var users = new User[]
             {
                 new User
                 {
                     Name = "John Smith",
                     Email = "admin@example.com",
-                    Role = "Admin",
+                    RoleId = adminRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-6)
                 },
@@ -39,7 +49,7 @@ namespace ToolBox.Data
                 {
                     Name = "Jane Doe",
                     Email = "jane.doe@example.com",
-                    Role = "Manager",
+                    RoleId = managerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-4)
                 },
@@ -47,7 +57,7 @@ namespace ToolBox.Data
                 {
                     Name = "Robert Johnson",
                     Email = "robert.johnson@example.com",
-                    Role = "User",
+                    RoleId = userRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddMonths(-2)
                 },
@@ -55,7 +65,7 @@ namespace ToolBox.Data
                 {
                     Name = "Maria Garcia",
                     Email = "maria.garcia@example.com",
-                    Role = "User",
+                    RoleId = userRole.Id,
                     IsActive = false,
                     CreatedAt = DateTime.UtcNow.AddMonths(-1)
                 },
@@ -63,7 +73,7 @@ namespace ToolBox.Data
                 {
                     Name = "David Lee",
                     Email = "david.lee@example.com",
-                    Role = "Developer",
+                    RoleId = developerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-15)
                 },
@@ -71,7 +81,7 @@ namespace ToolBox.Data
                 {
                     Name = "Sarah Wilson",
                     Email = "sarah.wilson@example.com",
-                    Role = "Tester",
+                    RoleId = testerRole.Id,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-7)
                 }

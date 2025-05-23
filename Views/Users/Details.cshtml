@@ -41,7 +41,7 @@
                                 }
                             </div>
                             <div>
-                                <span class="badge bg-info">@Html.DisplayFor(model => model.Role)</span>
+                                <span class="badge bg-info">@Html.DisplayFor(model => model.Role.Name)</span>
                             </div>
                         </div>
                         <div class="col-md-9">
@@ -124,10 +124,10 @@
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        This user has @Model.Role permissions.
+                        This user has @Model.Role?.Name permissions.
                     </div>
                     <p>Role capabilities:</p>
-                    @switch (Model.Role)
+                    @switch (Model.Role?.Name)
                     {
                         case "Admin":
                             <ul>

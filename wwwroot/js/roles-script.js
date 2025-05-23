@@ -47,33 +47,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Manejar el envío del formulario de nuevo rol (sin implementar backend)
-    const addRoleForm = document.getElementById('addRoleForm');
-    if (addRoleForm) {
-        addRoleForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulamos que el rol se guardó exitosamente
-            const roleNameInput = document.getElementById('roleNameInput');
-            const roleName = roleNameInput.value.trim();
-            
-            if (roleName) {
-                // Aquí se conectaría con el backend en el futuro
-                console.log('Nuevo rol creado:', roleName);
-                
-                // Cerrar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addRoleModal'));
-                modal.hide();
-                
-                // Mostrar mensaje de éxito (podría implementarse con una librería de toasts/alerts)
-                alert('Rol creado exitosamente');
-                
-                // Limpiar el formulario
-                addRoleForm.reset();
-            } else {
-                // Mostrar mensaje de error si no hay nombre de rol
-                alert('Por favor ingrese un nombre de rol');
-            }
-        });
-    }
+    // COMENTADO: El formulario de crear rol ahora se maneja en una página completa separada
+    // // Manejar el envío del formulario de nuevo rol (sin implementar backend)
+    // const addRoleForm = document.getElementById('addRoleForm');
+    // if (addRoleForm) {
+    //     addRoleForm.addEventListener('submit', function(e) {
+    //         e.preventDefault();
+    //         
+    //         // Simulamos que el rol se guardó exitosamente
+    //         const roleNameInput = document.getElementById('roleNameInput');
+    //         const roleName = roleNameInput.value.trim();
+    //         
+    //         if (roleName) {
+    //             // Aquí se conectaría con el backend en el futuro
+    //             console.log('Nuevo rol creado:', roleName);
+    //             
+    //             // Cerrar el modal
+    //             const modal = bootstrap.Modal.getInstance(document.getElementById('addRoleModal'));
+    //             modal.hide();
+    //             
+    //             // Mostrar mensaje de éxito (podría implementarse con una librería de toasts/alerts)
+    //             alert('Rol creado exitosamente');
+    //             
+    //             // Limpiar el formulario
+    //             addRoleForm.reset();
+    //         } else {
+    //             // Mostrar mensaje de error si no hay nombre de rol
+    //             alert('Por favor ingrese un nombre de rol');
+    //         }
+    //     });
+    // }
 });
