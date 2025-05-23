@@ -3,8 +3,12 @@ using Microsoft.Extensions.Logging;
 using ToolBox.Data;
 using ToolBox.Interfaces;
 using ToolBox.Services;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure QuestPDF license for Community use (free for organizations with revenue < $1M USD)
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

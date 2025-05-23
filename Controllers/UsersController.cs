@@ -12,6 +12,11 @@ using ToolBox.Data;
 using ToolBox.Models;
 using ToolBox.Interfaces;
 using ToolBox.Models.ViewModels;
+using ClosedXML.Excel; // ClosedXML
+using QuestPDF.Fluent; // QuestPDF
+using QuestPDF.Helpers; // QuestPDF
+using QuestPDF.Infrastructure; // QuestPDF
+using ToolBox.Documents; // Para UserListPdfDocument
 
 namespace ToolBox.Controllers
 {
@@ -62,47 +67,104 @@ namespace ToolBox.Controllers
         }
         
         // Acciones para Exportar
-        public async Task<IActionResult> ExportToExcel()
+        public async Task<IActionResult> ExportToExcel(string? roleFilter = null, string? statusFilter = null, string? searchTerm = null)
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _userService.GetAllUsersAsync(roleFilter, statusFilter, searchTerm);
+            var dataToExport = users.Select(u => new {
+                u.FullName,
+                u.Email,
+                RoleName = u.Role?.Name ?? "Sin rol",
+                Status = u.IsActive ? "Activo" : "Inactivo"
+                // Nota: PhoneNumber y CompanyName no están en el modelo User actual,
+                // por lo que los omitimos por ahora. Se pueden agregar si se necesitan.
+            }).ToList();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Usuarios");
+                
+                // Cabeceras
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "Nombre Completo";
+                worksheet.Cell(currentRow, 2).Value = "Email";
+                worksheet.Cell(currentRow, 3).Value = "Rol";
+                worksheet.Cell(currentRow, 4).Value = "Estado";
+                
+                // Aplicar estilo a la cabecera
+                worksheet.Row(currentRow).Style.Font.Bold = true;
+                worksheet.Row(currentRow).Style.Fill.BackgroundColor = XLColor.LightBlue;
+                worksheet.Row(currentRow).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                // Datos
+                foreach (var user in dataToExport)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = user.FullName;
+                    worksheet.Cell(currentRow, 2).Value = user.Email;
+                    worksheet.Cell(currentRow, 3).Value = user.RoleName;
+                    worksheet.Cell(currentRow, 4).Value = user.Status;
+                }
+
+                // Ajustar ancho de columnas
+                worksheet.Columns().AdjustToContents();
+                
+                // Agregar bordes a toda la tabla
+                var tableRange = worksheet.Range(1, 1, currentRow, 4);
+                tableRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                tableRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    if (content == null || content.Length == 0) {
+                        return Content("Error generando el archivo Excel con ClosedXML.", "text/plain");
+                    }
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Usuarios_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+                }
+            }
+        }
+
+        public async Task<IActionResult> ExportToPdf(string? roleFilter = null, string? statusFilter = null, string? searchTerm = null)
+        {
+            var users = await _userService.GetAllUsersAsync(roleFilter, statusFilter, searchTerm);
+            // Mapea a una lista de los datos que quieres en el PDF. Podrías usar UserListItemViewModel
+            // o un DTO específico para el PDF si es necesario.
+            var dataForPdf = users.Select(u => new UserPdfDto // Suponiendo un DTO UserPdfDto
+            {
+                FullName = u.FullName,
+                Email = u.Email,
+                RoleName = u.Role?.Name ?? "N/A",
+                Status = u.IsActive ? "Activo" : "Inactivo"
+            }).ToList();
+
+            // Necesitarás crear la clase UserListPdfDocument
+            var document = new UserListPdfDocument(dataForPdf); 
+            byte[] pdfBytes = document.GeneratePdf(); // QuestPDF genera el documento aquí
+
+            if (pdfBytes == null || pdfBytes.Length == 0) {
+                return Content("Error generando el archivo PDF.", "text/plain");
+            }
+            return File(pdfBytes, "application/pdf", $"Usuarios_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+        }
+
+        public async Task<IActionResult> ExportToCsv(string? roleFilter = null, string? statusFilter = null, string? searchTerm = null)
+        {
+            // Por defecto mostrar usuarios activos si no se especifica filtro
+            statusFilter = statusFilter ?? "active";
+            var users = await _userService.GetAllUsersAsync(roleFilter, statusFilter, searchTerm);
             
-            // En una implementación real, utilizaremos EPPlus o ClosedXML para generar Excel
-            // Por ahora, crearemos un archivo CSV con formato simple
             var builder = new StringBuilder();
-            builder.AppendLine("ID,Name,Email,Role,Status,Created Date");
+            builder.AppendLine("ID,Nombre Completo,Email,Nombre Usuario,Rol,Estado,Fecha Creación");
             
             foreach (var user in users)
             {
-                builder.AppendLine($"{user.Id},\"{user.FullName}\",\"{user.Email}\",\"{user.Role?.Name}\",\"{(user.IsActive ? "Active" : "Inactive")}\",\"{user.CreatedAt.ToShortDateString()}\"");
+                builder.AppendLine($"{user.Id},\"{user.FullName}\",\"{user.Email}\",\"{user.UserName}\",\"{user.Role?.Name ?? "Sin rol"}\",\"{(user.IsActive ? "Activo" : "Inactivo")}\",\"{user.CreatedAt:dd/MM/yyyy}\"");
             }
             
             byte[] fileBytes = Encoding.UTF8.GetBytes(builder.ToString());
-            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "users.xlsx");
-        }
-
-        public async Task<IActionResult> ExportToPdf()
-        {
-            var users = await _context.Users.ToListAsync();
-            
-            // En una implementación real, utilizaríamos QuestPDF o similar para generar PDF
-            // Por ahora, mostraremos un mensaje indicando que se requiere la biblioteca
-            return Content("Para implementar esta funcionalidad, instalar el paquete NuGet QuestPDF");
-        }
-
-        public async Task<IActionResult> ExportToCsv()
-        {
-            var users = await _context.Users.ToListAsync();
-            
-            var builder = new StringBuilder();
-            builder.AppendLine("ID,Name,Email,Role,Status,Created Date");
-            
-            foreach (var user in users)
-            {
-                builder.AppendLine($"{user.Id},\"{user.FullName}\",\"{user.Email}\",\"{user.Role?.Name}\",\"{(user.IsActive ? "Active" : "Inactive")}\",\"{user.CreatedAt.ToShortDateString()}\"");
-            }
-            
-            byte[] fileBytes = Encoding.UTF8.GetBytes(builder.ToString());
-            return File(fileBytes, "text/csv", "users.csv");
+            string fileName = $"Usuarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            return File(fileBytes, "text/csv", fileName);
         }
 
         // GET: Users/Details/5

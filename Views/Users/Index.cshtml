@@ -188,21 +188,35 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="text-truncate d-flex align-items-center">
-                                        <span class="badge badge-center rounded-pill bg-label-primary w-px-30 h-px-30 me-2">
-                                            <i class="fas fa-user fs-sm"></i>
+                                    @if (!string.IsNullOrEmpty(user.RoleName))
+                                    {
+                                        <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis px-4 py-2 d-inline-flex align-items-center" style="min-width: 120px; white-space: nowrap;">
+                                            <i class="fas fa-user-tag me-2"></i>
+                                            <span class="fw-medium">@user.RoleName</span>
                                         </span>
-                                        <span>@(user.RoleName ?? "Sin rol")</span>
-                                    </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-light text-muted px-4 py-2 d-inline-flex align-items-center" style="min-width: 120px; white-space: nowrap;">
+                                            <i class="fas fa-user-slash me-2"></i>
+                                            <span class="fw-medium">Sin rol</span>
+                                        </span>
+                                    }
                                 </td>
                                 <td>
                                     @if (user.IsActive)
                                     {
-                                        <span class="badge bg-success-subtle text-success-emphasis" data-translate-key="status_active">Active</span>
+                                        <span class="badge rounded-pill bg-success text-white px-3 py-2" data-translate-key="status_active">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            <span class="fw-medium">Activo</span>
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary-subtle text-secondary-emphasis" data-translate-key="status_inactive">Inactive</span>
+                                        <span class="badge rounded-pill bg-warning text-dark px-3 py-2" data-translate-key="status_inactive">
+                                            <i class="fas fa-pause-circle me-1"></i>
+                                            <span class="fw-medium">Inactivo</span>
+                                        </span>
                                     }
                                 </td>
                                 <td>
@@ -464,7 +478,7 @@
                             
                         } else {
                             // Actualizar el botón y el badge de estado
-                            const statusBadge = row.querySelector('.badge');
+                            const statusBadge = row.querySelector('td:nth-child(4) .badge'); // Seleccionar específicamente el badge de estado
                             
                             if (result.newIsActiveState) {
                                 // El usuario ahora está activo
@@ -474,8 +488,8 @@
                                 currentToggleButton.dataset.action = 'deactivate';
                                 currentToggleButton.innerHTML = '<i class="fas fa-user-slash"></i>';
                                 
-                                statusBadge.className = 'badge bg-success-subtle text-success-emphasis';
-                                statusBadge.textContent = 'Active';
+                                statusBadge.className = 'badge rounded-pill bg-success text-white px-3 py-2';
+                                statusBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i><span class="fw-medium">Activo</span>';
                             } else {
                                 // El usuario ahora está inactivo
                                 currentToggleButton.className = 'btn btn-sm btn-icon text-success toggle-status-btn';
@@ -484,8 +498,8 @@
                                 currentToggleButton.dataset.action = 'activate';
                                 currentToggleButton.innerHTML = '<i class="fas fa-user-check"></i>';
                                 
-                                statusBadge.className = 'badge bg-secondary-subtle text-secondary-emphasis';
-                                statusBadge.textContent = 'Inactive';
+                                statusBadge.className = 'badge rounded-pill bg-warning text-dark px-3 py-2';
+                                statusBadge.innerHTML = '<i class="fas fa-pause-circle me-1"></i><span class="fw-medium">Inactivo</span>';
                             }
                         }
                         
@@ -526,6 +540,56 @@
                 });
                 toast.show();
             }
+            
+            // Función para actualizar enlaces de exportación con filtros actuales
+            function updateExportLinks() {
+                const params = new URLSearchParams();
+                
+                // Obtener valores de los filtros
+                const roleValue = roleFilter ? roleFilter.value : '';
+                const statusValue = statusFilter ? statusFilter.value : '';
+                const searchValue = searchInput ? searchInput.value : '';
+                
+                // Agregar parámetros si tienen valor
+                if (roleValue) params.append('roleFilter', roleValue);
+                if (statusValue) params.append('statusFilter', statusValue);
+                if (searchValue) params.append('searchTerm', searchValue);
+                
+                const queryString = params.toString();
+                const suffix = queryString ? '?' + queryString : '';
+                
+                // Actualizar enlaces de exportación
+                const excelLink = document.querySelector('a[href*="ExportToExcel"]');
+                const pdfLink = document.querySelector('a[href*="ExportToPdf"]');
+                const csvLink = document.querySelector('a[href*="ExportToCsv"]');
+                
+                if (excelLink) {
+                    excelLink.href = '@Url.Action("ExportToExcel", "Users")' + suffix;
+                }
+                if (pdfLink) {
+                    pdfLink.href = '@Url.Action("ExportToPdf", "Users")' + suffix;
+                }
+                if (csvLink) {
+                    csvLink.href = '@Url.Action("ExportToCsv", "Users")' + suffix;
+                }
+            }
+            
+            // Actualizar enlaces de exportación al cambiar filtros
+            if (roleFilter) {
+                roleFilter.addEventListener('change', updateExportLinks);
+            }
+            if (statusFilter) {
+                statusFilter.addEventListener('change', updateExportLinks);
+            }
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(updateExportLinks, 500);
+                });
+            }
+            
+            // Inicializar enlaces de exportación con filtros actuales
+            updateExportLinks();
             
             // Manejar mensajes de éxito/error de TempData
             @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
