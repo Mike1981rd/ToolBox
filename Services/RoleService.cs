@@ -69,7 +69,51 @@ namespace ToolBox.Services
 
         public async Task<bool> DeleteRoleAsync(int roleId)
         {
-            throw new NotImplementedException();
+            var role = await _context.Roles
+                                     .Include(r => r.Users) // Necesario para verificar usuarios asignados
+                                     .Include(r => r.RolePermissions) // Para eliminar en cascada o manualmente las asociaciones
+                                     .FirstOrDefaultAsync(r => r.Id == roleId);
+
+            if (role == null)
+            {
+                return false; // Rol no encontrado
+            }
+
+            // CONDICIÓN CLAVE: No eliminar si tiene usuarios asignados
+            if (role.Users != null && role.Users.Any())
+            {
+                // Podrías lanzar una excepción específica aquí o simplemente retornar false
+                // para que el controlador maneje el mensaje al usuario.
+                // Por ejemplo: throw new InvalidOperationException("El rol no se puede eliminar porque tiene usuarios asignados.");
+                return false; // Indica fallo debido a usuarios asignados
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Eliminar las asociaciones RolePermissions primero si no hay eliminación en cascada configurada
+                    // Si la FK en RolePermissions tiene ON DELETE CASCADE para RoleId, esto no es estrictamente necesario,
+                    // pero es más explícito y seguro hacerlo.
+                    if (role.RolePermissions != null && role.RolePermissions.Any())
+                    {
+                        _context.RolePermissions.RemoveRange(role.RolePermissions);
+                        // No es necesario SaveChanges aquí si el SaveChanges final lo cubre.
+                    }
+                    
+                    _context.Roles.Remove(role);
+                    int affectedRows = await _context.SaveChangesAsync();
+                    
+                    await transaction.CommitAsync();
+                    return affectedRows > 0;
+                }
+                catch (Exception ex) // Ser más específico con las excepciones si es posible
+                {
+                    await transaction.RollbackAsync();
+                    // Loggear la excepción (ex.Message)
+                    return false; // Indica fallo en la eliminación
+                }
+            }
         }
 
         public async Task<IEnumerable<Permission>> GetAllPermissionsAsync()
@@ -109,7 +153,51 @@ namespace ToolBox.Services
 
         public async Task<bool> UpdateRoleAsync(int roleId, Role roleDetails, IEnumerable<int> permissionIds)
         {
-            throw new NotImplementedException();
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            
+            try
+            {
+                // Buscar el rol existente
+                var existingRole = await _context.Roles
+                    .Include(r => r.RolePermissions)
+                    .FirstOrDefaultAsync(r => r.Id == roleId);
+                
+                if (existingRole == null)
+                {
+                    return false;
+                }
+                
+                // Actualizar propiedades del rol
+                existingRole.Name = roleDetails.Name;
+                existingRole.Description = roleDetails.Description;
+                existingRole.AssignedDashboard = roleDetails.AssignedDashboard;
+                existingRole.IsActive = roleDetails.IsActive;
+                existingRole.UpdatedAt = DateTime.UtcNow;
+                
+                // Eliminar permisos existentes
+                _context.RolePermissions.RemoveRange(existingRole.RolePermissions);
+                
+                // Agregar nuevos permisos
+                foreach (var permissionId in permissionIds)
+                {
+                    _context.RolePermissions.Add(new RolePermission
+                    {
+                        RoleId = roleId,
+                        PermissionId = permissionId
+                    });
+                }
+                
+                // Guardar cambios
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
     }
 }

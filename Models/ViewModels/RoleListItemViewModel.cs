@@ -7,5 +7,6 @@ namespace ToolBox.Models.ViewModels
         public string Description { get; set; }
         public string AssignedDashboard { get; set; }
         public bool IsActive { get; set; }
+        public int UserCount { get; set; }
     }
 }

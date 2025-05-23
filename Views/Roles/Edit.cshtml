@@ -1,0 +1,202 @@
+@model ToolBox.Models.ViewModels.RoleEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Rol";
+    Layout = "_AdminLayout";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Roles" asp-action="Index" data-translate-key="roles_menu">Roles</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="edit_role">Edit Role</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-4" data-translate-key="edit_role_title">Edit Role</h4>
+                
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <!-- Información del Rol -->
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3" data-translate-key="role_information">Role Information</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label" data-translate-key="role_name">Role Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter role name" data-translate-placeholder-key="role_name_placeholder" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label"><span data-translate-key="description">Description</span> <span class="text-muted" data-translate-key="optional">(Optional)</span></label>
+                            <textarea id="Description" name="Description" class="form-control" rows="3" placeholder="Enter optional description" data-translate-placeholder-key="description_placeholder">@Model.Description</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AssignedDashboard" class="form-label" data-translate-key="assigned_dashboard">Assigned Dashboard</label>
+                            <select asp-for="AssignedDashboard" class="form-select">
+                                <option value="" data-translate-key="select_dashboard">Select Dashboard</option>
+                                <option value="Admin" data-translate-key="admin_dashboard">Admin Dashboard</option>
+                                <option value="Coach" data-translate-key="coach_dashboard">Coach Dashboard</option>
+                                <option value="Client" data-translate-key="client_dashboard">Client Dashboard</option>
+                            </select>
+                            <span asp-validation-for="AssignedDashboard" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" id="IsActive">
+                                <label class="form-check-label" for="IsActive" data-translate-key="role_active_status">
+                                    Active Status
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permisos del Rol -->
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3" data-translate-key="role_permissions">Role Permissions</h5>
+                        <p class="text-muted" data-translate-key="select_permissions_message">Select the permissions you want to assign to this role.</p>
+
+                        @if (Model.AvailablePermissions != null && Model.AvailablePermissions.Any())
+                        {
+                            var permissionsByModule = Model.AvailablePermissions.GroupBy(p => p.ModuleName);
+
+                            foreach (var moduleGroup in permissionsByModule.OrderBy(g => g.Key))
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">@moduleGroup.Key</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            @foreach (var permission in moduleGroup.OrderBy(p => p.ActionName))
+                                            {
+                                                <div class="col-md-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               name="SelectedPermissionIds" 
+                                                               value="@permission.Id" 
+                                                               id="perm_@permission.Id"
+                                                               @(permission.IsSelected ? "checked" : "")>
+                                                        <label class="form-check-label" for="perm_@permission.Id">
+                                                            <span data-translate-key="@permission.ActionName.ToLower()">@permission.ActionName</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted" data-translate-key="no_permissions_available">No permissions available.</p>
+                        }
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary" data-translate-key="cancel_button">Cancel</a>
+                        <button type="submit" class="btn btn-primary" data-translate-key="update_role_button">Update Role</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Informativo -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title" data-translate-key="about_roles">About Roles</h5>
+                <p class="card-text text-muted" data-translate-key="about_roles_description">
+                    Roles provide a way to group permissions together. Users assigned to a role will inherit all permissions associated with that role.
+                </p>
+                
+                <hr>
+                
+                <h6 class="mb-3" data-translate-key="available_dashboards">Available Dashboards:</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong data-translate-key="admin">Admin:</strong> 
+                        <span class="text-muted" data-translate-key="admin_dashboard_description">Full system access</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong data-translate-key="coach">Coach:</strong> 
+                        <span class="text-muted" data-translate-key="coach_dashboard_description">Access to coaching tools</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong data-translate-key="client">Client:</strong> 
+                        <span class="text-muted" data-translate-key="client_dashboard_description">Limited client access</span>
+                    </li>
+                </ul>
+
+                <hr>
+
+                <h6 class="mb-3" data-translate-key="permission_types">Permission Types:</h6>
+                <ul class="list-unstyled">
+                    <li><strong data-translate-key="read">Read:</strong> <span data-translate-key="read_permission_description">Allows viewing information</span></li>
+                    <li><strong data-translate-key="write">Write:</strong> <span data-translate-key="write_permission_description">Allows editing existing information</span></li>
+                    <li><strong data-translate-key="create">Create:</strong> <span data-translate-key="create_permission_description">Allows creating new information</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Ensure translations are applied when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get saved language from localStorage
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            console.log('Current language:', savedLanguage);
+            
+            // Remove validation from Description field
+            setTimeout(function() {
+                // Remove validation attributes
+                $('#Description').removeAttr('data-val-required');
+                $('#Description').removeAttr('aria-required');
+                $('#Description').removeAttr('required');
+                
+                // Remove from jQuery validator if it exists
+                if ($.validator && $.validator.unobtrusive) {
+                    var $form = $('#Description').closest('form');
+                    var validator = $form.data('validator');
+                    
+                    if (validator && validator.settings && validator.settings.rules) {
+                        // Remove Description from rules
+                        delete validator.settings.rules.Description;
+                        
+                        // Remove from error list if present
+                        if (validator.errorList) {
+                            validator.errorList = validator.errorList.filter(function(error) {
+                                return error.element.name !== 'Description';
+                            });
+                        }
+                    }
+                }
+                
+                // Clear any existing validation messages
+                $('#Description').removeClass('input-validation-error');
+                $('span[data-valmsg-for="Description"]').empty().removeClass('field-validation-error');
+            }, 100);
+        });
+    </script>
+    
+    <script>
+        // Script opcional para "Seleccionar todos" los permisos de un módulo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aquí puedes agregar funcionalidad adicional si es necesaria
+        });
+    </script>
+}

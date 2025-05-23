@@ -1,15 +1,35 @@
 /* Estilos para el módulo de Roles */
 
+/* Delete icon styles */
+.role-card .fa-trash-alt {
+    transition: all 0.2s ease;
+}
+
+.role-card a.text-danger:hover .fa-trash-alt {
+    transform: scale(1.2);
+}
+
 /* Card styles */
 .role-card {
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .role-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(115, 103, 240, 0.25);
+    border-color: rgba(115, 103, 240, 0.3);
+}
+
+/* Dark mode role card */
+[data-theme="dark"] .role-card {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .role-card:hover {
+    border-color: rgba(115, 103, 240, 0.5);
 }
 
 /* Avatar group styles */
@@ -52,11 +72,24 @@
 .add-role-card {
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    border: 2px dashed #e0e0e0;
+    background-color: #fafafa;
 }
 
 .add-role-card:hover {
     border-color: var(--bs-primary);
     box-shadow: 0 0.125rem 0.25rem rgba(var(--bs-primary-rgb), 0.075) !important; /* Sombra sutil al hacer hover */
+    background-color: rgba(115, 103, 240, 0.05);
+}
+
+/* Dark mode add role card */
+[data-theme="dark"] .add-role-card {
+    border-color: #3b4253;
+    background-color: rgba(59, 66, 83, 0.3);
+}
+
+[data-theme="dark"] .add-role-card:hover {
+    background-color: rgba(115, 103, 240, 0.1);
 }
 
 /* Table styles */

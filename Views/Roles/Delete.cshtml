@@ -1,0 +1,98 @@
+@model ToolBox.Models.Role
+
+@{
+    ViewData["Title"] = "Eliminar Rol";
+    Layout = "_AdminLayout";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Roles" asp-action="Index" data-translate-key="roles_menu">Roles</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="delete_role">Delete Role</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3" data-translate-key="delete_role_confirmation_title">Delete Role Confirmation</h3>
+                </div>
+                
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span data-translate-key="delete_role_warning">Are you sure you want to delete this role? This action cannot be undone.</span>
+                </div>
+                
+                <div class="mb-4">
+                    <dl class="row">
+                        <dt class="col-sm-4" data-translate-key="role_name">Role Name:</dt>
+                        <dd class="col-sm-8"><strong>@Model.Name</strong></dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <dt class="col-sm-4" data-translate-key="description">Description:</dt>
+                            <dd class="col-sm-8">@Model.Description</dd>
+                        }
+                        
+                        <dt class="col-sm-4" data-translate-key="assigned_dashboard">Assigned Dashboard:</dt>
+                        <dd class="col-sm-8">@Model.AssignedDashboard</dd>
+                        
+                        <dt class="col-sm-4" data-translate-key="status">Status:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success" data-translate-key="status_active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary" data-translate-key="status_inactive">Inactive</span>
+                            }
+                        </dd>
+                        
+                        <dt class="col-sm-4" data-translate-key="permissions_count">Permissions:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.RolePermissions != null)
+                            {
+                                <span>@Model.RolePermissions.Count() <span data-translate-key="permissions_assigned">permissions assigned</span></span>
+                            }
+                            else
+                            {
+                                <span data-translate-key="no_permissions_assigned">No permissions assigned</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <span data-translate-key="delete_role_info">All permissions associated with this role will be removed. Users will need to be assigned to a different role.</span>
+                </div>
+                
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-action="Index" class="btn btn-secondary" data-translate-key="cancel_button">Cancel</a>
+                        <button type="submit" class="btn btn-danger" data-translate-key="delete_confirm_button">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Role
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Ensure translations are applied when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            console.log('Delete page - Current language:', savedLanguage);
+        });
+    </script>
+}
