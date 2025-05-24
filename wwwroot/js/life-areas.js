@@ -573,5 +573,18 @@ style.textContent = `
     #selectedIconPreview {
         transition: all 0.3s ease;
     }
+    
+    /* Life Area Icons in Table */
+    .avatar.avatar-md {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    tr:hover .avatar.avatar-md {
+        transform: scale(1.05);
+    }
 `;
 document.head.appendChild(style);
