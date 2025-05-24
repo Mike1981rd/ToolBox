@@ -164,18 +164,20 @@
                                 <td>
                                     <div class="d-flex justify-content-start align-items-center user-name">
                                         <div class="avatar-wrapper me-3">
-                                            <div class="avatar avatar-sm">
+                                            <div class="avatar avatar-md">
                                                 @if (!string.IsNullOrEmpty(user.AvatarUrl))
                                                 {
-                                                    <img src="@user.AvatarUrl" alt="Avatar" class="rounded-circle" 
+                                                    <img src="@user.AvatarUrl" alt="Avatar de @user.FullName" 
+                                                         class="table-avatar rounded-circle" 
                                                          asp-append-version="true"
                                                          onerror="this.onerror=null; this.src='/img/default-avatar.png';"
-                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                         loading="lazy">
                                                 }
                                                 else
                                                 {
-                                                    <img src="/img/default-avatar.png" alt="Avatar" class="rounded-circle"
-                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                    <img src="/img/default-avatar.png" alt="Avatar por defecto" 
+                                                         class="table-avatar rounded-circle"
+                                                         loading="lazy">
                                                 }
                                             </div>
                                         </div>

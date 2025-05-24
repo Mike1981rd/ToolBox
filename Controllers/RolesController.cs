@@ -14,11 +14,13 @@ namespace ToolBox.Controllers
     public class RolesController : Controller
     {
         private readonly IRoleService _roleService;
+        private readonly IUserService _userService;
         private readonly ApplicationDbContext _context;
 
-        public RolesController(IRoleService roleService, ApplicationDbContext context)
+        public RolesController(IRoleService roleService, IUserService userService, ApplicationDbContext context)
         {
             _roleService = roleService;
+            _userService = userService;
             _context = context;
         }
 
@@ -26,29 +28,36 @@ namespace ToolBox.Controllers
         public async Task<IActionResult> Index()
         {
             var roles = await _roleService.GetAllRolesAsync();
-            
-            // TEMPORAL: Filtrar para mostrar solo roles específicos durante desarrollo
-            // Comentar o eliminar esta línea para mostrar todos los roles
-            // roles = roles.Where(r => r.Name == "TEST").ToList();
-            
-            // Get user counts for each role
-            var userCountsByRole = await _context.Users
-                .Where(u => u.RoleId != null)
-                .GroupBy(u => u.RoleId)
-                .Select(g => new { RoleId = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.RoleId.Value, x => x.Count);
-            
-            var roleViewModels = roles.Select(r => new RoleListItemViewModel
+            var roleCardVMs = roles.Select(r => new RoleListItemViewModel
             {
                 Id = r.Id,
                 Name = r.Name,
                 Description = r.Description,
-                AssignedDashboard = r.AssignedDashboard,
-                IsActive = r.IsActive,
-                UserCount = userCountsByRole.ContainsKey(r.Id) ? userCountsByRole[r.Id] : 0
+                UserCount = r.Users?.Count() ?? 0,
+                UserAvatarUrls = r.Users?.Where(u => !string.IsNullOrEmpty(u.AvatarUrl))
+                                        .Select(u => u.AvatarUrl!)
+                                        .Take(1)
+                                        .ToList() ?? new List<string>()
             }).ToList();
 
-            return View(roleViewModels);
+            var allUsersFromDb = await _userService.GetAllUsersAsync();
+            var allUserVMs = allUsersFromDb.Select(u => new UserListItemViewModel
+            {
+                Id = u.Id,
+                AvatarUrl = u.AvatarUrl,
+                FullName = u.FullName,
+                Email = u.Email,
+                RoleName = u.Role?.Name,
+                IsActive = u.IsActive
+            }).ToList();
+
+            var pageViewModel = new RolesIndexPageViewModel
+            {
+                RoleCards = roleCardVMs,
+                AllSystemUsers = allUserVMs
+            };
+
+            return View(pageViewModel);
         }
 
         // GET: Roles/Create

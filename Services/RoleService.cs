@@ -128,6 +128,7 @@ namespace ToolBox.Services
         public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
             return await _context.Roles
+                .Include(r => r.Users)
                 .OrderBy(r => r.Name)
                 .ToListAsync();
         }

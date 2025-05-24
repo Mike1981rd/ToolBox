@@ -8,5 +8,6 @@ namespace ToolBox.Models.ViewModels
         public string AssignedDashboard { get; set; }
         public bool IsActive { get; set; }
         public int UserCount { get; set; }
+        public List<string> UserAvatarUrls { get; set; } = new List<string>();
     }
 }

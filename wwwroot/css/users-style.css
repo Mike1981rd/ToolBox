@@ -209,6 +209,47 @@
     margin-bottom: 1rem;
 }
 
+/* Estilos mejorados para avatares en tabla */
+.table-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    object-fit: cover;
+    object-position: center;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    /* Propiedades para mejorar la nitidez */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: optimizeQuality;
+    /* Suavizado de bordes */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Reducir blur en transformaciones */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.table-avatar:hover {
+    transform: translateZ(0) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--bs-primary);
+}
+
+/* Mejorar el contenedor del avatar en tabla */
+.avatar.avatar-md {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-wrapper {
+    flex-shrink: 0;
+}
+
 /* Efecto de resaltado cuando se sube una nueva imagen */
 #userAvatarPreview.avatar-highlight {
     border-color: var(--primary-color) !important;

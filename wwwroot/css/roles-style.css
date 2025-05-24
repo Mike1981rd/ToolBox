@@ -1,12 +1,24 @@
 /* Estilos para el módulo de Roles */
 
-/* Delete icon styles */
-.role-card .fa-trash-alt {
-    transition: all 0.2s ease;
+/* Delete button styles */
+.btn-danger.rounded-circle {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.8;
 }
 
-.role-card a.text-danger:hover .fa-trash-alt {
-    transform: scale(1.2);
+.btn-danger.rounded-circle:hover {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4) !important;
+}
+
+.btn-danger.rounded-circle i {
+    font-size: 14px;
+}
+
+/* Card hover effect for delete button */
+.card:hover .btn-danger.rounded-circle {
+    opacity: 1;
 }
 
 /* Card styles */
