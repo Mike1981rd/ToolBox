@@ -1,5 +1,21 @@
 # ToolBox Admin Dashboard Project
 
+## ⚠️ Notas Críticas sobre Fechas y PostgreSQL
+
+### Problema con Fechas en PostgreSQL/Npgsql
+Cuando se envían fechas desde JavaScript a ASP.NET Core con PostgreSQL, es **CRÍTICO** usar el formato ISO 8601 completo:
+
+```javascript
+// ❌ INCORRECTO - Causará error al guardar
+const fechaLimite = "2024-05-24";
+
+// ✅ CORRECTO - Formato ISO completo
+const dateObj = new Date(fechaLimiteValue + 'T00:00:00');
+const fechaLimite = dateObj.toISOString(); // "2024-05-24T00:00:00.000Z"
+```
+
+**Razón**: Los campos `DateTime?` en C# se mapean a `timestamp` en PostgreSQL, que requiere fecha Y hora completa.
+
 ## 🎯 Stack Tecnológico
 - ASP.NET Core MVC (.NET 8)
 - Entity Framework Core (PostgreSQL)
