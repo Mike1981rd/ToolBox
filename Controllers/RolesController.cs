@@ -36,7 +36,7 @@ namespace ToolBox.Controllers
                 UserCount = r.Users?.Count() ?? 0,
                 UserAvatarUrls = r.Users?.Where(u => !string.IsNullOrEmpty(u.AvatarUrl))
                                         .Select(u => u.AvatarUrl!)
-                                        .Take(1)
+                                        .Take(4)
                                         .ToList() ?? new List<string>()
             }).ToList();
 

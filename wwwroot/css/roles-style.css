@@ -47,37 +47,66 @@
 /* Avatar group styles */
 .avatar-group {
     display: flex;
+    position: relative;
+    align-items: center;
 }
 
-.avatar-group .avatar {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #fff; /* O el color de fondo de la tarjeta */
-    margin-left: -15px;
+.avatar-item {
+    position: relative;
     transition: transform 0.2s ease;
 }
 
-.avatar-group .avatar:hover {
-    transform: translateY(-3px);
-    z-index: 1;
+.avatar-item:hover {
+    transform: translateY(-3px) scale(1.05);
+    z-index: 20 !important;
 }
 
-.avatar-group .avatar:first-child {
-    margin-left: 0;
+.avatar-item img {
+    display: block;
+    image-rendering: optimizeQuality;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
+/* Counter circle styles */
 .avatar-counter {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    background-color: #f0f0f0; /* Color de fondo para el contador */
-    color: #555; /* Color de texto para el contador */
-    font-size: 0.8rem;
-    font-weight: bold;
-    border: 2px solid #fff;
-    margin-left: -15px;
+    width: 50px;
+    height: 50px;
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.avatar-counter:hover {
+    transform: translateY(-3px) scale(1.05);
+    background-color: #dee2e6;
+}
+
+/* Dark mode avatar counter */
+[data-theme="dark"] .avatar-item img,
+[data-theme="dark"] .avatar-counter {
+    border-color: var(--bs-card-bg, #1c1e21);
+}
+
+[data-theme="dark"] .avatar-counter {
+    background-color: #3b4253;
+    color: #b4b7bd;
+}
+
+[data-theme="dark"] .avatar-counter:hover {
+    background-color: #4b5563;
 }
 
 /* Add role card */

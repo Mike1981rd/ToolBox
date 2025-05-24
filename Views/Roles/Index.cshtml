@@ -49,14 +49,36 @@
                         <p class="card-text text-muted small mb-3">@roleCard.Description</p>
                     }
                     <div class="d-flex align-items-center">
-                        <div class="avatar-group me-3" style="min-width: 56px;">
-                            @if (roleCard.UserAvatarUrls != null && roleCard.UserAvatarUrls.Any() && !string.IsNullOrEmpty(roleCard.UserAvatarUrls.First()))
+                        <div class="avatar-group d-flex me-3" style="min-width: 56px;">
+                            @if (roleCard.UserCount > 0)
                             {
-                                <img src="@roleCard.UserAvatarUrls.First()" asp-append-version="true" alt="Avatar de usuario" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid white;" />
-                            }
-                            else if (roleCard.UserCount > 0)
-                            {
-                                <img src="/img/default-avatar.png" asp-append-version="true" alt="Avatar por defecto" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid white;" />
+                                var avatarsToShow = roleCard.UserAvatarUrls?.Where(url => !string.IsNullOrEmpty(url)).Take(4).ToList() ?? new List<string>();
+                                var hasAvatars = avatarsToShow.Any();
+                                var remainingCount = roleCard.UserCount - 4;
+                                var showCounter = roleCard.UserCount > 4;
+                                
+                                if (hasAvatars)
+                                {
+                                    @for(int i = 0; i < avatarsToShow.Count; i++)
+                                    {
+                                        <div class="avatar-item" style="margin-left: @(i > 0 ? "-15px" : "0"); z-index: @(10 - i);">
+                                            <img src="@avatarsToShow[i]" asp-append-version="true" alt="Avatar de usuario" class="rounded-circle border-white" style="width: 50px; height: 50px; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+                                        </div>
+                                    }
+                                }
+                                else if (roleCard.UserCount > 0)
+                                {
+                                    <div class="avatar-item">
+                                        <img src="/img/default-avatar.png" asp-append-version="true" alt="Avatar por defecto" class="rounded-circle border-white" style="width: 50px; height: 50px; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+                                    </div>
+                                }
+                                
+                                if (showCounter)
+                                {
+                                    <div class="avatar-item d-flex align-items-center justify-content-center" style="margin-left: -15px; z-index: 5; width: 50px; height: 50px; background-color: #e9ecef; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <span style="font-size: 16px; font-weight: 600; color: #495057;">+@remainingCount</span>
+                                    </div>
+                                }
                             }
                         </div>
                         <small class="text-muted">@roleCard.UserCount @(roleCard.UserCount == 1 ? "Usuario" : "Usuarios")</small>
