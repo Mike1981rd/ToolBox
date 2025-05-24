@@ -15,6 +15,7 @@ namespace ToolBox.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<LifeArea> LifeAreas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,8 +64,22 @@ namespace ToolBox.Data
             //     .HasIndex(u => u.Email)
             //     .IsUnique();
 
+            // LifeArea configuration
+            modelBuilder.Entity<LifeArea>()
+                .HasIndex(la => la.DisplayOrder);
+
+            modelBuilder.Entity<LifeArea>()
+                .HasOne(la => la.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(la => la.CreatedByUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Seed Permissions data
             SeedPermissions(modelBuilder);
+            
+            // Seed LifeAreas data
+            SeedLifeAreas(modelBuilder);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -161,6 +176,26 @@ namespace ToolBox.Data
                 "WelcomeMessage" => "Mensaje de Bienvenida",
                 _ => module
             };
+        }
+
+        private void SeedLifeAreas(ModelBuilder modelBuilder)
+        {
+            var now = DateTime.UtcNow;
+            var lifeAreas = new[]
+            {
+                new LifeArea { Id = 1, Title = "Spiritual", IconClass = "fas fa-pray", IconColor = "#8e44ad", Description = "Connection with your inner self and beliefs", DisplayOrder = 1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 2, Title = "Physical Health", IconClass = "fas fa-heartbeat", IconColor = "#e74c3c", Description = "Physical wellness and fitness", DisplayOrder = 2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 3, Title = "Family & Friends", IconClass = "fas fa-users", IconColor = "#3498db", Description = "Relationships with loved ones", DisplayOrder = 3, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 4, Title = "Partner", IconClass = "fas fa-heart", IconColor = "#e91e63", Description = "Romantic relationships and partnerships", DisplayOrder = 4, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 5, Title = "Mission/Career", IconClass = "fas fa-briefcase", IconColor = "#34495e", Description = "Professional growth and purpose", DisplayOrder = 5, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 6, Title = "Finances", IconClass = "fas fa-dollar-sign", IconColor = "#27ae60", Description = "Financial stability and growth", DisplayOrder = 6, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 7, Title = "Personal Growth", IconClass = "fas fa-graduation-cap", IconColor = "#f39c12", Description = "Self-improvement and learning", DisplayOrder = 7, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 8, Title = "Fun & Recreation", IconClass = "fas fa-gamepad", IconColor = "#9b59b6", Description = "Leisure activities and hobbies", DisplayOrder = 8, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 9, Title = "Experiences", IconClass = "fas fa-plane", IconColor = "#1abc9c", Description = "Travel and new adventures", DisplayOrder = 9, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new LifeArea { Id = 10, Title = "Environment", IconClass = "fas fa-home", IconColor = "#95a5a6", Description = "Living space and surroundings", DisplayOrder = 10, IsActive = true, CreatedAt = now, UpdatedAt = now }
+            };
+
+            modelBuilder.Entity<LifeArea>().HasData(lifeAreas);
         }
     }
 }
