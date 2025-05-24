@@ -1,6 +1,5 @@
 @model IEnumerable<ToolBox.Models.ViewModels.UserListItemViewModel>
 @{
-    ViewData["Title"] = "Users";
     Layout = "_AdminLayout";
 }
 
@@ -250,12 +249,6 @@
                                             </button>
                                         }
                                         
-                                        <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-end m-0">
-                                            <a href="@Url.Action("Details", new { id = user.Id })" class="dropdown-item" data-translate-key="action_view">View</a>
-                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -375,25 +368,56 @@
                 statusFilter.addEventListener('change', applyFilters);
             }
             
-            // Para el campo de búsqueda, usar un timeout para evitar múltiples solicitudes
-            let searchTimeout;
+            // Implementar búsqueda dinámica del lado del cliente
             if (searchInput) {
-                // Establecer el valor actual de búsqueda si existe
-                const currentSearchTerm = '@(ViewBag.CurrentSearchTerm ?? "")';
-                if (currentSearchTerm) {
-                    searchInput.value = currentSearchTerm;
-                }
-                
                 searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(applyFilters, 500); // Esperar 500ms después de dejar de escribir
+                    const searchTerm = this.value.toLowerCase().trim();
+                    const tableRows = document.querySelectorAll('#usersTable tbody tr');
+                    
+                    tableRows.forEach(row => {
+                        // Omitir fila de "no hay usuarios"
+                        if (row.cells.length === 1) return;
+                        
+                        // Obtener el texto del nombre y email del usuario
+                        const userCell = row.cells[1]; // Segunda columna contiene usuario
+                        const fullName = userCell.querySelector('.fw-semibold')?.textContent.toLowerCase() || '';
+                        const email = userCell.querySelector('.text-muted')?.textContent.toLowerCase() || '';
+                        
+                        // Verificar si el término de búsqueda coincide con nombre o email
+                        const matches = fullName.includes(searchTerm) || email.includes(searchTerm);
+                        
+                        // Mostrar u ocultar la fila según la coincidencia
+                        row.style.display = matches ? '' : 'none';
+                    });
+                    
+                    // Verificar si todas las filas están ocultas
+                    const visibleRows = Array.from(tableRows).filter(row => 
+                        row.style.display !== 'none' && row.cells.length > 1
+                    );
+                    
+                    if (visibleRows.length === 0) {
+                        // Si no hay filas visibles, mostrar mensaje
+                        const tbody = document.querySelector('#usersTable tbody');
+                        const noResultsRow = tbody.querySelector('.no-results-row');
+                        
+                        if (!noResultsRow) {
+                            const newRow = tbody.insertRow();
+                            newRow.className = 'no-results-row';
+                            newRow.innerHTML = '<td colspan="6" class="text-center">No se encontraron usuarios que coincidan con la búsqueda</td>';
+                        }
+                    } else {
+                        // Si hay resultados, remover mensaje de "no resultados" si existe
+                        const noResultsRow = document.querySelector('.no-results-row');
+                        if (noResultsRow) {
+                            noResultsRow.remove();
+                        }
+                    }
                 });
                 
-                // También manejar Enter
+                // También manejar Enter para prevenir el comportamiento por defecto
                 searchInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        clearTimeout(searchTimeout);
-                        applyFilters();
+                        e.preventDefault();
                     }
                 });
             }
