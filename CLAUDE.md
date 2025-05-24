@@ -828,3 +828,119 @@ Este módulo establece el patrón estándar para todos los módulos futuros del 
 - Productos/Servicios  
 - Configuraciones
 - Reportes
+
+# Sistema de Filtros con Estado Persistente - Patrón para Módulos CRUD
+
+## Problema Encontrado: Filtros de Estado con Toggle Dinámico
+
+### Descripción del Problema
+Al implementar filtros de estado (Active/Inactive) con toggle dinámico en el módulo de Áreas de Vida, encontramos que:
+
+1. **Problema de Sincronización**: Cuando se desactivaba un elemento y luego se cambiaba al filtro "Inactivos", el elemento no aparecía sin recargar la página
+2. **Error 404**: Al cambiar filtros, la URL se construía incorrectamente causando errores 404
+3. **Inconsistencia**: El módulo funcionaba diferente a Users, creando una experiencia inconsistente
+
+### Solución Implementada
+
+#### 1. **Filtro de Estado del Lado del Servidor**
+```csharp
+// En el Controller - Agregar parámetro statusFilter
+public async Task<IActionResult> Index(string? statusFilter = null)
+{
+    statusFilter = statusFilter ?? "active"; // Por defecto activos
+    ViewBag.CurrentStatusFilter = statusFilter;
+    
+    var items = await _service.GetAllAsync(includeInactive: true);
+    
+    // Filtrar en el servidor
+    if (statusFilter == "active")
+        items = items.Where(x => x.IsActive);
+    else if (statusFilter == "inactive")
+        items = items.Where(x => !x.IsActive);
+    
+    return View(items);
+}
+```
+
+#### 2. **Vista con Filtro Persistente**
+```html
+<!-- En la Vista - Select con estado actual -->
+<select id="selectStatus" class="form-select filter-select">
+    @if (ViewBag.CurrentStatusFilter == "active")
+    {
+        <option value="active" selected>Activos</option>
+        <option value="inactive">Inactivos</option>
+    }
+    else
+    {
+        <option value="active">Activos</option>
+        <option value="inactive" selected>Inactivos</option>
+    }
+</select>
+```
+
+#### 3. **JavaScript - Recarga con Parámetros**
+```javascript
+// IMPORTANTE: Usar window.location.pathname para evitar errores 404
+if (statusFilter) {
+    statusFilter.addEventListener('change', function() {
+        const params = new URLSearchParams();
+        const statusValue = this.value;
+        
+        if (statusValue) params.append('statusFilter', statusValue);
+        
+        // Usar pathname actual para mantener la ruta correcta
+        const currentPath = window.location.pathname;
+        window.location.href = currentPath + (params.toString() ? '?' + params.toString() : '');
+    });
+}
+```
+
+#### 4. **Toggle con Recarga Automática**
+```javascript
+async function toggleStatus(id, button) {
+    // ... hacer petición AJAX ...
+    
+    if (result.success) {
+        // Actualizar botón visualmente
+        if (result.newIsActiveState) {
+            button.className = 'btn btn-sm btn-icon text-warning toggle-status-btn';
+            button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            // ... actualizar otros atributos
+        } else {
+            button.className = 'btn btn-sm btn-icon text-success toggle-status-btn';
+            button.innerHTML = '<i class="fas fa-eye"></i>';
+            // ... actualizar otros atributos
+        }
+        
+        showToast(result.message, 'success');
+        
+        // Recargar después de 1 segundo para sincronizar con filtros
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+```
+
+### Puntos Clave para Evitar Problemas
+
+1. **NO usar rutas hardcodeadas**: 
+   - ❌ `window.location.href = '/Module' + params`
+   - ✅ `window.location.href = window.location.pathname + params`
+
+2. **Recargar página después de toggle**: Garantiza que los filtros se apliquen correctamente
+
+3. **Filtrar en el servidor**: No depender solo de JavaScript para filtros de estado
+
+4. **Mantener estado en ViewBag**: Para que el select muestre la opción correcta después de recargar
+
+### Patrón Recomendado para Nuevos Módulos
+
+1. **Controller**: Aceptar parámetro `statusFilter` en Index
+2. **Service**: Método que acepte `includeInactive` para traer todos
+3. **Vista**: Select con opciones basadas en ViewBag
+4. **JavaScript**: Recargar página con parámetros, NO filtrar solo en cliente
+5. **Toggle**: Actualizar visualmente + recargar para sincronizar
+
+Este patrón garantiza consistencia con el módulo de Users y evita problemas de sincronización.

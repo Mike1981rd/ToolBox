@@ -19,9 +19,105 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchLifeArea');
     const statusFilter = document.getElementById('selectStatus');
     
+    // Icon elements
+    const colorPicker = document.getElementById('lifeAreaColor');
+    const colorText = document.getElementById('lifeAreaColorText');
+    const iconPreview = document.getElementById('iconPreview');
+    const selectedIconPreview = document.getElementById('selectedIconPreview');
+    const iconSearch = document.getElementById('iconSearch');
+    const iconCategoryFilter = document.getElementById('iconCategoryFilter');
+    
     // Variables for icon selection
     let selectedIcon = 'fas fa-circle';
     let availableIcons = [];
+    
+    // Function declarations
+    function updateIconPreview(iconClass, color) {
+        selectedIconPreview.className = iconClass;
+        selectedIconPreview.style.color = color;
+        selectedIconPreview.style.fontSize = '2rem';
+        
+        // Set a light background with the color as a tint
+        const rgb = hexToRgb(color);
+        if (rgb) {
+            iconPreview.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
+        } else {
+            iconPreview.style.backgroundColor = '#f0f0f0';
+        }
+        
+        // Add a subtle animation effect
+        iconPreview.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            iconPreview.style.transform = 'scale(1)';
+        }, 100);
+    }
+    
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+    
+    function filterIconsList() {
+        const searchTerm = iconSearch ? iconSearch.value.toLowerCase() : '';
+        const category = iconCategoryFilter ? iconCategoryFilter.value : '';
+        
+        return availableIcons.filter(icon => {
+            const matchesSearch = !searchTerm || 
+                icon.name.toLowerCase().includes(searchTerm) || 
+                icon.class.toLowerCase().includes(searchTerm);
+            const matchesCategory = !category || icon.category === category;
+            return matchesSearch && matchesCategory;
+        });
+    }
+    
+    function renderIconGrid() {
+        const iconGrid = document.getElementById('iconGrid');
+        const filteredIcons = filterIconsList();
+        
+        iconGrid.innerHTML = filteredIcons.map(icon => `
+            <div class="icon-option p-3 text-center cursor-pointer" data-icon="${icon.class}" data-name="${icon.name}" data-category="${icon.category}">
+                <i class="${icon.class} fa-2x mb-2"></i>
+                <div class="small">${icon.name}</div>
+            </div>
+        `).join('');
+        
+        // Add click handlers
+        iconGrid.querySelectorAll('.icon-option').forEach(option => {
+            option.addEventListener('click', function() {
+                iconGrid.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Update preview immediately when icon is clicked
+                const selectedIconClass = this.dataset.icon;
+                const currentColor = document.getElementById('lifeAreaColor').value;
+                updateIconPreview(selectedIconClass, currentColor);
+            });
+        });
+    }
+    
+    function filterIcons() {
+        renderIconGrid();
+    }
+    
+    async function loadAvailableIcons() {
+        try {
+            const response = await fetch('/LifeAreas/GetIconOptions');
+            availableIcons = await response.json();
+            renderIconGrid();
+        } catch (error) {
+            console.error('Error loading icons:', error);
+        }
+    }
+    
+    // Initialize icon preview with default values
+    if (selectedIconPreview && iconPreview) {
+        updateIconPreview('fas fa-circle', '#6c757d');
+    }
     
     // Load available icons
     loadAvailableIcons();
@@ -105,12 +201,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Setup icon color synchronization
-    const colorPicker = document.getElementById('lifeAreaColor');
-    const colorText = document.getElementById('lifeAreaColorText');
-    const iconPreview = document.getElementById('iconPreview');
-    const selectedIconPreview = document.getElementById('selectedIconPreview');
-    
     colorPicker.addEventListener('input', function() {
         const color = this.value;
         colorText.value = color;
@@ -126,11 +216,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     // Setup icon search and filter
-    const iconSearch = document.getElementById('iconSearch');
-    const iconCategoryFilter = document.getElementById('iconCategoryFilter');
-    
-    iconSearch.addEventListener('input', filterIcons);
-    iconCategoryFilter.addEventListener('change', filterIcons);
+    if (iconSearch) {
+        iconSearch.addEventListener('input', filterIcons);
+    }
+    if (iconCategoryFilter) {
+        iconCategoryFilter.addEventListener('change', filterIcons);
+    }
     
     // Add new life area button
     const addNewLifeAreaBtn = document.getElementById('addNewLifeAreaBtn');
@@ -139,6 +230,13 @@ document.addEventListener('DOMContentLoaded', function () {
             resetForm();
             offcanvasTitle.textContent = 'Agregar Nueva Área de Vida';
             submitButtonText.textContent = 'Agregar';
+            
+            // Ensure no icon is selected in the grid
+            setTimeout(() => {
+                document.querySelectorAll('.icon-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+            }, 100);
         });
     }
     
@@ -237,61 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     
-    // Functions
-    async function loadAvailableIcons() {
-        try {
-            const response = await fetch('/LifeAreas/GetIconOptions');
-            availableIcons = await response.json();
-            renderIconGrid();
-        } catch (error) {
-            console.error('Error loading icons:', error);
-        }
-    }
-    
-    function renderIconGrid() {
-        const iconGrid = document.getElementById('iconGrid');
-        const filteredIcons = filterIconsList();
-        
-        iconGrid.innerHTML = filteredIcons.map(icon => `
-            <div class="icon-option p-3 text-center cursor-pointer" data-icon="${icon.class}" data-name="${icon.name}" data-category="${icon.category}">
-                <i class="${icon.class} fa-2x mb-2"></i>
-                <div class="small">${icon.name}</div>
-            </div>
-        `).join('');
-        
-        // Add click handlers
-        iconGrid.querySelectorAll('.icon-option').forEach(option => {
-            option.addEventListener('click', function() {
-                iconGrid.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-    }
-    
-    function filterIcons() {
-        renderIconGrid();
-    }
-    
-    function filterIconsList() {
-        const searchTerm = iconSearch.value.toLowerCase();
-        const category = iconCategoryFilter.value;
-        
-        return availableIcons.filter(icon => {
-            const matchesSearch = !searchTerm || 
-                icon.name.toLowerCase().includes(searchTerm) || 
-                icon.class.toLowerCase().includes(searchTerm);
-            const matchesCategory = !category || icon.category === category;
-            return matchesSearch && matchesCategory;
-        });
-    }
-    
-    function updateIconPreview(iconClass, color) {
-        selectedIconPreview.className = iconClass;
-        selectedIconPreview.style.color = color;
-        selectedIconPreview.style.fontSize = '2rem';
-        iconPreview.style.backgroundColor = color;
-    }
-    
+    // Other Functions
     async function loadLifeAreaForEdit(id) {
         try {
             const response = await fetch(`/LifeAreas/GetById/${id}`);
@@ -312,6 +356,18 @@ document.addEventListener('DOMContentLoaded', function () {
             // Update icon preview
             selectedIcon = data.iconClass;
             updateIconPreview(data.iconClass, data.iconColor);
+            
+            // Pre-select the icon in the grid when modal opens
+            setTimeout(() => {
+                const iconOptions = document.querySelectorAll('.icon-option');
+                iconOptions.forEach(option => {
+                    if (option.dataset.icon === data.iconClass) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }, 100);
             
             // Update UI
             offcanvasTitle.textContent = 'Editar Área de Vida';
@@ -388,7 +444,8 @@ document.addEventListener('DOMContentLoaded', function () {
         selectedIcon = 'fas fa-circle';
         colorPicker.value = '#6c757d';
         colorText.value = '#6c757d';
-        updateIconPreview(selectedIcon, '#6c757d');
+        document.getElementById('lifeAreaIconClass').value = 'fas fa-circle';
+        updateIconPreview('fas fa-circle', '#6c757d');
         clearValidationErrors();
     }
     
@@ -495,15 +552,26 @@ style.textContent = `
     .icon-option:hover {
         background-color: #f8f9fa;
         border-color: #dee2e6;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .icon-option.selected {
         background-color: #e7f1ff;
         border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
     }
     
     .cursor-pointer {
         cursor: pointer;
+    }
+    
+    #iconPreview {
+        transition: all 0.3s ease;
+    }
+    
+    #selectedIconPreview {
+        transition: all 0.3s ease;
     }
 `;
 document.head.appendChild(style);
