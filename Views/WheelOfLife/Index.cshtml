@@ -25,7 +25,7 @@
 
         .chart-wrapper {
             position: relative;
-            height: 400px;
+            height: 650px;
             width: 100%;
         }
 
@@ -270,9 +270,25 @@
             transition: opacity 0.3s ease;
         }
 
+        .chart-legend {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .legend-item {
+            font-size: 11px;
+            color: #495057;
+        }
+
+        .legend-color {
+            flex-shrink: 0;
+        }
+
         @@media (max-width: 768px) {
             .chart-wrapper {
-                height: 350px;
+                height: 550px;
             }
 
             .total-score-number {
@@ -331,7 +347,7 @@
                     Tu Rueda de Equilibrio de Vida
                 </h3>
                 <div class="chart-wrapper">
-                    <canvas id="wheelOfLifeChart"></canvas>
+                    <div id="wheelOfLifeChart"></div>
                     <div id="chartLoading" class="loading-spinner d-none">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading chart...</span>
@@ -397,8 +413,8 @@
 </div>
 
 @section Scripts {
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <!-- Wheel of Life JavaScript -->
     <script src="~/js/wheel-of-life.js"></script>

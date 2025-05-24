@@ -1,4 +1,4 @@
-// Wheel of Life JavaScript Module
+// Modern Wheel of Life with ApexCharts
 const WheelOfLife = {
     config: {
         chart: null,
@@ -9,7 +9,7 @@ const WheelOfLife = {
 
     // Initialize the module
     init: function() {
-        console.log('Initializing Wheel of Life module...');
+        console.log('Initializing Modern Wheel of Life module...');
         this.bindEvents();
         this.loadWheelData();
     },
@@ -95,110 +95,155 @@ const WheelOfLife = {
         $('.total-score-label').html(`Total Score / ${data.areasCount * 10}`);
     },
 
-    // Initialize Chart.js radar chart
+    // Initialize ApexCharts RadialBar visualization
     initializeChart: function(areas) {
-        const canvas = document.getElementById('wheelOfLifeChart');
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext('2d');
-        
+        const chartContainer = document.getElementById('wheelOfLifeChart');
+        if (!chartContainer) return;
+
         // Destroy existing chart if any
         if (this.config.chart) {
             this.config.chart.destroy();
         }
-        
-        // Prepare chart data
-        const labels = areas.map(area => area.areaName);
-        const data = areas.map(area => area.currentScore || 5);
-        const backgroundColors = areas.map(area => this.hexToRgba(area.iconColor, 0.2));
-        const borderColors = areas.map(area => area.iconColor);
 
-        this.config.chart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Puntuación Actual',
-                    data: data,
-                    backgroundColor: this.hexToRgba('#667eea', 0.2),
-                    borderColor: '#667eea',
-                    borderWidth: 3,
-                    pointBackgroundColor: borderColors,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: borderColors,
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
+        // Prepare data
+        const series = areas.map(area => ((area.currentScore || 5) / 10) * 100); // Convert to percentage
+        const labels = areas.map(area => area.areaName);
+        const colors = areas.map(area => area.iconColor);
+
+        // Chart configuration
+        const options = {
+            series: series,
+            chart: {
+                type: 'radialBar',
+                height: 580,
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: {
+                        enabled: true,
+                        delay: 150
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: '#667eea',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.parsed.r}/10`;
-                            }
-                        }
+                    dynamicAnimation: {
+                        enabled: true,
+                        speed: 350
                     }
                 },
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 10,
-                        stepSize: 1,
-                        ticks: {
-                            font: {
-                                size: 12,
-                                weight: '600'
-                            },
-                            color: '#718096',
-                            backdropColor: 'rgba(255, 255, 255, 0.9)',
-                            backdropPadding: 3,
-                            showLabelBackdrop: true
-                        },
-                        grid: {
-                            color: '#e2e8f0',
-                            lineWidth: 1
-                        },
-                        angleLines: {
-                            color: '#e2e8f0',
-                            lineWidth: 1
-                        },
-                        pointLabels: {
-                            font: {
-                                size: 13,
-                                weight: '600'
-                            },
+                background: 'transparent',
+                fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif'
+            },
+            plotOptions: {
+                radialBar: {
+                    offsetY: 0,
+                    startAngle: 0,
+                    endAngle: 360,
+                    hollow: {
+                        margin: 5,
+                        size: '15%',
+                        background: 'transparent',
+                        image: undefined,
+                        imageOffsetX: 0,
+                        imageOffsetY: 0,
+                        position: 'front',
+                        dropShadow: {
+                            enabled: true,
+                            top: 3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.24
+                        }
+                    },
+                    track: {
+                        background: '#f2f2f2',
+                        strokeWidth: '67%',
+                        margin: 0,
+                        dropShadow: {
+                            enabled: true,
+                            top: -3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.35
+                        }
+                    },
+                    dataLabels: {
+                        show: true,
+                        name: {
+                            offsetY: -10,
+                            show: true,
                             color: '#2d3748',
-                            padding: 15
+                            fontSize: '11px',
+                            fontWeight: '600'
+                        },
+                        value: {
+                            formatter: function(val, opts) {
+                                return Math.round((val / 100) * 10) + '/10';
+                            },
+                            color: '#667eea',
+                            fontSize: '13px',
+                            fontWeight: 'bold',
+                            show: true,
                         }
                     }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'nearest'
                 }
-            }
-        });
+            },
+            colors: colors,
+            labels: labels,
+            legend: {
+                show: true,
+                floating: true,
+                fontSize: '12px',
+                position: 'bottom',
+                offsetX: 0,
+                offsetY: 80, // Much more spacing from chart
+                labels: {
+                    useSeriesColors: true,
+                },
+                markers: {
+                    size: 6,
+                    strokeWidth: 0,
+                    strokeColor: '#fff',
+                    fillColors: colors,
+                    radius: 12
+                },
+                formatter: function(seriesName, opts) {
+                    return seriesName + ': ' + Math.round((opts.w.globals.series[opts.seriesIndex] / 100) * 10) + '/10';
+                },
+                itemMargin: {
+                    vertical: 8, // More vertical spacing between legend items
+                    horizontal: 20 // More horizontal spacing between legend items
+                }
+            },
+            tooltip: {
+                enabled: true,
+                theme: 'dark',
+                style: {
+                    fontSize: '12px',
+                    fontFamily: '"Segoe UI", sans-serif'
+                },
+                y: {
+                    formatter: function(val, opts) {
+                        const score = Math.round((val / 100) * 10);
+                        return `Puntuación: ${score}/10`;
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 768,
+                options: {
+                    chart: {
+                        height: 480
+                    },
+                    legend: {
+                        position: 'bottom',
+                        offsetY: 60 // More spacing on mobile too
+                    }
+                }
+            }]
+        };
+
+        // Create chart
+        this.config.chart = new ApexCharts(chartContainer, options);
+        this.config.chart.render();
     },
 
     // Bind all event handlers
@@ -225,12 +270,6 @@ const WheelOfLife = {
         });
 
         // Save scores button
-        $('#saveScoresBtn').on('click', (e) => {
-            e.preventDefault();
-            this.saveScores();
-        });
-
-        // Remove any existing event handlers to prevent duplicates
         $('#saveScoresBtn').off('click').on('click', (e) => {
             e.preventDefault();
             this.saveScores();
@@ -249,11 +288,11 @@ const WheelOfLife = {
     updateChart: function() {
         if (!this.config.chart) return;
 
-        const newData = this.config.currentData.map(area => area.currentScore || 5);
+        // Convert scores to percentages for radial chart
+        const newSeries = this.config.currentData.map(area => ((area.currentScore || 5) / 10) * 100);
         
-        // Update chart data
-        this.config.chart.data.datasets[0].data = newData;
-        this.config.chart.update('none');
+        // Update chart with animation
+        this.config.chart.updateSeries(newSeries);
     },
 
     // Update statistics locally
@@ -367,17 +406,6 @@ const WheelOfLife = {
     // Show error message
     showError: function(message) {
         this.showMessage('error', message);
-    },
-
-    // Utility functions
-    hexToRgba: function(hex, opacity) {
-        if (!hex || !hex.startsWith('#')) return `rgba(102, 126, 234, ${opacity})`;
-        
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
 };
 
@@ -385,7 +413,6 @@ const WheelOfLife = {
 $(document).ready(function() {
     // Add CSRF token if not present
     if (!$('input[name="__RequestVerificationToken"]').length) {
-        // This should be added by the view, but just in case
         console.warn('CSRF token not found in the page');
     }
     
