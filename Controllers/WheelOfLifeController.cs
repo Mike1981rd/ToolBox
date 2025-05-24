@@ -1,296 +1,217 @@
 using Microsoft.AspNetCore.Mvc;
-using ToolBox.Models;
+using Microsoft.EntityFrameworkCore;
+using ToolBox.Data;
+using ToolBox.Interfaces;
+using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
     public class WheelOfLifeController : Controller
     {
         private readonly ILogger<WheelOfLifeController> _logger;
+        private readonly IWheelOfLifeService _wheelOfLifeService;
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public WheelOfLifeController(ILogger<WheelOfLifeController> logger)
+        public WheelOfLifeController(
+            ILogger<WheelOfLifeController> logger,
+            IWheelOfLifeService wheelOfLifeService,
+            ApplicationDbContext context,
+            IWebHostEnvironment hostEnvironment)
         {
             _logger = logger;
+            _wheelOfLifeService = wheelOfLifeService;
+            _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        // GET: /WheelOfLife/GetWheelData
+        [HttpGet]
+        public async Task<IActionResult> GetWheelData()
         {
             try
             {
-                var lifeAreas = GetLifeAreaScores();
-                var totalScore = lifeAreas.Sum(area => area.CurrentScore);
-                var averageScore = lifeAreas.Count > 0 ? Math.Round((double)totalScore / lifeAreas.Count, 2) : 0;
-                var maxPossibleScore = lifeAreas.Count * 10;
-
-                var model = new WheelOfLifePageViewModel
+                var userId = GetCurrentUserId();
+                if (userId == 0)
                 {
-                    LifeAreas = lifeAreas,
-                    TotalScore = totalScore,
-                    AverageScore = averageScore,
-                    MaxPossibleScore = maxPossibleScore,
-                    LastUpdated = DateTime.Now.ToString("MMM dd, yyyy")
-                };
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
 
-                return View(model);
+                var wheelData = await _wheelOfLifeService.GetWheelDataForUserAsync(userId);
+                
+                return Json(new 
+                { 
+                    success = true, 
+                    data = wheelData 
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading Wheel of Life index page");
-                return View(new WheelOfLifePageViewModel());
+                _logger.LogError(ex, "Error getting wheel data");
+                return Json(new { success = false, message = "Error al cargar los datos de la rueda de la vida" });
             }
         }
 
+        // POST: /WheelOfLife/SaveScores
         [HttpPost]
-        public async Task<JsonResult> SaveWheelScores([FromBody] SaveWheelScoresRequestViewModel request)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveScores([FromBody] SaveWheelScoresRequestViewModel model)
         {
             try
             {
-                // Validate the model
-                if (request?.Scores == null || !request.Scores.Any())
+                _logger.LogInformation("=== SaveScores START ===");
+                _logger.LogInformation("Scores count: {Count}", model?.Scores?.Count);
+
+                if (!ModelState.IsValid)
                 {
-                    return Json(new SaveWheelScoresResponseViewModel
+                    var errors = ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors.Select(e => $"{x.Key}: {e.ErrorMessage}"))
+                        .ToList();
+                    
+                    _logger.LogWarning("ModelState is invalid: {Errors}", string.Join(", ", errors));
+                        
+                    return Json(new
                     {
-                        Success = false,
-                        Message = "No scores provided",
-                        Errors = new List<string> { "Please provide scores to save" }
+                        success = false,
+                        message = "Error de validación: " + string.Join(", ", errors)
                     });
                 }
 
-                // Validate each score
-                var errors = new List<string>();
-                foreach (var score in request.Scores)
+                var userId = GetCurrentUserId();
+                if (userId == 0)
                 {
-                    if (score.CurrentScore < 1 || score.CurrentScore > 10)
+                    return Json(new
                     {
-                        errors.Add($"Score for {score.AreaName} must be between 1 and 10");
+                        success = false,
+                        message = "Usuario no autenticado"
+                    });
+                }
+
+                if (model.Scores == null || !model.Scores.Any())
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Por favor proporcione al menos una puntuación"
+                    });
+                }
+
+                _logger.LogInformation("About to save scores for User {UserId}, Count: {Count}", 
+                    userId, model.Scores.Count);
+                
+                // Log each score being sent
+                foreach (var score in model.Scores)
+                {
+                    _logger.LogInformation("Score: LifeAreaId={LifeAreaId}, Score={Score}", 
+                        score.LifeAreaId, score.Score);
+                }
+
+                // Save/Update scores
+                var (success, savedCount, updatedCount) = await _wheelOfLifeService.SaveUserScoresAsync(
+                    userId, 
+                    model.Scores
+                );
+
+                _logger.LogInformation("SaveUserScoresAsync returned: Success={Success}, SavedCount={SavedCount}, UpdatedCount={UpdatedCount}", 
+                    success, savedCount, updatedCount);
+
+                if (success)
+                {
+                    _logger.LogInformation(
+                        "User {UserId} saved wheel scores: {SavedCount} new, {UpdatedCount} updated", 
+                        userId, savedCount, updatedCount
+                    );
+
+                    string message;
+                    if (savedCount == 0 && updatedCount == 0)
+                    {
+                        message = "No se realizaron cambios - las puntuaciones ya estaban guardadas con los mismos valores";
+                    }
+                    else if (savedCount > 0 && updatedCount > 0)
+                    {
+                        message = $"Puntuaciones guardadas exitosamente: {savedCount} nuevas, {updatedCount} actualizadas";
+                    }
+                    else if (savedCount > 0)
+                    {
+                        message = $"Se guardaron {savedCount} puntuaciones nuevas exitosamente";
+                    }
+                    else
+                    {
+                        message = $"Se actualizaron {updatedCount} puntuaciones exitosamente";
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = message,
+                        savedCount = savedCount,
+                        updatedCount = updatedCount
+                    });
+                }
+                else
+                {
+                    _logger.LogWarning("SaveUserScoresAsync failed for User {UserId}", userId);
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Error al guardar las puntuaciones"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving wheel scores");
+                
+                var errorMessage = "Error al guardar las puntuaciones";
+                if (_hostEnvironment?.IsDevelopment() == true)
+                {
+                    errorMessage += $": {ex.Message}";
+                    if (ex.InnerException != null)
+                    {
+                        errorMessage += $" - Inner: {ex.InnerException.Message}";
                     }
                 }
-
-                if (errors.Any())
+                
+                return Json(new
                 {
-                    return Json(new SaveWheelScoresResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Validation errors occurred",
-                        Errors = errors
-                    });
-                }
-
-                // Simulate processing and saving the scores
-                // In a real application, you would save these to a database
-                await Task.Delay(300); // Simulate processing time
-
-                var totalScore = request.Scores.Sum(s => s.CurrentScore);
-                var averageScore = Math.Round((double)totalScore / request.Scores.Count, 2);
-
-                _logger.LogInformation("Wheel of Life scores saved: {ScoreCount} areas with total score {TotalScore}", 
-                    request.Scores.Count, totalScore);
-
-                return Json(new SaveWheelScoresResponseViewModel
-                {
-                    Success = true,
-                    Message = "Scores saved successfully!",
-                    TotalScore = totalScore,
-                    AverageScore = averageScore,
-                    AreasCount = request.Scores.Count,
-                    SavedAt = DateTime.Now
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error saving wheel of life scores");
-                return Json(new SaveWheelScoresResponseViewModel
-                {
-                    Success = false,
-                    Message = "An error occurred while saving your scores",
-                    Errors = new List<string> { "Please try again later" }
+                    success = false,
+                    message = errorMessage
                 });
             }
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetChartData()
+        // Helper method to get current user ID (same as LifeAssessmentController)
+        private int GetCurrentUserId()
         {
             try
             {
-                var lifeAreas = GetLifeAreaScores();
-                
-                var chartData = new ChartDataViewModel
+                var firstActiveUser = _context.Users
+                    .Where(u => u.IsActive)
+                    .OrderBy(u => u.Id)
+                    .FirstOrDefault();
+                    
+                if (firstActiveUser != null)
                 {
-                    Labels = lifeAreas.Select(area => area.AreaName).ToList(),
-                    Data = lifeAreas.Select(area => area.CurrentScore).ToList(),
-                    BackgroundColors = lifeAreas.Select(area => ConvertToRgba(area.AreaColor, 0.6)).ToList(),
-                    BorderColors = lifeAreas.Select(area => area.AreaColor).ToList(),
-                    ChartType = "radar"
-                };
-
-                return Json(new { success = true, data = chartData });
+                    _logger.LogDebug("Using test user: {UserId} - {UserName}", firstActiveUser.Id, firstActiveUser.FullName);
+                    return firstActiveUser.Id;
+                }
+                else
+                {
+                    _logger.LogError("No active users found in database!");
+                    return 0;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting chart data");
-                return Json(new { success = false, message = "Error loading chart data" });
+                _logger.LogError(ex, "Error getting test user ID");
+                return 0;
             }
         }
-
-        [HttpGet]
-        public async Task<JsonResult> GetWheelStats()
-        {
-            try
-            {
-                var lifeAreas = GetLifeAreaScores();
-                
-                var stats = new WheelStatsViewModel
-                {
-                    TotalAssessments = 1,
-                    TotalAreas = lifeAreas.Count,
-                    OverallAverageScore = lifeAreas.Count > 0 ? Math.Round(lifeAreas.Average(a => a.CurrentScore), 2) : 0,
-                    LastUpdated = DateTime.Now,
-                    AreaStats = lifeAreas.Select(area => new AreaStatViewModel
-                    {
-                        AreaId = area.AreaId,
-                        AreaName = area.AreaName,
-                        AverageScore = area.CurrentScore,
-                        HighestScore = area.CurrentScore,
-                        LowestScore = area.CurrentScore,
-                        Icon = area.AreaIcon,
-                        Color = area.AreaColor
-                    }).ToList()
-                };
-
-                return Json(new { success = true, stats = stats });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting wheel statistics");
-                return Json(new { success = false, message = "Error loading statistics" });
-            }
-        }
-
-        #region Private Helper Methods
-
-        private List<LifeAreaScoreViewModel> GetLifeAreaScores()
-        {
-            // Sample life areas with initial scores - in a real application, these would come from a database
-            return new List<LifeAreaScoreViewModel>
-            {
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 1,
-                    AreaName = "Physical Health",
-                    AreaSlug = "physical-health",
-                    AreaIcon = "💪",
-                    AreaColor = "#FF6B6B",
-                    AreaDescription = "Your physical well-being, fitness, and health habits",
-                    CurrentScore = 6,
-                    OrderIndex = 1
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 2,
-                    AreaName = "Mental Health",
-                    AreaSlug = "mental-health",
-                    AreaIcon = "🧠",
-                    AreaColor = "#4ECDC4",
-                    AreaDescription = "Your mental well-being, stress management, and emotional health",
-                    CurrentScore = 7,
-                    OrderIndex = 2
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 3,
-                    AreaName = "Career & Work",
-                    AreaSlug = "career-work",
-                    AreaIcon = "💼",
-                    AreaColor = "#45B7D1",
-                    AreaDescription = "Your professional life, career satisfaction, and work-life balance",
-                    CurrentScore = 8,
-                    OrderIndex = 3
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 4,
-                    AreaName = "Financial Wellness",
-                    AreaSlug = "financial-wellness",
-                    AreaIcon = "💰",
-                    AreaColor = "#F7DC6F",
-                    AreaDescription = "Your financial health, planning, and money management",
-                    CurrentScore = 5,
-                    OrderIndex = 4
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 5,
-                    AreaName = "Relationships",
-                    AreaSlug = "relationships",
-                    AreaIcon = "❤️",
-                    AreaColor = "#BB8FCE",
-                    AreaDescription = "Your relationships with family, friends, and romantic partners",
-                    CurrentScore = 9,
-                    OrderIndex = 5
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 6,
-                    AreaName = "Personal Growth",
-                    AreaSlug = "personal-growth",
-                    AreaIcon = "🌱",
-                    AreaColor = "#85C1E9",
-                    AreaDescription = "Your personal development, learning, and self-improvement",
-                    CurrentScore = 7,
-                    OrderIndex = 6
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 7,
-                    AreaName = "Spiritual Life",
-                    AreaSlug = "spiritual-life",
-                    AreaIcon = "🙏",
-                    AreaColor = "#A9DFBF",
-                    AreaDescription = "Your spiritual well-being, purpose, and inner peace",
-                    CurrentScore = 6,
-                    OrderIndex = 7
-                },
-                new LifeAreaScoreViewModel
-                {
-                    AreaId = 8,
-                    AreaName = "Recreation & Fun",
-                    AreaSlug = "recreation-fun",
-                    AreaIcon = "🎯",
-                    AreaColor = "#F8C471",
-                    AreaDescription = "Your hobbies, leisure activities, and work-life balance",
-                    CurrentScore = 8,
-                    OrderIndex = 8
-                }
-            };
-        }
-
-        private string ConvertToRgba(string hexColor, double opacity)
-        {
-            // Convert hex color to RGBA with specified opacity
-            if (string.IsNullOrEmpty(hexColor) || !hexColor.StartsWith("#"))
-            {
-                return $"rgba(102, 126, 234, {opacity})"; // Default color
-            }
-
-            try
-            {
-                var hex = hexColor.TrimStart('#');
-                if (hex.Length == 6)
-                {
-                    var r = Convert.ToInt32(hex.Substring(0, 2), 16);
-                    var g = Convert.ToInt32(hex.Substring(2, 2), 16);
-                    var b = Convert.ToInt32(hex.Substring(4, 2), 16);
-                    return $"rgba({r}, {g}, {b}, {opacity})";
-                }
-            }
-            catch
-            {
-                // Fallback to default color if conversion fails
-            }
-
-            return $"rgba(102, 126, 234, {opacity})";
-        }
-
-        #endregion
     }
 }

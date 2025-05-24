@@ -18,6 +18,7 @@ namespace ToolBox.Data
         public DbSet<LifeArea> LifeAreas { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<WheelOfLifeScore> WheelOfLifeScores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -109,6 +110,27 @@ namespace ToolBox.Data
             // Create unique index for UserId + QuestionId (one answer per user per question)
             modelBuilder.Entity<UserAnswer>()
                 .HasIndex(ua => new { ua.UserId, ua.QuestionId })
+                .IsUnique();
+                
+            // WheelOfLifeScore configuration
+            modelBuilder.Entity<WheelOfLifeScore>()
+                .HasKey(w => w.Id);
+                
+            modelBuilder.Entity<WheelOfLifeScore>()
+                .HasOne(w => w.User)
+                .WithMany()
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<WheelOfLifeScore>()
+                .HasOne(w => w.LifeArea)
+                .WithMany()
+                .HasForeignKey(w => w.LifeAreaId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Create unique index for UserId + LifeAreaId (one score per user per life area)
+            modelBuilder.Entity<WheelOfLifeScore>()
+                .HasIndex(w => new { w.UserId, w.LifeAreaId })
                 .IsUnique();
                 
             // Seed Questions data

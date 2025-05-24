@@ -9,7 +9,8 @@
       "Bash(find:*)",
       "Bash(dotnet build)",
       "Bash(node:*)",
-      "Bash(dotnet ef migrations add:*)"
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(dotnet run)"
     ],
     "deny": []
   }
