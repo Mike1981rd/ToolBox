@@ -1,4 +1,3 @@
-@model ToolBox.Models.LifeAssessmentIndexViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -52,6 +51,25 @@
         .area-select:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Custom styling for select options with icons */
+        .area-icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 8px;
+        }
+
+        .area-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            margin-right: 8px;
         }
 
         .questions-container {
@@ -232,8 +250,8 @@
 <!-- Page Header -->
 <div class="life-assessment-header">
     <div class="container">
-        <h1 class="h2 mb-0" data-translate-key="page_titles.lifeAssessment">Life Assessment Questionnaires</h1>
-        <p class="mb-0 mt-2 opacity-90">Evaluate different areas of your life on a scale of 1-10</p>
+        <h1 class="h2 mb-0" data-translate-key="page_titles.lifeAssessment">Cuestionarios de Evaluación de Vida</h1>
+        <p class="mb-0 mt-2 opacity-90">Evalúe diferentes áreas de su vida en una escala del 1 al 10</p>
     </div>
 </div>
 
@@ -253,24 +271,24 @@
         <div class="row align-items-center">
             <div class="col-md-3">
                 <label for="areaSelect" class="form-label fw-semibold" data-translate-key="labels.filterByCategory">
-                    <i class="fas fa-filter me-2"></i>Filter By Category
+                    <i class="fas fa-filter me-2"></i>Filtrar por Categoría
                 </label>
             </div>
             <div class="col-md-6">
-                <select id="areaSelect" class="form-select area-select">
-                    <option value="" data-translate-key="placeholders.selectArea">Select an Area...</option>
-                    @foreach (var area in Model.LifeAreas)
-                    {
-                        <option value="@area.Id" data-count="@area.QuestionCount">
-                            @area.Icon @area.Name (@area.QuestionCount questions)
-                        </option>
-                    }
-                </select>
+                <div class="d-flex align-items-center">
+                    <div id="selectedAreaIcon" class="area-icon me-3 d-none" style="background-color: #6c757d;">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <select id="areaSelect" class="form-select area-select flex-grow-1">
+                        <option value="" data-translate-key="placeholders.selectArea">Filtrar por Área de la Vida</option>
+                        <!-- Life areas will be loaded dynamically -->
+                    </select>
+                </div>
             </div>
             <div class="col-md-3">
                 <small class="text-muted">
                     <i class="fas fa-info-circle me-1"></i>
-                    <span id="questionCount">Select an area to begin</span>
+                    <span id="questionCount">Seleccione un área para comenzar</span>
                 </small>
             </div>
         </div>
@@ -281,10 +299,10 @@
         <div class="assessment-card-header">
             <h3 class="h5 mb-0">
                 <i class="fas fa-clipboard-list me-2"></i>
-                <span id="sectionTitle" data-translate-key="labels.questions">Assessment Questions</span>
+                <span id="sectionTitle" data-translate-key="labels.questions">Preguntas de Evaluación</span>
             </h3>
             <small class="text-muted mt-1" id="sectionSubtitle">
-                Rate each statement on a scale of 1 (strongly disagree) to 10 (strongly agree)
+                Califique cada declaración en una escala del 1 (totalmente en desacuerdo) al 10 (totalmente de acuerdo)
             </small>
         </div>
         <div class="assessment-card-body">
@@ -294,15 +312,15 @@
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-3 mb-0">Loading questions...</p>
+                    <p class="mt-3 mb-0">Cargando preguntas...</p>
                 </div>
 
                 <!-- No questions state -->
                 <div id="noQuestions" class="no-questions">
                     <div class="no-questions-icon">📋</div>
-                    <h4 data-translate-key="messages.selectAreaToStart">Select an area to start your assessment</h4>
+                    <h4 data-translate-key="messages.selectAreaToStart">Seleccione un área para comenzar su evaluación</h4>
                     <p class="text-muted" data-translate-key="messages.selectAreaDescription">
-                        Choose a life area from the dropdown above to see related questions and begin your evaluation.
+                        Elija un área de vida del menú desplegable para ver las preguntas relacionadas y comenzar su evaluación.
                     </p>
                 </div>
 
@@ -313,10 +331,10 @@
             <!-- Submit Section -->
             <div id="submitSection" class="submit-section d-none">
                 <button id="submitAnswersBtn" class="btn submit-btn" data-translate-key="buttons.submitAnswers">
-                    <i class="fas fa-paper-plane me-2"></i>Submit Answers
+                    <i class="fas fa-paper-plane me-2"></i>Guardar Respuestas
                 </button>
                 <p class="text-muted mt-3 mb-0">
-                    Make sure you've answered all questions before submitting.
+                    Puede guardar sus respuestas aunque no haya completado todas las preguntas.
                 </p>
             </div>
         </div>
@@ -324,6 +342,9 @@
 
     <!-- Success/Error Messages -->
     <div id="messageContainer"></div>
+    
+    <!-- CSRF Token for AJAX requests -->
+    @Html.AntiForgeryToken()
 </div>
 
 @section Scripts {
@@ -342,6 +363,7 @@
                 console.log('Initializing Life Assessment module...');
                 this.bindEvents();
                 this.loadInitialState();
+                this.loadLifeAreas();
             },
 
             // Bind all event handlers
@@ -350,8 +372,18 @@
                 $('#areaSelect').on('change', (e) => {
                     const areaId = parseInt(e.target.value);
                     if (areaId) {
+                        // Get selected option to access icon data
+                        const selectedOption = e.target.options[e.target.selectedIndex];
+                        const icon = $(selectedOption).data('icon');
+                        const iconColor = $(selectedOption).data('icon-color');
+                        
+                        // Update icon display
+                        this.updateAreaIcon(icon, iconColor);
+                        
                         this.loadQuestionsByArea(areaId);
                     } else {
+                        // Hide icon when no area selected
+                        $('#selectedAreaIcon').addClass('d-none');
                         this.showNoQuestionsState();
                     }
                 });
@@ -373,10 +405,50 @@
                 });
             },
 
+            // Update area icon display
+            updateAreaIcon: function(iconClass, iconColor) {
+                const iconElement = $('#selectedAreaIcon');
+                if (iconClass && iconColor) {
+                    iconElement.css('background-color', iconColor);
+                    iconElement.find('i').attr('class', iconClass);
+                    iconElement.removeClass('d-none');
+                } else {
+                    iconElement.addClass('d-none');
+                }
+            },
+
             // Load initial state
             loadInitialState: function() {
                 this.showNoQuestionsState();
-                this.updateQuestionCount('Select an area to begin');
+                this.updateQuestionCount('Seleccione un área para comenzar');
+            },
+
+            // Load life areas from API
+            loadLifeAreas: function() {
+                $.get(`${this.config.baseUrl}/GetActiveLifeAreas`)
+                    .done((response) => {
+                        if (response.success && response.areas && response.areas.length > 0) {
+                            const select = $('#areaSelect');
+                            select.empty();
+                            select.append('<option value="" data-translate-key="placeholders.selectArea">Filtrar por Área de la Vida</option>');
+                            
+                            response.areas.forEach(area => {
+                                // Create option with proper text (without icon class)
+                                const option = $('<option></option>')
+                                    .attr('value', area.id)
+                                    .attr('data-count', area.questionCount)
+                                    .attr('data-icon', area.icon)
+                                    .attr('data-icon-color', area.iconColor)
+                                    .text(`${area.name} (${area.questionCount} preguntas)`);
+                                select.append(option);
+                            });
+                        } else {
+                            console.error('No life areas found');
+                        }
+                    })
+                    .fail(() => {
+                        console.error('Error loading life areas');
+                    });
             },
 
             // Load questions for selected area
@@ -393,13 +465,13 @@
                         if (response.success && response.questions && response.questions.length > 0) {
                             this.config.currentQuestions = response.questions;
                             this.renderQuestions(response.questions, response.areaName);
-                            this.updateQuestionCount(`${response.questions.length} questions loaded`);
+                            this.updateQuestionCount(`${response.questions.length} preguntas cargadas`);
                         } else {
-                            this.showNoQuestionsFound(response.areaName || 'Selected Area');
+                            this.showNoQuestionsFound(response.areaName || 'Área Seleccionada');
                         }
                     })
                     .fail(() => {
-                        this.showError('Error loading questions. Please try again.');
+                        this.showError('Error al cargar las preguntas. Por favor intente nuevamente.');
                         this.showNoQuestionsState();
                     })
                     .always(() => {
@@ -421,8 +493,8 @@
                 $('#questionsList').addClass('d-none');
                 $('#submitSection').addClass('d-none');
                 $('#noQuestions').removeClass('d-none');
-                $('#sectionTitle').text('Assessment Questions');
-                $('#sectionSubtitle').text('Rate each statement on a scale of 1 (strongly disagree) to 10 (strongly agree)');
+                $('#sectionTitle').text('Preguntas de Evaluación');
+                $('#sectionSubtitle').text('Califique cada declaración en una escala del 1 (totalmente en desacuerdo) al 10 (totalmente de acuerdo)');
             },
 
             // Show no questions found for area
@@ -434,8 +506,8 @@
                 
                 $('#noQuestions').html(`
                     <div class="no-questions-icon">📋</div>
-                    <h4>No questions found</h4>
-                    <p class="text-muted">No questions are available for "${areaName}" at this time.</p>
+                    <h4>No se encontraron preguntas</h4>
+                    <p class="text-muted">No hay preguntas disponibles para "${areaName}" en este momento.</p>
                 `);
             },
 
@@ -454,9 +526,10 @@
                                        min="1" 
                                        max="10" 
                                        placeholder="1-10"
+                                       value="${question.existingScore || ''}"
                                        data-question-id="${question.questionId}"
-                                       data-area-id="${question.areaId}">
-                                <div class="scale-indicator">1-10 scale</div>
+                                       data-area-id="${this.config.currentAreaId}">
+                                <div class="scale-indicator">Escala 1-10</div>
                             </div>
                         </div>
                     </div>
@@ -468,8 +541,8 @@
                 $('#submitSection').removeClass('d-none');
                 
                 // Update section title
-                $('#sectionTitle').text(`${areaName} Assessment`);
-                $('#sectionSubtitle').text(`${questions.length} questions • Rate each on a scale of 1-10`);
+                $('#sectionTitle').text(`Evaluación de ${areaName}`);
+                $('#sectionSubtitle').text(`${questions.length} preguntas • Califique cada una en una escala del 1 al 10`);
                 
                 this.updateSubmitButtonState();
             },
@@ -482,12 +555,13 @@
                     return value && value >= 1 && value <= 10;
                 });
 
-                const allFilled = inputs.length > 0 && filledInputs.length === inputs.length;
-                $('#submitAnswersBtn').prop('disabled', !allFilled);
+                // Enable submit button if at least one answer is provided
+                const hasAtLeastOneAnswer = filledInputs.length > 0;
+                $('#submitAnswersBtn').prop('disabled', !hasAtLeastOneAnswer);
                 
                 if (inputs.length > 0) {
                     const progress = Math.round((filledInputs.length / inputs.length) * 100);
-                    $('#submitSection p').text(`${filledInputs.length} of ${inputs.length} questions answered (${progress}%)`);
+                    $('#submitSection p').text(`${filledInputs.length} de ${inputs.length} preguntas respondidas (${progress}%)`);
                 }
             },
 
@@ -496,44 +570,108 @@
                 const answers = [];
                 $('.answer-input').each(function() {
                     const questionId = parseInt($(this).data('question-id'));
-                    const areaId = parseInt($(this).data('area-id'));
                     const value = parseInt($(this).val());
                     
-                    if (questionId && areaId && value >= 1 && value <= 10) {
+                    if (questionId && value >= 1 && value <= 10) {
                         answers.push({
                             questionId: questionId,
-                            answerValue: value,
-                            areaId: areaId
+                            score: value
                         });
                     }
                 });
 
                 if (answers.length === 0) {
-                    this.showError('Please answer at least one question before submitting.');
+                    this.showError('Por favor responda al menos una pregunta antes de guardar.');
+                    return;
+                }
+
+                // Get CSRF token
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                // Prepare request data - use PascalCase to match C# model
+                const requestData = {
+                    AreaId: this.config.currentAreaId,
+                    Answers: answers.map(a => ({
+                        QuestionId: a.questionId,
+                        Score: a.score
+                    }))
+                };
+
+                console.log('Sending data:', requestData); // Debug log
+                console.log('Area ID:', this.config.currentAreaId);
+                console.log('Answers array:', answers);
+                console.log('Token:', token);
+
+                // Validate area ID
+                if (!this.config.currentAreaId) {
+                    this.showError('Error: No se ha seleccionado un área válida');
                     return;
                 }
 
                 // Disable submit button
-                $('#submitAnswersBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Submitting...');
+                $('#submitAnswersBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
+
+                // Final JSON to send
+                const jsonData = JSON.stringify(requestData);
+                console.log('Final JSON being sent:', jsonData);
+                console.log('URL:', `${this.config.baseUrl}/SaveAnswers`);
 
                 $.ajax({
-                    url: `${this.config.baseUrl}/SubmitAnswers`,
+                    url: `${this.config.baseUrl}/SaveAnswers`,
                     method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     contentType: 'application/json',
-                    data: JSON.stringify(answers),
+                    data: jsonData,
                     success: (response) => {
+                        console.log('Server response:', response);
                         if (response.success) {
+                            console.log('Success! Message:', response.message);
                             this.showSuccess(response.message, response);
-                            this.resetForm();
+                            // Don't reset form - allow user to update answers
                         } else {
-                            this.showError(response.message || 'Error submitting answers');
+                            console.log('Server returned success=false:', response.message);
+                            this.showError(response.message || 'Error al guardar las respuestas');
                         }
                     },
-                    error: () => {
-                        this.showError('Network error. Please check your connection and try again.');
+                    error: (xhr, status, error) => {
+                        console.error('AJAX Error:', {
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            responseText: xhr.responseText,
+                            error: error,
+                            readyState: xhr.readyState
+                        });
+                        
+                        let errorMessage = 'Error de conexión. Por favor verifique su conexión e intente nuevamente.';
+                        
+                        // Handle different error types
+                        if (xhr.status === 400) {
+                            errorMessage = 'Error de validación. Por favor verifique los datos ingresados.';
+                        } else if (xhr.status === 401) {
+                            errorMessage = 'No autorizado. Por favor recargue la página.';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Error interno del servidor. Por favor intente nuevamente.';
+                        }
+                        
+                        // Try to parse error response
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            if (errorResponse.message) {
+                                errorMessage = errorResponse.message;
+                            }
+                        } catch (e) {
+                            // If not JSON, check if responseText has content
+                            if (xhr.responseText) {
+                                console.error('Raw response:', xhr.responseText);
+                            }
+                        }
+                        
+                        this.showError(errorMessage);
                     },
                     complete: () => {
-                        $('#submitAnswersBtn').prop('disabled', false).html('<i class="fas fa-paper-plane me-2"></i>Submit Answers');
+                        $('#submitAnswersBtn').prop('disabled', false).html('<i class="fas fa-paper-plane me-2"></i>Guardar Respuestas');
                     }
                 });
             },
@@ -554,19 +692,19 @@
 
             // Show success message
             showSuccess: function(message, data) {
-                const statsHtml = data.areaName ? `
+                const statsHtml = data.savedCount !== undefined ? `
                     <div class="mt-3">
-                        <strong>Assessment Results:</strong><br>
-                        Area: ${data.areaName}<br>
-                        Questions Answered: ${data.answeredQuestions}<br>
-                        Average Score: ${data.averageScore}/10
+                        <strong>Resultados de la Evaluación:</strong><br>
+                        Nuevas Respuestas Guardadas: ${data.savedCount}<br>
+                        Respuestas Actualizadas: ${data.updatedCount}<br>
+                        Total de Preguntas: ${data.savedCount + data.updatedCount}
                     </div>
                 ` : '';
 
                 const alertHtml = `
                     <div class="alert alert-success-custom alert-dismissible fade show" role="alert">
                         <i class="fas fa-check-circle me-2"></i>
-                        <strong>Success!</strong> ${message}
+                        <strong>¡Éxito!</strong> ${message}
                         ${statsHtml}
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
                     </div>
@@ -593,6 +731,11 @@
 
         // Initialize when document is ready
         $(document).ready(function() {
+            // Remove client-side validation for optional fields
+            // This allows saving partial answers
+            $('.answer-input').removeAttr('data-val-required');
+            $('.answer-input').removeAttr('data-val');
+            
             LifeAssessment.init();
         });
     </script>

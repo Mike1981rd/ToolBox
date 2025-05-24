@@ -17,6 +17,7 @@ namespace ToolBox.Data
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<LifeArea> LifeAreas { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -88,6 +89,27 @@ namespace ToolBox.Data
                 .WithMany()
                 .HasForeignKey(q => q.LifeAreaId)
                 .OnDelete(DeleteBehavior.Cascade);
+                
+            // UserAnswer configuration
+            modelBuilder.Entity<UserAnswer>()
+                .HasKey(ua => ua.Id);
+                
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(ua => ua.User)
+                .WithMany()
+                .HasForeignKey(ua => ua.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(ua => ua.Question)
+                .WithMany()
+                .HasForeignKey(ua => ua.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Create unique index for UserId + QuestionId (one answer per user per question)
+            modelBuilder.Entity<UserAnswer>()
+                .HasIndex(ua => new { ua.UserId, ua.QuestionId })
+                .IsUnique();
                 
             // Seed Questions data
             SeedQuestions(modelBuilder);
