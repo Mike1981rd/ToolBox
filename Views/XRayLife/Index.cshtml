@@ -71,11 +71,11 @@
 
 <!-- Encabezado con Búsqueda Grande -->
 <div class="faq-header text-center mb-4">
-    <h4 class="mb-2" data-translate-key="xray_life_main_title">X-Ray of Life</h4>
-    <p class="text-muted mb-3" data-translate-key="xray_life_main_subtitle">Select an Area of Life or search for specific questions.</p>
+    <h4 class="mb-2">Radiografía de Vida</h4>
+    <p class="text-muted mb-3">Selecciona un Área de Vida o busca preguntas específicas.</p>
     <div class="input-group input-group-lg shadow-sm">
         <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Search questions..." data-translate-placeholder-key="search_articles_placeholder" id="xrayQuestionSearchInput">
+        <input type="text" class="form-control" placeholder="Buscar preguntas..." id="xrayQuestionSearchInput">
     </div>
 </div>
 
@@ -86,26 +86,14 @@
             <div class="card-body">
                 <ul class="nav nav-pills flex-column life-areas-nav">
                     @{
-                        // Placeholder: Cargar Áreas de Vida desde ViewBag.LifeAreas
-                        var lifeAreas = ViewBag.LifeAreas as List<dynamic> ?? new List<dynamic> {
-                            new { Id = "1", TitleKey = "life_area_spirituality", IconClass = "fas fa-pray" },
-                            new { Id = "2", TitleKey = "life_area_growth_learning", IconClass = "fas fa-brain" },
-                            new { Id = "3", TitleKey = "life_area_social_love", IconClass = "fas fa-heart" },
-                            new { Id = "4", TitleKey = "life_area_family_friends", IconClass = "fas fa-users" },
-                            new { Id = "5", TitleKey = "life_area_community", IconClass = "fas fa-city" },
-                            new { Id = "6", TitleKey = "life_area_environment", IconClass = "fas fa-leaf" },
-                            new { Id = "7", TitleKey = "life_area_work_mission", IconClass = "fas fa-briefcase" },
-                            new { Id = "8", TitleKey = "life_area_economy_finance", IconClass = "fas fa-dollar-sign" },
-                            new { Id = "9", TitleKey = "life_area_health_body", IconClass = "fas fa-heartbeat" },
-                            new { Id = "10", TitleKey = "life_area_recreation_fun", IconClass = "fas fa-gamepad" }
-                        };
+                        var lifeAreas = ViewBag.LifeAreas as List<ToolBox.Models.LifeArea> ?? new List<ToolBox.Models.LifeArea>();
+                        var selectedAreaId = ViewBag.SelectedAreaId ?? 0;
                     }
-                    @for (int i = 0; i < lifeAreas.Count; i++)
+                    @foreach (var area in lifeAreas)
                     {
-                        var area = lifeAreas[i];
                         <li class="nav-item">
-                            <a class="nav-link @(i == 0 ? "active" : "")" href="#" data-area-id="@area.Id">
-                                <i class="@(area.IconClass ?? "fas fa-circle") fa-fw me-2"></i><span data-translate-key="@area.TitleKey">@area.TitleKey.ToString().Replace("life_area_","").Replace("_"," ").ToUpperInvariant()</span>
+                            <a class="nav-link @(area.Id == selectedAreaId ? "active" : "")" href="#" data-area-id="@area.Id">
+                                <i class="@area.IconClass fa-fw me-2"></i><span>@area.Title</span>
                             </a>
                         </li>
                     }
@@ -118,38 +106,34 @@
     <div class="col-lg-9 col-md-8">
         <div class="accordion" id="xrayQuestionsAccordion">
             @{
-                // Placeholder: Cargar Preguntas desde ViewBag.Questions
-                var questions = ViewBag.Questions as List<dynamic> ?? new List<dynamic> {
-                    new { Id = "q1", AreaId = "1", QuestionTextKey = "xray_q_spirit_1", AnswerTextKey = "xray_a_spirit_1" },
-                    new { Id = "q2", AreaId = "1", QuestionTextKey = "xray_q_spirit_2", AnswerTextKey = "xray_a_spirit_2" },
-                    new { Id = "q3", AreaId = "2", QuestionTextKey = "xray_q_growth_1", AnswerTextKey = "xray_a_growth_1" },
-                    new { Id = "q4", AreaId = "3", QuestionTextKey = "xray_q_social_1", AnswerTextKey = "xray_a_social_1" },
-                    new { Id = "q5", AreaId = "4", QuestionTextKey = "xray_q_family_1", AnswerTextKey = "xray_a_family_1" }
-                };
+                var questions = ViewBag.Questions as List<ToolBox.Models.Question> ?? new List<ToolBox.Models.Question>();
             }
             @if (!questions.Any())
             {
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
                         <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
-                        <p data-translate-key="no_questions_found">No questions found for this area or search.</p>
+                        <p>No se encontraron preguntas para esta área.</p>
                     </div>
                 </div>
             }
             @foreach (var q in questions)
             {
-                <div class="accordion-item mb-3 shadow-sm" data-question-area-id="@q.AreaId" data-question-id="@q.Id">
+                <div class="accordion-item mb-3 shadow-sm" data-question-area-id="@q.LifeAreaId" data-question-id="@q.Id">
                     <h2 class="accordion-header" id="heading_@q.Id">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@q.Id" aria-expanded="false" aria-controls="collapse_@q.Id">
-                            <span data-translate-key="@q.QuestionTextKey">@q.QuestionTextKey.ToString().Replace("xray_q_","").Replace("_"," ").ToUpperInvariant()</span>
+                            <span>@q.QuestionText</span>
                         </button>
                     </h2>
                     <div id="collapse_@q.Id" class="accordion-collapse collapse" aria-labelledby="heading_@q.Id" data-bs-parent="#xrayQuestionsAccordion">
                         <div class="accordion-body">
-                            <p data-translate-key="@q.AnswerTextKey">(Answer placeholder - @q.AnswerTextKey)</p>
                             <div class="mt-2 text-end">
-                                <button class="btn btn-sm btn-outline-primary edit-xray-question-btn" data-id="@q.Id" data-bs-toggle="offcanvas" data-bs-target="#addEditXRayQuestionOffcanvas"><i class="fas fa-edit me-1"></i> <span data-translate-key="edit_button">Edit</span></button>
-                                <button class="btn btn-sm btn-outline-danger deactivate-xray-question-btn" data-id="@q.Id"><i class="fas fa-toggle-off me-1"></i> <span data-translate-key="deactivate_button">Deactivate</span></button>
+                                <button class="btn btn-sm btn-outline-primary edit-xray-question-btn" data-id="@q.Id" data-bs-toggle="offcanvas" data-bs-target="#addEditXRayQuestionOffcanvas">
+                                    <i class="fas fa-edit me-1"></i> <span>Editar</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-xray-question-btn" data-id="@q.Id">
+                                    <i class="fas fa-trash me-1"></i> <span>Eliminar</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -160,7 +144,7 @@
         <!-- Botón Centrado para Añadir Nueva Pregunta -->
         <div class="text-center mt-4 mb-4">
             <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#addEditXRayQuestionOffcanvas" id="addNewXRayQuestionBtnMain">
-                <i class="fas fa-plus me-2"></i><span data-translate-key="add_new_question_button">Add New Question</span>
+                <i class="fas fa-plus me-2"></i><span>Añadir Nueva Pregunta</span>
             </button>
         </div>
     </div>
@@ -168,21 +152,12 @@
 
 <!-- Offcanvas para Añadir/Editar Pregunta -->
 @{
-    ViewBag.LifeAreasForSelect = new List<dynamic> {
-        new { Id = "1", TitleKey = "life_area_spirituality" },
-        new { Id = "2", TitleKey = "life_area_growth_learning" },
-        new { Id = "3", TitleKey = "life_area_social_love" },
-        new { Id = "4", TitleKey = "life_area_family_friends" },
-        new { Id = "5", TitleKey = "life_area_community" },
-        new { Id = "6", TitleKey = "life_area_environment" },
-        new { Id = "7", TitleKey = "life_area_work_mission" },
-        new { Id = "8", TitleKey = "life_area_economy_finance" },
-        new { Id = "9", TitleKey = "life_area_health_body" },
-        new { Id = "10", TitleKey = "life_area_recreation_fun" }
-    };
+    ViewBag.LifeAreasForSelect = lifeAreas;
 }
 @await Html.PartialAsync("_AddEditXRayQuestionOffcanvas")
 
+@Html.AntiForgeryToken()
+
 @section Scripts {
-    <script src="~/js/xray-life-updated.js"></script>
+    <script src="~/js/xray-life.js"></script>
 }

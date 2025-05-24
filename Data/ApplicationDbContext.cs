@@ -16,6 +16,7 @@ namespace ToolBox.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<LifeArea> LifeAreas { get; set; }
+        public DbSet<Question> Questions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,6 +81,16 @@ namespace ToolBox.Data
             
             // Seed LifeAreas data
             SeedLifeAreas(modelBuilder);
+            
+            // Question configuration
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.LifeArea)
+                .WithMany()
+                .HasForeignKey(q => q.LifeAreaId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Seed Questions data
+            SeedQuestions(modelBuilder);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -196,6 +207,35 @@ namespace ToolBox.Data
             };
 
             modelBuilder.Entity<LifeArea>().HasData(lifeAreas);
+        }
+        
+        private void SeedQuestions(ModelBuilder modelBuilder)
+        {
+            var now = DateTime.UtcNow;
+            var questions = new[]
+            {
+                // Spiritual Questions
+                new Question { Id = 1, LifeAreaId = 1, QuestionText = "¿Cuál es mi propósito en la vida?", CreatedAt = now, UpdatedAt = now },
+                new Question { Id = 2, LifeAreaId = 1, QuestionText = "¿Qué prácticas espirituales me conectan con mi ser interior?", CreatedAt = now, UpdatedAt = now },
+                
+                // Physical Health Questions  
+                new Question { Id = 3, LifeAreaId = 2, QuestionText = "¿Qué hábitos de salud necesito mejorar?", CreatedAt = now, UpdatedAt = now },
+                new Question { Id = 4, LifeAreaId = 2, QuestionText = "¿Cómo puedo mantener un equilibrio entre ejercicio y descanso?", CreatedAt = now, UpdatedAt = now },
+                
+                // Family & Friends Questions
+                new Question { Id = 5, LifeAreaId = 3, QuestionText = "¿Cómo puedo fortalecer mis relaciones familiares?", CreatedAt = now, UpdatedAt = now },
+                new Question { Id = 6, LifeAreaId = 3, QuestionText = "¿Qué amistades aportan valor a mi vida?", CreatedAt = now, UpdatedAt = now },
+                
+                // Partner Questions
+                new Question { Id = 7, LifeAreaId = 4, QuestionText = "¿Qué cualidades busco en una pareja?", CreatedAt = now, UpdatedAt = now },
+                new Question { Id = 8, LifeAreaId = 4, QuestionText = "¿Cómo puedo mejorar mi comunicación en pareja?", CreatedAt = now, UpdatedAt = now },
+                
+                // Mission/Career Questions
+                new Question { Id = 9, LifeAreaId = 5, QuestionText = "¿Mi trabajo actual se alinea con mi misión de vida?", CreatedAt = now, UpdatedAt = now },
+                new Question { Id = 10, LifeAreaId = 5, QuestionText = "¿Qué habilidades necesito desarrollar para mi crecimiento profesional?", CreatedAt = now, UpdatedAt = now }
+            };
+            
+            modelBuilder.Entity<Question>().HasData(questions);
         }
     }
 }
