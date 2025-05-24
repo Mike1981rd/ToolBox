@@ -1,4 +1,6 @@
-@model ToolBox.Models.WheelOfProgressPageViewModel
+@{
+    ViewData["Title"] = "Rueda del Progreso";
+}
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -27,9 +29,9 @@
 
         .chart-wrapper {
             position: relative;
-            height: 400px;
+            height: 320px;
             width: 100%;
-            padding: 1rem;
+            padding: 0.5rem;
         }
 
         #progressWheelChart {
@@ -149,13 +151,21 @@
         }
 
         .progress-input {
-            width: 80px;
+            width: 90px;
             text-align: center;
             font-weight: 600;
         }
 
         .deadline-input {
-            min-width: 140px;
+            min-width: 160px;
+        }
+        
+        .goal-input {
+            min-width: 200px;
+        }
+        
+        .action-input {
+            min-width: 180px;
         }
 
         .save-section {
@@ -308,35 +318,35 @@
     <!-- Statistics Cards -->
     <div class="stats-cards">
         <div class="stat-card">
-            <span class="stat-number">@((int)Model.GlobalProgressPercentage)%</span>
+            <span id="globalProgressStat" class="stat-number">0%</span>
             <span class="stat-label" data-translate-key="wheelOfProgress.globalProgress">Progreso Global</span>
         </div>
         <div class="stat-card">
-            <span class="stat-number">@Model.TotalCategories</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.totalCategories">Total Categorías</span>
+            <span id="totalMetasStat" class="stat-number">0</span>
+            <span class="stat-label" data-translate-key="wheelOfProgress.totalCategories">Total Metas</span>
         </div>
         <div class="stat-card">
-            <span class="stat-number">@Model.CategoriesWithGoals</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.categoriesWithGoals">Con Metas</span>
+            <span id="metasCompletadasStat" class="stat-number">0</span>
+            <span class="stat-label" data-translate-key="wheelOfProgress.categoriesWithGoals">Completadas</span>
         </div>
         <div class="stat-card">
-            <span class="stat-number">@Model.LastUpdated.ToString("MMM dd")</span>
+            <span id="ultimaActualizacionStat" class="stat-number">-</span>
             <span class="stat-label" data-translate-key="wheelOfProgress.lastUpdated">Última Actualización</span>
         </div>
     </div>
 
     <div class="row">
-        <!-- Chart Column -->
-        <div class="col-md-5">
+        <!-- Chart Column - Más pequeño -->
+        <div class="col-md-4">
             <div class="chart-container">
-                <h3 class="text-center mb-4" data-translate-key="wheelOfProgress.chartTitle">
+                <h3 class="text-center mb-3" data-translate-key="wheelOfProgress.chartTitle">
                     <i class="fas fa-chart-pie me-2"></i>
                     Tu Rueda del Progreso
                 </h3>
                 <div class="chart-wrapper">
-                    <canvas id="progressWheelChart" width="400" height="400"></canvas>
+                    <canvas id="progressWheelChart" width="350" height="350"></canvas>
                     <div class="global-progress-overlay">
-                        <div id="globalProgressNumber" class="global-progress-number">@((int)Model.GlobalProgressPercentage)%</div>
+                        <div id="globalProgressNumber" class="global-progress-number">0%</div>
                         <div class="global-progress-label" data-translate-key="wheelOfProgress.globalLabel">Global</div>
                     </div>
                     <div id="chartLoading" class="loading-spinner d-none">
@@ -348,8 +358,8 @@
             </div>
         </div>
 
-        <!-- Progress Table Column -->
-        <div class="col-md-7">
+        <!-- Progress Table Column - Más ancho -->
+        <div class="col-md-8">
             <div class="progress-table-container">
                 <div class="progress-table-header">
                     <h3 class="h5 mb-0" data-translate-key="wheelOfProgress.progressTableTitle">
@@ -371,61 +381,13 @@
                             </tr>
                         </thead>
                         <tbody id="progressTableBody">
-                            @foreach (var area in Model.LifeAreas.OrderBy(a => a.OrderIndex))
-                            {
-                                var areaRowspan = area.Categories.Count;
-                                for (int i = 0; i < area.Categories.Count; i++)
-                                {
-                                    var category = area.Categories.OrderBy(c => c.OrderIndex).ElementAt(i);
-                                    <tr data-area-id="@area.AreaId" data-category-id="@category.CategoryId">
-                                        @if (i == 0)
-                                        {
-                                            <td class="area-cell" rowspan="@areaRowspan" style="background-color: @area.AreaColor;">
-                                                <div>
-                                                    @area.AreaIcon<br>
-                                                    <small data-translate-key="areas.@area.AreaSlug">@area.AreaName</small>
-                                                </div>
-                                            </td>
-                                        }
-                                        <td class="category-cell" style="background-color: @category.CategoryColor;">
-                                            <span data-translate-key="categories.@category.CategorySlug">@category.CategoryName</span>
-                                        </td>
-                                        <td>
-                                            <input type="text" 
-                                                   class="form-control input-progress goal-input" 
-                                                   data-category-id="@category.CategoryId"
-                                                   value="@category.GoalText"
-                                                   placeholder="Define tu meta..."
-                                                   maxlength="500">
-                                        </td>
-                                        <td>
-                                            <input type="number" 
-                                                   class="form-control input-progress progress-input" 
-                                                   data-category-id="@category.CategoryId"
-                                                   value="@category.ProgressPercentage"
-                                                   min="0" 
-                                                   max="100"
-                                                   placeholder="0">
-                                        </td>
-                                        <td>
-                                            <input type="text" 
-                                                   class="form-control input-progress action-input" 
-                                                   data-category-id="@category.CategoryId"
-                                                   value="@category.NextActionText"
-                                                   placeholder="Próxima acción..."
-                                                   maxlength="500">
-                                        </td>
-                                        <td>
-                                            <input type="text" 
-                                                   class="form-control input-progress deadline-input flatpickr-input" 
-                                                   data-category-id="@category.CategoryId"
-                                                   value="@(category.DeadlineDate?.ToString("yyyy-MM-dd") ?? "")"
-                                                   placeholder="Seleccionar fecha..."
-                                                   readonly>
-                                        </td>
-                                    </tr>
-                                }
-                            }
+                            <!-- La tabla será poblada dinámicamente via JavaScript -->
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    <p class="mt-2">Cargando datos de progreso...</p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -436,7 +398,7 @@
                         <div>
                             <small class="text-muted">
                                 <i class="fas fa-info-circle me-1"></i>
-                                <span data-translate-key="wheelOfProgress.autoSaveNote">Los cambios se guardan automáticamente</span>
+                                <span data-translate-key="wheelOfProgress.saveNote">Haz clic en el botón para guardar los cambios</span>
                             </small>
                         </div>
                         <button id="saveProgressBtn" class="save-btn" data-translate-key="buttons.saveProgress">
@@ -448,6 +410,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- CSRF Token for AJAX requests -->
+    @Html.AntiForgeryToken()
 </div>
 
 @section Scripts {
@@ -464,7 +429,7 @@
             config: {
                 chart: null,
                 baseUrl: '/WheelOfProgress',
-                currentData: @Html.Raw(Json.Serialize(Model.LifeAreas)),
+                currentData: [],
                 isLoading: false,
                 datepickers: []
             },
@@ -472,10 +437,121 @@
             // Initialize the module
             init: function() {
                 console.log('Initializing Wheel of Progress module...');
-                this.initializeChart();
-                this.initializeDatepickers();
+                this.loadWheelData();
                 this.bindEvents();
-                this.updateGlobalProgress();
+            },
+            
+            // Load data from backend
+            loadWheelData: async function() {
+                this.showLoading(true);
+                
+                try {
+                    const response = await $.get(`${this.config.baseUrl}/GetWheelData`);
+                    
+                    if (response.success && response.data) {
+                        console.log('Wheel data loaded:', response.data);
+                        this.config.currentData = response.data;
+                        this.renderProgressTable(response.data.areas);
+                        this.updateStatistics(response.data.stats);
+                        this.initializeChart();
+                        this.initializeDatepickers();
+                    } else {
+                        this.showError('Error al cargar los datos');
+                    }
+                } catch (error) {
+                    console.error('Error loading wheel data:', error);
+                    this.showError('Error de conexión al cargar los datos');
+                } finally {
+                    this.showLoading(false);
+                }
+            },
+            
+            // Render progress table
+            renderProgressTable: function(areas) {
+                const tbody = $('#progressTableBody');
+                tbody.empty();
+                
+                areas.forEach(area => {
+                    const categorias = area.categorias || [];
+                    categorias.forEach((categoria, index) => {
+                        const isFirstCategory = index === 0;
+                        const rowspan = categorias.length;
+                        
+                        const fechaLimite = categoria.fechaLimite ? 
+                            new Date(categoria.fechaLimite).toISOString().split('T')[0] : '';
+                        
+                        let row = `<tr data-area-id="${area.id}" data-category-id="${categoria.id}">`;
+                        
+                        if (isFirstCategory) {
+                            // Use white text for dark backgrounds (like Vida Empresarial #2c3e50)
+                            const textColor = area.iconColor === '#2c3e50' ? 'white' : 'white';
+                            row += `
+                                <td class="area-cell" rowspan="${rowspan}" style="background-color: ${area.iconColor}; color: ${textColor};">
+                                    <div>
+                                        <i class="${area.iconClass}"></i><br>
+                                        <small>${area.nombre}</small>
+                                    </div>
+                                </td>
+                            `;
+                        }
+                        
+                        row += `
+                            <td class="category-cell">
+                                <span>${categoria.nombre}</span>
+                            </td>
+                            <td>
+                                <input type="text" 
+                                       class="form-control input-progress goal-input" 
+                                       data-category-id="${categoria.id}"
+                                       value="${categoria.meta || ''}"
+                                       placeholder="Define tu meta..."
+                                       maxlength="1000">
+                            </td>
+                            <td>
+                                <input type="number" 
+                                       class="form-control input-progress progress-input" 
+                                       data-category-id="${categoria.id}"
+                                       value="${categoria.porcentajeProgreso || 0}"
+                                       min="0" 
+                                       max="100"
+                                       placeholder="0">
+                            </td>
+                            <td>
+                                <input type="text" 
+                                       class="form-control input-progress action-input" 
+                                       data-category-id="${categoria.id}"
+                                       value="${categoria.siguienteAccion || ''}"
+                                       placeholder="Próxima acción..."
+                                       maxlength="1000">
+                            </td>
+                            <td>
+                                <input type="text" 
+                                       class="form-control input-progress deadline-input flatpickr-input" 
+                                       data-category-id="${categoria.id}"
+                                       value="${fechaLimite}"
+                                       placeholder="Seleccionar fecha..."
+                                       readonly>
+                            </td>
+                        </tr>`;
+                        
+                        tbody.append(row);
+                    });
+                });
+            },
+            
+            // Update statistics display
+            updateStatistics: function(stats) {
+                $('#globalProgressStat').text(Math.round(stats.progresoGlobal) + '%');
+                $('#totalMetasStat').text(stats.totalMetas);
+                $('#metasCompletadasStat').text(stats.metasCompletadas);
+                $('#globalProgressNumber').text(Math.round(stats.progresoGlobal) + '%');
+                
+                if (stats.ultimaActualizacion) {
+                    const fecha = new Date(stats.ultimaActualizacion);
+                    $('#ultimaActualizacionStat').text(fecha.toLocaleDateString());
+                } else {
+                    $('#ultimaActualizacionStat').text('-');
+                }
             },
 
             // Initialize Chart.js polar area chart
@@ -499,17 +575,26 @@
                 const isSpanish = currentLang === 'es';
                 
                 // Prepare chart data with translations
-                const labels = this.config.currentData.map(area => {
+                const areas = this.config.currentData.areas || [];
+                const labels = areas.map(area => {
                     if (isSpanish && window.translations && window.translations.es) {
-                        const translatedName = window.translations.es[`areas.${area.areaSlug}`];
-                        return translatedName || area.areaName;
+                        const translatedName = window.translations.es[`areas.${area.nombre.toLowerCase()}`];
+                        return translatedName || area.nombre;
                     }
-                    return area.areaName;
+                    return area.nombre;
                 });
                 
-                const data = this.config.currentData.map(area => area.areaScore);
-                const backgroundColors = this.config.currentData.map(area => this.hexToRgba(area.areaColor, 0.8));
-                const borderColors = this.config.currentData.map(area => area.areaColor);
+                // Calculate average progress for each area
+                const data = areas.map(area => {
+                    const categorias = area.categorias || [];
+                    if (categorias.length === 0) return 0;
+                    
+                    const totalProgress = categorias.reduce((sum, cat) => sum + (cat.porcentajeProgreso || 0), 0);
+                    return Math.round((totalProgress / categorias.length) / 10); // Scale to 0-10 for polar chart
+                });
+                
+                const backgroundColors = areas.map(area => this.hexToRgba(area.iconColor, 0.8));
+                const borderColors = areas.map(area => area.iconColor);
 
                 this.config.chart = new Chart(ctx, {
                     type: 'polarArea',
@@ -556,8 +641,9 @@
                                         return context[0].label;
                                     },
                                     label: function(context) {
-                                        const scoreLabel = isSpanish ? 'Puntuación' : 'Score';
-                                        return `${scoreLabel}: ${context.parsed}/10`;
+                                        const progressLabel = isSpanish ? 'Progreso Promedio' : 'Average Progress';
+                                        const actualProgress = Math.round(context.parsed * 10); // Convert back to 0-100 scale
+                                        return `${progressLabel}: ${actualProgress}%`;
                                     }
                                 }
                             }
@@ -643,14 +729,17 @@
                     this.saveProgress();
                 });
 
-                // Auto-save on input changes (debounced)
+                // Auto-save desactivado por ahora para evitar errores
+                // Se puede reactivar más adelante con un debounce mayor
+                /*
                 let autoSaveTimeout;
                 $(document).on('input', '.input-progress', () => {
                     clearTimeout(autoSaveTimeout);
                     autoSaveTimeout = setTimeout(() => {
                         this.saveProgress(true); // Silent save
-                    }, 2000);
+                    }, 5000); // Aumentado a 5 segundos
                 });
+                */
 
                 // Window resize handler for chart responsiveness
                 $(window).on('resize', this.debounce(() => {
@@ -693,49 +782,65 @@
                 }
 
                 // Collect all progress data from the table
-                const progressData = [];
+                const categories = [];
                 
                 $('#progressTableBody tr').each(function() {
                     const $row = $(this);
                     const categoryId = parseInt($row.data('category-id'));
-                    const areaId = parseInt($row.data('area-id'));
                     
-                    const goalText = $row.find('.goal-input').val() || '';
-                    const progressPercentage = parseInt($row.find('.progress-input').val()) || 0;
-                    const nextActionText = $row.find('.action-input').val() || '';
-                    const deadlineDate = $row.find('.deadline-input').val() || null;
+                    const meta = $row.find('.goal-input').val() || '';
+                    const porcentajeProgreso = parseInt($row.find('.progress-input').val()) || 0;
+                    const siguienteAccion = $row.find('.action-input').val() || '';
+                    const fechaLimiteValue = $row.find('.deadline-input').val();
                     
-                    progressData.push({
-                        categoryId: categoryId,
-                        areaId: areaId,
-                        goalText: goalText,
-                        progressPercentage: progressPercentage,
-                        nextActionText: nextActionText,
-                        deadlineDate: deadlineDate
+                    // Convertir fecha a formato ISO completo para PostgreSQL
+                    let fechaLimite = null;
+                    if (fechaLimiteValue && fechaLimiteValue.trim() !== '') {
+                        // Crear fecha local y convertir a ISO (incluye hora)
+                        const dateObj = new Date(fechaLimiteValue + 'T00:00:00');
+                        fechaLimite = dateObj.toISOString();
+                    }
+                    
+                    categories.push({
+                        CategoriaProgresoId: categoryId,
+                        Meta: meta,
+                        PorcentajeProgreso: porcentajeProgreso,
+                        SiguienteAccion: siguienteAccion,
+                        FechaLimite: fechaLimite
                     });
                 });
 
+                const progressData = {
+                    Categories: categories
+                };
+
+                // Get CSRF token
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
                 $.ajax({
-                    url: `${this.config.baseUrl}/SaveProgressData`,
+                    url: `${this.config.baseUrl}/SaveProgress`,
                     method: 'POST',
                     contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     data: JSON.stringify(progressData),
                     success: (response) => {
                         if (response.success) {
                             if (!silent) {
                                 this.showMessage('success', response.message, response);
                             }
-                            // Update global progress display
-                            if (response.newGlobalProgressPercentage !== undefined) {
-                                $('#globalProgressNumber').text(response.newGlobalProgressPercentage + '%');
+                            // Update statistics if provided
+                            if (response.updatedStats) {
+                                this.updateStatistics(response.updatedStats);
                             }
                         } else {
                             this.showMessage('error', response.message || 'Error saving progress');
                         }
                     },
-                    error: () => {
-                        if (!silent) {
-                            this.showMessage('error', 'Network error. Please check your connection and try again.');
+                    error: (xhr) => {
+                        if (!silent && xhr.status >= 400) {
+                            this.showMessage('error', 'Error al guardar el progreso. Por favor intente nuevamente.');
                         }
                     },
                     complete: () => {
@@ -753,10 +858,11 @@
                 const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
                 
                 let extraInfo = '';
-                if (type === 'success' && data) {
+                if (type === 'success' && data && data.updatedStats) {
                     extraInfo = `
                         <div style="margin-top: 0.5rem; font-size: 0.9rem;">
-                            Categorías actualizadas: ${data.totalCategoriesUpdated} | Progreso global: ${data.newGlobalProgressPercentage}%
+                            Progreso global: ${Math.round(data.updatedStats.progresoGlobal)}% | 
+                            Metas completadas: ${data.updatedStats.metasCompletadas}
                         </div>
                     `;
                 }
@@ -798,6 +904,29 @@
                     clearTimeout(timeout);
                     timeout = setTimeout(later, wait);
                 };
+            },
+
+            // Show loading state
+            showLoading: function(show) {
+                if (show) {
+                    $('#chartLoading').removeClass('d-none');
+                } else {
+                    $('#chartLoading').addClass('d-none');
+                }
+            },
+
+            // Show error message
+            showError: function(message) {
+                console.error('Wheel of Progress Error:', message);
+                const tbody = $('#progressTableBody');
+                tbody.html(`
+                    <tr>
+                        <td colspan="6" class="text-center text-danger py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            <p class="mt-2">${message}</p>
+                        </td>
+                    </tr>
+                `);
             }
         };
 

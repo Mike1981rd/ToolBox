@@ -19,6 +19,9 @@ namespace ToolBox.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<WheelOfLifeScore> WheelOfLifeScores { get; set; }
+        public DbSet<AreaProgreso> AreasProgreso { get; set; }
+        public DbSet<CategoriaProgreso> CategoriasProgreso { get; set; }
+        public DbSet<ProgresoMetaUsuario> ProgresosMetasUsuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -133,8 +136,52 @@ namespace ToolBox.Data
                 .HasIndex(w => new { w.UserId, w.LifeAreaId })
                 .IsUnique();
                 
+            // AreaProgreso configuration
+            modelBuilder.Entity<AreaProgreso>()
+                .HasKey(ap => ap.Id);
+                
+            modelBuilder.Entity<AreaProgreso>()
+                .HasIndex(ap => ap.OrdenVisualizacion);
+                
+            // CategoriaProgreso configuration
+            modelBuilder.Entity<CategoriaProgreso>()
+                .HasKey(cp => cp.Id);
+                
+            modelBuilder.Entity<CategoriaProgreso>()
+                .HasOne(cp => cp.AreaProgreso)
+                .WithMany(ap => ap.Categorias)
+                .HasForeignKey(cp => cp.AreaProgresoId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<CategoriaProgreso>()
+                .HasIndex(cp => new { cp.AreaProgresoId, cp.OrdenVisualizacion });
+                
+            // ProgresoMetaUsuario configuration
+            modelBuilder.Entity<ProgresoMetaUsuario>()
+                .HasKey(pmu => pmu.Id);
+                
+            modelBuilder.Entity<ProgresoMetaUsuario>()
+                .HasOne(pmu => pmu.User)
+                .WithMany()
+                .HasForeignKey(pmu => pmu.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<ProgresoMetaUsuario>()
+                .HasOne(pmu => pmu.CategoriaProgreso)
+                .WithMany(cp => cp.ProgresosUsuarios)
+                .HasForeignKey(pmu => pmu.CategoriaProgresoId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Create unique index for UserId + CategoriaProgresoId (one progress per user per category)
+            modelBuilder.Entity<ProgresoMetaUsuario>()
+                .HasIndex(pmu => new { pmu.UserId, pmu.CategoriaProgresoId })
+                .IsUnique();
+                
             // Seed Questions data
             SeedQuestions(modelBuilder);
+            
+            // Seed Wheel of Progress data
+            SeedWheelOfProgressData(modelBuilder);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -280,6 +327,53 @@ namespace ToolBox.Data
             };
             
             modelBuilder.Entity<Question>().HasData(questions);
+        }
+        
+        private void SeedWheelOfProgressData(ModelBuilder modelBuilder)
+        {
+            var now = DateTime.UtcNow;
+            
+            // Seed AreaProgreso (basado en la imagen original del sistema)
+            var areasProgreso = new[]
+            {
+                new AreaProgreso { Id = 1, Nombre = "Vida Empresarial", Descripcion = "Carrera, negocios y crecimiento profesional", IconClass = "fas fa-briefcase", IconColor = "#2c3e50", OrdenVisualizacion = 1, CreatedAt = now },
+                new AreaProgreso { Id = 2, Nombre = "Vida Creativa", Descripcion = "Expresión artística y creatividad", IconClass = "fas fa-palette", IconColor = "#e74c3c", OrdenVisualizacion = 2, CreatedAt = now },
+                new AreaProgreso { Id = 3, Nombre = "Vida Social", Descripcion = "Relaciones con amigos y comunidad", IconClass = "fas fa-users", IconColor = "#3498db", OrdenVisualizacion = 3, CreatedAt = now },
+                new AreaProgreso { Id = 4, Nombre = "Vida Amorosa", Descripcion = "Relaciones románticas y pareja", IconClass = "fas fa-heart", IconColor = "#e91e63", OrdenVisualizacion = 4, CreatedAt = now },
+                new AreaProgreso { Id = 5, Nombre = "Propósito de Vida", Descripcion = "Misión personal y espiritualidad", IconClass = "fas fa-compass", IconColor = "#9b59b6", OrdenVisualizacion = 5, CreatedAt = now }
+            };
+
+            // Seed CategoriaProgreso (basado en el sistema original)
+            var categoriasProgreso = new[]
+            {
+                // Vida Empresarial
+                new CategoriaProgreso { Id = 1, Nombre = "Dinero y Finanzas", AreaProgresoId = 1, OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaProgreso { Id = 2, Nombre = "Carrera y Misión", AreaProgresoId = 1, OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaProgreso { Id = 3, Nombre = "Productividad", AreaProgresoId = 1, OrdenVisualizacion = 3, CreatedAt = now },
+                
+                // Vida Creativa
+                new CategoriaProgreso { Id = 4, Nombre = "Arte y Expresión", AreaProgresoId = 2, OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaProgreso { Id = 5, Nombre = "Proyectos Creativos", AreaProgresoId = 2, OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaProgreso { Id = 6, Nombre = "Inspiración", AreaProgresoId = 2, OrdenVisualizacion = 3, CreatedAt = now },
+                
+                // Vida Social
+                new CategoriaProgreso { Id = 7, Nombre = "Amistades", AreaProgresoId = 3, OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaProgreso { Id = 8, Nombre = "Networking", AreaProgresoId = 3, OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaProgreso { Id = 9, Nombre = "Comunidad", AreaProgresoId = 3, OrdenVisualizacion = 3, CreatedAt = now },
+                
+                // Vida Amorosa
+                new CategoriaProgreso { Id = 10, Nombre = "Relación de Pareja", AreaProgresoId = 4, OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaProgreso { Id = 11, Nombre = "Familia", AreaProgresoId = 4, OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaProgreso { Id = 12, Nombre = "Amor Propio", AreaProgresoId = 4, OrdenVisualizacion = 3, CreatedAt = now },
+                
+                // Propósito de Vida
+                new CategoriaProgreso { Id = 13, Nombre = "Espiritualidad", AreaProgresoId = 5, OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaProgreso { Id = 14, Nombre = "Valores y Principios", AreaProgresoId = 5, OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaProgreso { Id = 15, Nombre = "Salud y Fitness", AreaProgresoId = 5, OrdenVisualizacion = 3, CreatedAt = now }
+            };
+
+            modelBuilder.Entity<AreaProgreso>().HasData(areasProgreso);
+            modelBuilder.Entity<CategoriaProgreso>().HasData(categoriasProgreso);
         }
     }
 }
