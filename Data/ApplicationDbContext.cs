@@ -29,6 +29,7 @@ namespace ToolBox.Data
         public DbSet<FrecuenciaHabito> FrecuenciasHabitos { get; set; }
         public DbSet<WelcomeMessageSettings> WelcomeMessageSettings { get; set; }
         public DbSet<Topic> Topics { get; set; }
+        public DbSet<Video> Videos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -263,6 +264,31 @@ namespace ToolBox.Data
                 
             // Seed Habit Tracker data
             SeedHabitTrackerData(modelBuilder);
+            
+            // Video configuration
+            modelBuilder.Entity<Video>()
+                .HasOne(v => v.Autor)
+                .WithMany()
+                .HasForeignKey(v => v.AutorId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            modelBuilder.Entity<Video>()
+                .HasOne(v => v.Tema)
+                .WithMany()
+                .HasForeignKey(v => v.TemaId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            modelBuilder.Entity<Video>()
+                .HasOne(v => v.UsuarioCreador)
+                .WithMany()
+                .HasForeignKey(v => v.UsuarioCreadorId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            modelBuilder.Entity<Video>()
+                .HasIndex(v => v.Titulo);
+                
+            modelBuilder.Entity<Video>()
+                .HasIndex(v => v.EstadoVideo);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)

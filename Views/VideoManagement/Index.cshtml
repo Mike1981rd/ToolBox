@@ -10,29 +10,78 @@
     </ol>
 </nav>
 
+@Html.AntiForgeryToken()
+
+<!-- Sección de Filtros -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header border-bottom">
+        <h5 class="card-title mb-0" data-translate-key="filters_title">Filtros</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="selectVideoStatus" data-translate-key="filter_select_status">Seleccionar Estado</label>
+                <select id="selectVideoStatus" class="form-select filter-select">
+                    <option value="" data-translate-key="all_option">Todos</option>
+                    <option value="Publicado" data-translate-key="status_published">Publicado</option>
+                    <option value="Borrador" data-translate-key="status_draft">Borrador</option>
+                    <option value="Archivado" data-translate-key="status_archived">Archivado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="selectVideoType" data-translate-key="filter_select_type">Tipo de Video</label>
+                <select id="selectVideoType" class="form-select filter-select">
+                    <option value="" data-translate-key="all_option">Todos</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Vimeo">Vimeo</option>
+                    <option value="Upload" data-translate-key="type_upload">Subido</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="selectFeatured" data-translate-key="filter_select_featured">Destacados</label>
+                <select id="selectFeatured" class="form-select filter-select">
+                    <option value="" data-translate-key="all_option">Todos</option>
+                    <option value="true" data-translate-key="featured_yes">Sí</option>
+                    <option value="false" data-translate-key="featured_no">No</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección Principal (Tabla) -->
 <div class="card shadow-sm">
     <div class="card-datatable table-responsive pt-0">
         <div class="dataTables_wrapper dt-bootstrap5 no-footer">
-            <div class="row p-3 align-items-center">
-                <div class="col-sm-12 col-md-4 col-lg-6">
-                    <div class="dataTables_filter_custom">
-                        <input type="search" class="form-control form-control-sm" placeholder="Search Videos..." data-translate-placeholder-key="search.placeholder.videos" id="videosSearchInput">
+            <div class="row mx-2 my-3">
+                <div class="col-sm-12 col-md-6">
+                    <div class="dataTables_filter_custom d-flex align-items-center">
+                        <label class="me-2">
+                            <input type="search" class="form-control" placeholder="Buscar Videos..." 
+                                   data-translate-placeholder-key="search.placeholder.videos" 
+                                   id="videosSearchInput" 
+                                   aria-controls="videosTable">
+                        </label>
                     </div>
                 </div>
-                <div class="col-sm-12 col-md-8 col-lg-6 d-flex justify-content-center justify-content-md-end">
+                <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end">
                     <div class="dataTables_length me-2">
-                         <label>
-                            <select name="videosTable_length" class="form-select form-select-sm" id="videosPageSize">
-                                <option value="7">7</option> 
+                        <label class="d-flex align-items-center">
+                            <select name="videosTable_length" aria-controls="videosTable" class="form-select form-select-sm" id="videosPageSize">
+                                <option value="7">7</option>
                                 <option value="10" selected>10</option>
-                                <option value="25">25</option> 
+                                <option value="25">25</option>
                                 <option value="50">50</option>
+                                <option value="100">100</option>
                             </select>
                         </label>
                     </div>
                     <div class="dt-buttons btn-group flex-wrap">
-                        <button class="btn btn-sm btn-primary" type="button" onclick="window.location.href='@Url.Action("VideoForm", "VideoManagement")'" id="addNewVideoBtn">
-                            <i class="fas fa-plus me-1"></i> <span data-translate-key="buttons.addNewVideo">Add New Video</span>
+                        <button class="btn btn-secondary create-new btn-primary" type="button" onclick="window.location.href='@Url.Action("VideoForm", "VideoManagement")'" id="addNewVideoBtn">
+                            <span>
+                                <i class="fas fa-plus me-2"></i>
+                                <span class="d-none d-sm-inline-block" data-translate-key="buttons.addNewVideo">Añadir Nuevo Video</span>
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -41,14 +90,16 @@
             <table class="table table-hover dataTable no-footer dtr-column" id="videosTable">
                 <thead>
                     <tr>
-                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" style="width: 18px;">
+                        <th class="control sorting_disabled" rowspan="1" colspan="1" style="width: 0px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 18px;" data-col="1" aria-label="">
                             <input type="checkbox" class="form-check-input">
                         </th>
-                        <th data-translate-key="th_video_title">TITLE</th>
-                        <th data-translate-key="th_video_topic">TOPIC</th>
-                        <th data-translate-key="th_video_author">AUTHOR</th>
-                        <th data-translate-key="th_video_upload_date">UPLOAD DATE</th>
-                        <th data-translate-key="th_video_actions">ACTIONS</th>
+                        <th data-translate-key="th_video_title">TÍTULO</th>
+                        <th data-translate-key="th_video_topic">TEMA</th>
+                        <th data-translate-key="th_video_author">AUTOR</th>
+                        <th data-translate-key="th_video_upload_date">FECHA DE SUBIDA</th>
+                        <th data-translate-key="th_video_status">ESTADO</th>
+                        <th data-translate-key="th_video_actions">ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody">
@@ -72,6 +123,51 @@
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        /* Centrar verticalmente los encabezados de la tabla */
+        #videosTable thead th {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+        
+        /* Asegurar que los badges no se corten */
+        #videosTable td {
+            white-space: normal;
+        }
+        
+        /* Estilo para los badges de estado */
+        #videosTable .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        
+        /* Mejorar el espaciado de los avatares */
+        .avatar-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            font-weight: 600;
+        }
+        
+        /* Alineación de acciones */
+        .btn-icon {
+            width: 2rem;
+            height: 2rem;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+        }
+    </style>
+}
 
 @section Scripts {
     <script src="~/js/video-management.js"></script>

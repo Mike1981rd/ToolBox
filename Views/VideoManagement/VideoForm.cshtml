@@ -1,8 +1,8 @@
-@model ToolBox.Models.VideoViewModel
+@model ToolBox.Models.VideoCreateEditViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     bool isEditMode = ViewBag.IsEditMode ?? false;
-    string pageTitle = isEditMode ? "Edit Video" : "Add New Video";
+    string pageTitle = isEditMode ? "Editar Video" : "Añadir Nuevo Video";
 }
 
 <nav aria-label="breadcrumb" class="mb-4">
@@ -16,7 +16,7 @@
 <!-- Go Back Button -->
 <div class="mb-3">
     <a href="@Url.Action("Index", "VideoManagement")" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> <span data-translate-key="buttons.goBack">Go Back</span>
+        <i class="fas fa-arrow-left me-1"></i> <span data-translate-key="buttons.goBack">Volver</span>
     </a>
 </div>
 
@@ -28,6 +28,7 @@
             </div>
             <div class="card-body">
                 <form id="videoForm" novalidate>
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="videoId" name="Id" value="@Model.Id">
                     
                     <!-- Video Player/Upload Section -->
@@ -35,57 +36,52 @@
                         <div class="col-12">
                             <div class="card bg-light">
                                 <div class="card-header">
-                                    <h6 class="mb-0" data-translate-key="labels.videoSection">Video Section</h6>
+                                    <h6 class="mb-0" data-translate-key="labels.videoSection">Sección de Video</h6>
                                 </div>
                                 <div class="card-body">
-                                    @if (isEditMode && !string.IsNullOrEmpty(Model.VideoUrl))
-                                    {
-                                        <!-- Existing Video Preview -->
-                                        <div class="mb-3" id="videoPreviewSection">
-                                            <label class="form-label" data-translate-key="labels.currentVideo">Current Video</label>
-                                            <div class="video-preview-container" style="position: relative; height: 300px; background: #000;">
-                                                @if (Model.MediaType == "youtube")
-                                                {
-                                                    <iframe width="100%" height="100%" src="@Model.VideoUrl.Replace("watch?v=", "embed/")" frameborder="0" allowfullscreen></iframe>
-                                                }
-                                                else if (Model.MediaType == "vimeo")
-                                                {
-                                                    <iframe width="100%" height="100%" src="@Model.VideoUrl" frameborder="0" allowfullscreen></iframe>
-                                                }
-                                                else
-                                                {
-                                                    <video width="100%" height="100%" controls>
-                                                        <source src="@Model.VideoFilePath" type="video/mp4">
-                                                        Your browser does not support the video tag.
-                                                    </video>
-                                                }
-                                            </div>
+                                    <!-- Video Source Selection -->
+                                    <div class="mb-3">
+                                        <label class="form-label" data-translate-key="labels.videoSource">Fuente del Video</label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="TipoFuenteVideo" id="youtubeRadio" value="YouTube" @(Model.TipoFuenteVideo == "YouTube" ? "checked" : "")>
+                                            <label class="form-check-label" for="youtubeRadio">
+                                                <i class="fab fa-youtube text-danger"></i> YouTube
+                                            </label>
                                         </div>
-                                    }
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="TipoFuenteVideo" id="vimeoRadio" value="Vimeo" @(Model.TipoFuenteVideo == "Vimeo" ? "checked" : "")>
+                                            <label class="form-check-label" for="vimeoRadio">
+                                                <i class="fab fa-vimeo text-info"></i> Vimeo
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="TipoFuenteVideo" id="uploadRadio" value="Upload" @(Model.TipoFuenteVideo == "Upload" ? "checked" : "")>
+                                            <label class="form-check-label" for="uploadRadio">
+                                                <i class="fas fa-upload"></i> <span data-translate-key="labels.uploadFile">Subir Archivo</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="videoUrl" data-translate-key="labels.videoUrl">Video URL</label>
-                                                <input type="url" class="form-control" id="videoUrl" name="VideoUrl" value="@Model.VideoUrl" placeholder="https://youtube.com/watch?v=..." data-translate-placeholder-key="placeholders.videoUrl">
-                                                <small class="form-text text-muted" data-translate-key="help.videoUrl">Enter YouTube or Vimeo URL</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="videoFile" data-translate-key="labels.uploadVideoFile">Upload Video File</label>
-                                                <input type="file" class="form-control" id="videoFile" name="VideoFile" accept="video/*">
-                                                <small class="form-text text-muted" data-translate-key="help.videoFile">Or upload a video file (MP4, AVI, MOV)</small>
-                                                @if (isEditMode && !string.IsNullOrEmpty(Model.UploadedFileName))
-                                                {
-                                                    <div class="mt-1">
-                                                        <small class="text-success">
-                                                            <i class="fas fa-file-video me-1"></i>
-                                                            Current file: @Model.UploadedFileName
-                                                        </small>
-                                                    </div>
-                                                }
-                                            </div>
+                                    <!-- URL Input Section -->
+                                    <div id="urlVideoSection" class="mb-3">
+                                        <label for="videoUrl" class="form-label" data-translate-key="labels.videoUrl">URL del Video</label>
+                                        <input type="url" class="form-control" id="videoUrl" name="UrlVideoExterno" value="@Model.UrlVideoExterno" placeholder="https://www.youtube.com/watch?v=...">
+                                        <div class="form-text" data-translate-key="helpers.videoUrlHelp">Ingrese una URL válida de YouTube o Vimeo</div>
+                                    </div>
+                                    
+                                    <!-- Upload Section -->
+                                    <div id="uploadVideoSection" class="mb-3" style="display: none;">
+                                        <label for="videoFile" class="form-label" data-translate-key="labels.videoFile">Archivo de Video</label>
+                                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/*">
+                                        <div class="form-text" data-translate-key="helpers.videoFileHelp">Tamaño máximo: 500MB. Formatos soportados: MP4, AVI, MOV, WMV</div>
+                                        <div id="uploadedFileInfo" style="display: none;"></div>
+                                    </div>
+                                    
+                                    <!-- Video Preview Section -->
+                                    <div id="videoPreviewSection" class="mb-3">
+                                        <label class="form-label" data-translate-key="labels.videoPreview">Vista Previa del Video</label>
+                                        <div id="videoPreviewContainer" class="border rounded p-3" style="min-height: 300px; background: #f8f9fa;">
+                                            <p class="text-muted text-center">Vista previa del video aparecerá aquí</p>
                                         </div>
                                     </div>
                                 </div>
@@ -99,34 +95,34 @@
                             <!-- Basic Information -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0" data-translate-key="labels.basicInformation">Basic Information</h6>
+                                    <h6 class="mb-0" data-translate-key="labels.basicInformation">Información Básica</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label class="form-label" for="title" data-translate-key="labels.videoTitle">Video Title</label>
-                                        <input type="text" class="form-control" id="title" name="Title" value="@Model.Title" placeholder="Enter video title" data-translate-placeholder-key="placeholders.videoTitle" required>
+                                        <label class="form-label" for="titulo" data-translate-key="labels.videoTitle">Título del Video</label>
+                                        <input type="text" class="form-control" id="titulo" name="Titulo" value="@Model.Titulo" placeholder="Ingrese el título del video" data-translate-placeholder-key="placeholders.videoTitle" required>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label" for="description" data-translate-key="labels.videoDescription">Video Description</label>
-                                        <textarea class="form-control" id="description" name="Description" rows="6" placeholder="Write a detailed description..." data-translate-placeholder-key="placeholders.videoDescription">@Model.Description</textarea>
+                                        <label class="form-label" for="description" data-translate-key="labels.videoDescription">Descripción del Video</label>
+                                        <textarea class="form-control" id="description" name="DescripcionHTML" rows="6" placeholder="Escriba una descripción detallada..." data-translate-placeholder-key="placeholders.videoDescription">@Model.DescripcionHTML</textarea>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label class="form-label" for="authorId" data-translate-key="labels.authorUser">Author/User</label>
-                                                <select class="form-select" id="authorId" name="AuthorId" required>
-                                                    <option value="" data-translate-key="placeholders.selectAuthor">Select Author</option>
+                                                <label class="form-label" for="authorId" data-translate-key="labels.user">Usuario</label>
+                                                <select class="form-select" id="authorId" name="AutorId">
+                                                    <option value="" data-translate-key="placeholders.selectUser">Seleccionar Usuario</option>
                                                     <!-- Options will be loaded dynamically -->
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label class="form-label" for="topicId" data-translate-key="labels.topic">Topic</label>
-                                                <select class="form-select" id="topicId" name="TopicId" required>
-                                                    <option value="" data-translate-key="placeholders.selectTopic">Select Topic</option>
+                                                <label class="form-label" for="topicId" data-translate-key="labels.topic">Tema</label>
+                                                <select class="form-select" id="topicId" name="TemaId">
+                                                    <option value="" data-translate-key="placeholders.selectTopic">Seleccionar Tema</option>
                                                     <!-- Options will be loaded dynamically -->
                                                 </select>
                                             </div>
@@ -136,18 +132,8 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label class="form-label" for="mediaType" data-translate-key="labels.mediaType">Media Type</label>
-                                                <select class="form-select" id="mediaType" name="MediaType" required>
-                                                    <option value="youtube" selected="@(Model.MediaType == "youtube")" data-translate-key="media_types.youtube">YouTube URL</option>
-                                                    <option value="vimeo" selected="@(Model.MediaType == "vimeo")" data-translate-key="media_types.vimeo">Vimeo URL</option>
-                                                    <option value="uploadedfile" selected="@(Model.MediaType == "uploadedfile")" data-translate-key="media_types.uploadedFile">Uploaded File</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="duration" data-translate-key="labels.duration">Duration (mm:ss)</label>
-                                                <input type="text" class="form-control" id="duration" name="Duration" value="@Model.Duration" placeholder="15:30" data-translate-placeholder-key="placeholders.duration">
+                                                <label class="form-label" for="duration" data-translate-key="labels.duration">Duración (mm:ss)</label>
+                                                <input type="text" class="form-control" id="duration" name="Duracion" value="@Model.Duracion" placeholder="15:30" data-translate-placeholder-key="placeholders.duration">
                                             </div>
                                         </div>
                                     </div>
@@ -160,25 +146,25 @@
                                     <h6 class="mb-0">
                                         <button class="btn btn-link p-0 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#seoSection" aria-expanded="false">
                                             <i class="fas fa-chevron-down me-1"></i>
-                                            <span data-translate-key="labels.seoSettings">SEO Settings</span>
+                                            <span data-translate-key="labels.seoSettings">Configuración SEO</span>
                                         </button>
                                     </h6>
                                 </div>
                                 <div class="collapse" id="seoSection">
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label class="form-label" for="metaTitle" data-translate-key="labels.metaTitle">Meta Title</label>
-                                            <input type="text" class="form-control" id="metaTitle" name="MetaTitle" value="@Model.MetaTitle" placeholder="SEO title for search engines" data-translate-placeholder-key="placeholders.metaTitle">
+                                            <label class="form-label" for="metaTitle" data-translate-key="labels.metaTitle">Meta Título</label>
+                                            <input type="text" class="form-control" id="metaTitle" name="MetaTituloSEO" value="@Model.MetaTituloSEO" placeholder="Título SEO para motores de búsqueda" data-translate-placeholder-key="placeholders.metaTitle">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label" for="metaDescription" data-translate-key="labels.metaDescription">Meta Description</label>
-                                            <textarea class="form-control" id="metaDescription" name="MetaDescription" rows="3" placeholder="SEO description for search engines" data-translate-placeholder-key="placeholders.metaDescription">@Model.MetaDescription</textarea>
+                                            <label class="form-label" for="metaDescription" data-translate-key="labels.metaDescription">Meta Descripción</label>
+                                            <textarea class="form-control" id="metaDescription" name="MetaDescripcionSEO" rows="3" placeholder="Descripción SEO para motores de búsqueda" data-translate-placeholder-key="placeholders.metaDescription">@Model.MetaDescripcionSEO</textarea>
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label" for="metaKeywords" data-translate-key="labels.keywords">Keywords</label>
-                                            <input type="text" class="form-control" id="metaKeywords" name="MetaKeywords" value="@Model.MetaKeywords" placeholder="keyword1, keyword2, keyword3" data-translate-placeholder-key="placeholders.keywords">
+                                            <label class="form-label" for="metaKeywords" data-translate-key="labels.keywords">Palabras Clave</label>
+                                            <input type="text" class="form-control" id="metaKeywords" name="PalabrasClaveSEO" value="@Model.PalabrasClaveSEO" placeholder="palabra1, palabra2, palabra3" data-translate-placeholder-key="placeholders.keywords">
                                         </div>
                                     </div>
                                 </div>
@@ -189,65 +175,56 @@
                         <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header">
-                                    <h6 class="mb-0" data-translate-key="labels.videoSettings">Video Settings</h6>
+                                    <h6 class="mb-0" data-translate-key="labels.videoSettings">Configuración del Video</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label class="form-label" data-translate-key="labels.isFeatured">Mark as Featured?</label>
+                                        <label class="form-label" data-translate-key="labels.isFeatured">¿Marcar como Destacado?</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="isFeatured" name="IsFeatured" checked="@Model.IsFeatured">
+                                            <input class="form-check-input" type="checkbox" id="isFeatured" name="EsDestacado" @(Model.EsDestacado ? "checked" : "")>
                                             <label class="form-check-label" for="isFeatured" data-translate-key="labels.featuredToggle">
-                                                Featured Video
+                                                Video Destacado
                                             </label>
                                         </div>
-                                        <small class="form-text text-muted" data-translate-key="help.featured">Featured videos appear prominently in listings</small>
+                                        <small class="form-text text-muted" data-translate-key="help.featured">Los videos destacados aparecen prominentemente en las listas</small>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label" for="status" data-translate-key="labels.status">Status</label>
-                                        <select class="form-select" id="status" name="Status">
-                                            <option value="published" selected="@(Model.Status == "published")" data-translate-key="status_options.published">Published</option>
-                                            <option value="draft" selected="@(Model.Status == "draft")" data-translate-key="status_options.draft">Draft</option>
-                                            <option value="archived" selected="@(Model.Status == "archived")" data-translate-key="status_options.archived">Archived</option>
+                                        <label class="form-label" for="videoStatus" data-translate-key="labels.status">Estado</label>
+                                        <select class="form-select" id="videoStatus" name="EstadoVideo">
+                                            @if (Model.EstadoVideo == "Publicado")
+                                            {
+                                                <option value="Publicado" selected data-translate-key="status_options.published">Publicado</option>
+                                                <option value="Borrador" data-translate-key="status_options.draft">Borrador</option>
+                                                <option value="Archivado" data-translate-key="status_options.archived">Archivado</option>
+                                            }
+                                            else if (Model.EstadoVideo == "Borrador")
+                                            {
+                                                <option value="Publicado" data-translate-key="status_options.published">Publicado</option>
+                                                <option value="Borrador" selected data-translate-key="status_options.draft">Borrador</option>
+                                                <option value="Archivado" data-translate-key="status_options.archived">Archivado</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="Publicado" data-translate-key="status_options.published">Publicado</option>
+                                                <option value="Borrador" data-translate-key="status_options.draft">Borrador</option>
+                                                <option value="Archivado" selected data-translate-key="status_options.archived">Archivado</option>
+                                            }
                                         </select>
                                     </div>
-
-                                    @if (isEditMode)
-                                    {
-                                        <div class="mb-3">
-                                            <label class="form-label" data-translate-key="labels.uploadInfo">Upload Info</label>
-                                            <div class="text-muted">
-                                                <small>
-                                                    <strong data-translate-key="labels.uploadDate">Upload Date:</strong><br>
-                                                    @Model.UploadDate.ToString("MMM dd, yyyy HH:mm")
-                                                </small>
-                                            </div>
-                                            @if (Model.UpdatedAt.HasValue)
-                                            {
-                                                <div class="text-muted mt-1">
-                                                    <small>
-                                                        <strong data-translate-key="labels.lastUpdated">Last Updated:</strong><br>
-                                                        @Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm")
-                                                    </small>
-                                                </div>
-                                            }
-                                        </div>
-                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="@Url.Action("Index", "VideoManagement")" class="btn btn-outline-secondary" data-translate-key="buttons.cancel">Cancel</a>
-                                <button type="submit" class="btn btn-primary" id="saveVideoBtn" data-translate-key="buttons.saveVideo">
-                                    <i class="fas fa-save me-1"></i> Save Video
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Submit Buttons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary" id="saveVideoBtn">
+                            <i class="fas fa-save me-1"></i> <span data-translate-key="buttons.saveVideo">Guardar Video</span>
+                        </button>
+                        <a href="@Url.Action("Index", "VideoManagement")" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i> <span data-translate-key="buttons.cancel">Cancelar</span>
+                        </a>
                     </div>
                 </form>
             </div>
@@ -256,15 +233,16 @@
 </div>
 
 @section Scripts {
-    <!-- Rich Text Editor (CKEditor) -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
+    <!-- TinyMCE for rich text editor -->
+    <script src="https://cdn.tiny.cloud/1/1ch6ln9g0ak7n4uqhevfwfodp03d49kcdiwwygiue9gc291x/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <!-- Video Management JavaScript -->
     <script src="~/js/video-management.js"></script>
+    
     <script>
-        // Initialize the form when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof VideoManagement !== 'undefined') {
-                VideoManagement.initializeForm(@Html.Raw(Json.Serialize(isEditMode)));
-            }
-        });
+        // Initialize form with video ID
+        const videoId = @Model.Id;
+        const videoListUrl = '@Url.Action("Index", "VideoManagement")';
+        VideoManagement.initializeForm(videoId);
     </script>
 }

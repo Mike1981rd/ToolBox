@@ -65,7 +65,7 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Descripcion = "Carrera, negocios y crecimiento profesional",
                             IconClass = "fas fa-briefcase",
                             IconColor = "#2c3e50",
@@ -75,7 +75,7 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Descripcion = "Expresión artística y creatividad",
                             IconClass = "fas fa-palette",
                             IconColor = "#e74c3c",
@@ -85,7 +85,7 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Descripcion = "Relaciones con amigos y comunidad",
                             IconClass = "fas fa-users",
                             IconColor = "#3498db",
@@ -95,7 +95,7 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Descripcion = "Relaciones románticas y pareja",
                             IconClass = "fas fa-heart",
                             IconColor = "#e91e63",
@@ -105,7 +105,7 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Descripcion = "Misión personal y espiritualidad",
                             IconClass = "fas fa-compass",
                             IconColor = "#9b59b6",
@@ -164,9 +164,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 1,
                             Color = "#e74c3c",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos relacionados con bienestar físico y mental",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6444),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9970),
                             IconClass = "fas fa-heartbeat",
                             IsActive = true,
                             Nombre = "Salud",
@@ -176,9 +176,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 2,
                             Color = "#3498db",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos que mejoran el rendimiento y eficiencia",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6454),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9978),
                             IconClass = "fas fa-chart-line",
                             IsActive = true,
                             Nombre = "Productividad",
@@ -188,9 +188,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 3,
                             Color = "#f39c12",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos de educación y desarrollo personal",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6457),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9980),
                             IconClass = "fas fa-graduation-cap",
                             IsActive = true,
                             Nombre = "Aprendizaje",
@@ -200,9 +200,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 4,
                             Color = "#27ae60",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos de meditación y atención plena",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6459),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9982),
                             IconClass = "fas fa-leaf",
                             IsActive = true,
                             Nombre = "Mindfulness",
@@ -212,9 +212,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 5,
                             Color = "#9b59b6",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos relacionados con relaciones y vida social",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6461),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9985),
                             IconClass = "fas fa-users",
                             IsActive = true,
                             Nombre = "Social",
@@ -224,9 +224,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 6,
                             Color = "#e67e22",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos artísticos y de expresión creativa",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6462),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9986),
                             IconClass = "fas fa-palette",
                             IsActive = true,
                             Nombre = "Creatividad",
@@ -236,9 +236,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 7,
                             Color = "#16a085",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos de manejo financiero y ahorro",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6464),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9988),
                             IconClass = "fas fa-dollar-sign",
                             IsActive = true,
                             Nombre = "Finanzas",
@@ -248,9 +248,9 @@ namespace ToolBox.Migrations
                         {
                             Id = 8,
                             Color = "#95a5a6",
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Hábitos de organización y cuidado del hogar",
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6466),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9990),
                             IconClass = "fas fa-home",
                             IsActive = true,
                             Nombre = "Hogar",
@@ -295,7 +295,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 1,
                             AreaProgresoId = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Dinero y Finanzas",
                             OrdenVisualizacion = 1
                         },
@@ -303,7 +303,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 2,
                             AreaProgresoId = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Carrera y Misión",
                             OrdenVisualizacion = 2
                         },
@@ -311,7 +311,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 3,
                             AreaProgresoId = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Productividad",
                             OrdenVisualizacion = 3
                         },
@@ -319,7 +319,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 4,
                             AreaProgresoId = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Arte y Expresión",
                             OrdenVisualizacion = 1
                         },
@@ -327,7 +327,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 5,
                             AreaProgresoId = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Proyectos Creativos",
                             OrdenVisualizacion = 2
                         },
@@ -335,7 +335,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 6,
                             AreaProgresoId = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Inspiración",
                             OrdenVisualizacion = 3
                         },
@@ -343,7 +343,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 7,
                             AreaProgresoId = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Amistades",
                             OrdenVisualizacion = 1
                         },
@@ -351,7 +351,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 8,
                             AreaProgresoId = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Networking",
                             OrdenVisualizacion = 2
                         },
@@ -359,7 +359,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 9,
                             AreaProgresoId = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Comunidad",
                             OrdenVisualizacion = 3
                         },
@@ -367,7 +367,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 10,
                             AreaProgresoId = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Relación de Pareja",
                             OrdenVisualizacion = 1
                         },
@@ -375,7 +375,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 11,
                             AreaProgresoId = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Familia",
                             OrdenVisualizacion = 2
                         },
@@ -383,7 +383,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 12,
                             AreaProgresoId = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Amor Propio",
                             OrdenVisualizacion = 3
                         },
@@ -391,7 +391,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 13,
                             AreaProgresoId = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Espiritualidad",
                             OrdenVisualizacion = 1
                         },
@@ -399,7 +399,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 14,
                             AreaProgresoId = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Valores y Principios",
                             OrdenVisualizacion = 2
                         },
@@ -407,7 +407,7 @@ namespace ToolBox.Migrations
                         {
                             Id = 15,
                             AreaProgresoId = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5570),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(4536),
                             Nombre = "Salud y Fitness",
                             OrdenVisualizacion = 3
                         });
@@ -455,10 +455,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Todos los días",
                             DiasIntervalo = 1,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6470),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9994),
                             IsActive = true,
                             Nombre = "Diario",
                             OrdenVisualizacion = 1
@@ -466,10 +466,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Una vez por semana",
                             DiasIntervalo = 7,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6475),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9999),
                             IsActive = true,
                             Nombre = "Semanal",
                             OrdenVisualizacion = 2
@@ -477,10 +477,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Lunes, miércoles y viernes",
                             DiasIntervalo = 2,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6477),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 676, DateTimeKind.Utc).AddTicks(1),
                             IsActive = true,
                             Nombre = "3 veces por semana",
                             OrdenVisualizacion = 3
@@ -488,10 +488,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Sábados y domingos",
                             DiasIntervalo = 7,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6479),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 676, DateTimeKind.Utc).AddTicks(3),
                             IsActive = true,
                             Nombre = "Fines de semana",
                             OrdenVisualizacion = 4
@@ -499,10 +499,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Lunes a viernes",
                             DiasIntervalo = 1,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6481),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 676, DateTimeKind.Utc).AddTicks(4),
                             IsActive = true,
                             Nombre = "Días laborales",
                             OrdenVisualizacion = 5
@@ -510,10 +510,10 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6441),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 675, DateTimeKind.Utc).AddTicks(9966),
                             Descripcion = "Una vez al mes",
                             DiasIntervalo = 30,
-                            FechaCreacion = new DateTime(2025, 5, 25, 14, 44, 52, 101, DateTimeKind.Utc).AddTicks(6483),
+                            FechaCreacion = new DateTime(2025, 5, 25, 16, 15, 4, 676, DateTimeKind.Utc).AddTicks(6),
                             IsActive = true,
                             Nombre = "Mensual",
                             OrdenVisualizacion = 6
@@ -628,122 +628,122 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Connection with your inner self and beliefs",
                             DisplayOrder = 1,
                             IconClass = "fas fa-pray",
                             IconColor = "#8e44ad",
                             IsActive = true,
                             Title = "Spiritual",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Physical wellness and fitness",
                             DisplayOrder = 2,
                             IconClass = "fas fa-heartbeat",
                             IconColor = "#e74c3c",
                             IsActive = true,
                             Title = "Physical Health",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Relationships with loved ones",
                             DisplayOrder = 3,
                             IconClass = "fas fa-users",
                             IconColor = "#3498db",
                             IsActive = true,
                             Title = "Family & Friends",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Romantic relationships and partnerships",
                             DisplayOrder = 4,
                             IconClass = "fas fa-heart",
                             IconColor = "#e91e63",
                             IsActive = true,
                             Title = "Partner",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Professional growth and purpose",
                             DisplayOrder = 5,
                             IconClass = "fas fa-briefcase",
                             IconColor = "#34495e",
                             IsActive = true,
                             Title = "Mission/Career",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Financial stability and growth",
                             DisplayOrder = 6,
                             IconClass = "fas fa-dollar-sign",
                             IconColor = "#27ae60",
                             IsActive = true,
                             Title = "Finances",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Self-improvement and learning",
                             DisplayOrder = 7,
                             IconClass = "fas fa-graduation-cap",
                             IconColor = "#f39c12",
                             IsActive = true,
                             Title = "Personal Growth",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Leisure activities and hobbies",
                             DisplayOrder = 8,
                             IconClass = "fas fa-gamepad",
                             IconColor = "#9b59b6",
                             IsActive = true,
                             Title = "Fun & Recreation",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 9,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Travel and new adventures",
                             DisplayOrder = 9,
                             IconClass = "fas fa-plane",
                             IconColor = "#1abc9c",
                             IsActive = true,
                             Title = "Experiences",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         },
                         new
                         {
                             Id = 10,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285),
                             Description = "Living space and surroundings",
                             DisplayOrder = 10,
                             IconClass = "fas fa-home",
                             IconColor = "#95a5a6",
                             IsActive = true,
                             Title = "Environment",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 99, DateTimeKind.Utc).AddTicks(672)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 671, DateTimeKind.Utc).AddTicks(285)
                         });
                 });
 
@@ -1293,82 +1293,82 @@ namespace ToolBox.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 1,
                             QuestionText = "¿Cuál es mi propósito en la vida?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 1,
                             QuestionText = "¿Qué prácticas espirituales me conectan con mi ser interior?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 2,
                             QuestionText = "¿Qué hábitos de salud necesito mejorar?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 2,
                             QuestionText = "¿Cómo puedo mantener un equilibrio entre ejercicio y descanso?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 3,
                             QuestionText = "¿Cómo puedo fortalecer mis relaciones familiares?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 3,
                             QuestionText = "¿Qué amistades aportan valor a mi vida?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 4,
                             QuestionText = "¿Qué cualidades busco en una pareja?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 4,
                             QuestionText = "¿Cómo puedo mejorar mi comunicación en pareja?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 9,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 5,
                             QuestionText = "¿Mi trabajo actual se alinea con mi misión de vida?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         },
                         new
                         {
                             Id = 10,
-                            CreatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480),
+                            CreatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965),
                             LifeAreaId = 5,
                             QuestionText = "¿Qué habilidades necesito desarrollar para mi crecimiento profesional?",
-                            UpdatedAt = new DateTime(2025, 5, 25, 14, 44, 52, 100, DateTimeKind.Utc).AddTicks(5480)
+                            UpdatedAt = new DateTime(2025, 5, 25, 16, 15, 4, 674, DateTimeKind.Utc).AddTicks(3965)
                         });
                 });
 
@@ -1646,6 +1646,96 @@ namespace ToolBox.Migrations
                     b.ToTable("UserAnswers");
                 });
 
+            modelBuilder.Entity("ToolBox.Models.Video", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AutorId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DescripcionHTML")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Duracion")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("EsDestacado")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("EstadoVideo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("FechaSubida")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MetaDescripcionSEO")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("MetaTituloSEO")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NombreArchivoVideoSubido")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("PalabrasClaveSEO")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PathVideoSubido")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("TemaId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TipoFuenteVideo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UrlVideoExterno")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("UsuarioCreadorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("EstadoVideo");
+
+                    b.HasIndex("TemaId");
+
+                    b.HasIndex("Titulo");
+
+                    b.HasIndex("UsuarioCreadorId");
+
+                    b.ToTable("Videos");
+                });
+
             modelBuilder.Entity("ToolBox.Models.WelcomeMessageSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -1868,6 +1958,30 @@ namespace ToolBox.Migrations
                     b.Navigation("Question");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ToolBox.Models.Video", b =>
+                {
+                    b.HasOne("ToolBox.Models.User", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ToolBox.Models.Topic", "Tema")
+                        .WithMany()
+                        .HasForeignKey("TemaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ToolBox.Models.User", "UsuarioCreador")
+                        .WithMany()
+                        .HasForeignKey("UsuarioCreadorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("Tema");
+
+                    b.Navigation("UsuarioCreador");
                 });
 
             modelBuilder.Entity("ToolBox.Models.WheelOfLifeScore", b =>

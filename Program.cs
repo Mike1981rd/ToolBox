@@ -30,6 +30,7 @@ builder.Services.AddScoped<ITareaService, TareaService>();
 builder.Services.AddScoped<IHabitoService, HabitoService>();
 builder.Services.AddScoped<IWelcomeMessageService, WelcomeMessageService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
 
 var app = builder.Build();
 

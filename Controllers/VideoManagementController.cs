@@ -1,10 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using ToolBox.Models;
+using ToolBox.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToolBox.Controllers
 {
     public class VideoManagementController : Controller
     {
+        private readonly IVideoService _videoService;
+        private readonly ITopicService _topicService;
+        private readonly IUserService _userService;
+        private readonly ILogger<VideoManagementController> _logger;
+
+        public VideoManagementController(
+            IVideoService videoService,
+            ITopicService topicService,
+            IUserService userService,
+            ILogger<VideoManagementController> logger)
+        {
+            _videoService = videoService;
+            _topicService = topicService;
+            _userService = userService;
+            _logger = logger;
+        }
         public IActionResult Index()
         {
             ViewBag.BreadcrumbActiveKey = "breadcrumb_video_management_list";
@@ -12,16 +30,40 @@ namespace ToolBox.Controllers
             return View();
         }
 
-        public IActionResult VideoForm(int? id)
+        public async Task<IActionResult> VideoForm(int? id)
         {
-            var model = new VideoViewModel();
+            var model = new VideoCreateEditViewModel();
             
             if (id.HasValue && id.Value > 0)
             {
-                // Edit mode - simulate loading existing video
+                // Edit mode
                 ViewBag.IsEditMode = true;
                 ViewBag.BreadcrumbActiveKey = "breadcrumb_edit_video";
-                model = GetSampleVideoById(id.Value);
+                
+                var video = await _videoService.GetByIdAsync(id.Value);
+                if (video == null)
+                {
+                    return NotFound();
+                }
+                
+                model = new VideoCreateEditViewModel
+                {
+                    Id = video.Id,
+                    Titulo = video.Titulo,
+                    DescripcionHTML = video.DescripcionHTML,
+                    AutorId = video.AutorId,
+                    TemaId = video.TemaId,
+                    TipoFuenteVideo = video.TipoFuenteVideo,
+                    UrlVideoExterno = video.UrlVideoExterno,
+                    NombreArchivoVideoSubido = video.NombreArchivoVideoSubido,
+                    PathVideoSubido = video.PathVideoSubido,
+                    Duracion = video.Duracion,
+                    MetaTituloSEO = video.MetaTituloSEO,
+                    MetaDescripcionSEO = video.MetaDescripcionSEO,
+                    PalabrasClaveSEO = video.PalabrasClaveSEO,
+                    EsDestacado = video.EsDestacado,
+                    EstadoVideo = video.EstadoVideo
+                };
             }
             else
             {
@@ -35,240 +77,380 @@ namespace ToolBox.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetVideos(string? searchTerm = null, int page = 1, int pageSize = 10)
+        public async Task<JsonResult> GetVideos(string? searchTerm = null, int page = 1, int pageSize = 10, string statusFilter = "all", string? typeFilter = null, string? featuredFilter = null)
         {
             try
             {
-                var videos = GetSampleVideos();
+                var (videos, totalCount) = await _videoService.GetPaginatedAsync(searchTerm, page, pageSize, statusFilter == "all" ? null : statusFilter, typeFilter, featuredFilter);
 
-                if (!string.IsNullOrEmpty(searchTerm))
+                var videoViewModels = videos.Select(v => new VideoListViewModel
                 {
-                    videos = videos.Where(v => 
-                        v.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        v.AuthorName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        v.TopicName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
-
-                var totalRecords = videos.Count;
-                var pagedVideos = videos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                    Id = v.Id,
+                    Titulo = v.Titulo,
+                    AutorNombre = v.Autor?.FullName,
+                    TemaNombre = v.Tema?.Name,
+                    TipoFuenteVideo = v.TipoFuenteVideo,
+                    Duracion = v.Duracion,
+                    EsDestacado = v.EsDestacado,
+                    EstadoVideo = v.EstadoVideo,
+                    FechaSubida = v.FechaSubida
+                }).ToList();
 
                 return Json(new 
                 { 
                     success = true, 
-                    data = pagedVideos,
-                    totalRecords = totalRecords,
+                    data = videoViewModels,
+                    totalRecords = totalCount,
                     page = page,
                     pageSize = pageSize,
-                    totalPages = (int)Math.Ceiling((double)totalRecords / pageSize)
+                    totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error loading videos: {ex.Message}" });
+                _logger.LogError(ex, "Error loading videos");
+                
+                // Check if it's a table doesn't exist error
+                if (ex.Message.Contains("does not exist") || ex.Message.Contains("relation") || ex.Message.Contains("table"))
+                {
+                    return Json(new { success = false, message = "La tabla de videos no existe. Por favor, ejecute las migraciones de la base de datos." });
+                }
+                
+                return Json(new { success = false, message = $"Error al cargar los videos: {ex.Message}" });
             }
         }
 
         [HttpPost]
-        public JsonResult SaveVideo([FromBody] VideoViewModel model)
+        public async Task<JsonResult> SaveVideo([FromForm] VideoSaveRequest model, IFormFile? videoFile)
         {
             try
             {
-                // Placeholder logic - in real implementation, save to database
+                Video video;
+                
                 if (model.Id == 0)
                 {
                     // Creating new video
-                    model.Id = new Random().Next(1000, 9999);
-                    model.UploadDate = DateTime.Now;
+                    video = new Video
+                    {
+                        Titulo = model.Titulo,
+                        DescripcionHTML = model.DescripcionHTML,
+                        AutorId = model.AutorId,
+                        TemaId = model.TemaId,
+                        TipoFuenteVideo = model.TipoFuenteVideo,
+                        UrlVideoExterno = model.UrlVideoExterno,
+                        Duracion = model.Duracion,
+                        MetaTituloSEO = model.MetaTituloSEO,
+                        MetaDescripcionSEO = model.MetaDescripcionSEO,
+                        PalabrasClaveSEO = model.PalabrasClaveSEO,
+                        EsDestacado = model.EsDestacado,
+                        EstadoVideo = model.EstadoVideo,
+                        UsuarioCreadorId = GetCurrentUserId()
+                    };
+
+                    // Handle video file upload if provided
+                    if (videoFile != null && videoFile.Length > 0)
+                    {
+                        var uploadsPath = Path.Combine("wwwroot", "uploads", "videos");
+                        if (!Directory.Exists(uploadsPath))
+                        {
+                            Directory.CreateDirectory(uploadsPath);
+                        }
+
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(videoFile.FileName)}";
+                        var filePath = Path.Combine(uploadsPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await videoFile.CopyToAsync(stream);
+                        }
+
+                        video.NombreArchivoVideoSubido = videoFile.FileName;
+                        video.PathVideoSubido = $"/uploads/videos/{fileName}";
+                    }
+
+                    var created = await _videoService.CreateAsync(video);
+                    return Json(new { success = true, message = "Video creado exitosamente", videoId = created.Id, redirectUrl = Url.Action("Index", "VideoManagement") });
                 }
                 else
                 {
                     // Updating existing video
-                    model.UpdatedAt = DateTime.Now;
-                }
+                    var existingVideo = await _videoService.GetByIdAsync(model.Id);
+                    if (existingVideo == null)
+                    {
+                        return Json(new { success = false, message = "Video no encontrado" });
+                    }
 
-                return Json(new { success = true, message = "Video saved successfully", data = model });
+                    video = new Video
+                    {
+                        Id = model.Id,
+                        Titulo = model.Titulo,
+                        DescripcionHTML = model.DescripcionHTML,
+                        AutorId = model.AutorId,
+                        TemaId = model.TemaId,
+                        TipoFuenteVideo = model.TipoFuenteVideo,
+                        UrlVideoExterno = model.UrlVideoExterno,
+                        Duracion = model.Duracion,
+                        MetaTituloSEO = model.MetaTituloSEO,
+                        MetaDescripcionSEO = model.MetaDescripcionSEO,
+                        PalabrasClaveSEO = model.PalabrasClaveSEO,
+                        EsDestacado = model.EsDestacado,
+                        EstadoVideo = model.EstadoVideo
+                    };
+
+                    // Handle video file upload if provided
+                    if (videoFile != null && videoFile.Length > 0)
+                    {
+                        var uploadsPath = Path.Combine("wwwroot", "uploads", "videos");
+                        if (!Directory.Exists(uploadsPath))
+                        {
+                            Directory.CreateDirectory(uploadsPath);
+                        }
+
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(videoFile.FileName)}";
+                        var filePath = Path.Combine(uploadsPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await videoFile.CopyToAsync(stream);
+                        }
+
+                        video.NombreArchivoVideoSubido = videoFile.FileName;
+                        video.PathVideoSubido = $"/uploads/videos/{fileName}";
+                    }
+                    else
+                    {
+                        // Keep existing video info if no new file uploaded
+                        video.NombreArchivoVideoSubido = existingVideo.NombreArchivoVideoSubido;
+                        video.PathVideoSubido = existingVideo.PathVideoSubido;
+                    }
+
+                    await _videoService.UpdateAsync(video);
+                    return Json(new { success = true, message = "Video actualizado exitosamente", redirectUrl = Url.Action("Index", "VideoManagement") });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error saving video: {ex.Message}" });
+                _logger.LogError(ex, "Error saving video");
+                return Json(new { success = false, message = "Error al guardar el video" });
             }
         }
 
         [HttpPost]
-        public JsonResult DeleteVideo(int videoId)
+        public async Task<JsonResult> DeleteVideo([FromBody] DeleteVideoRequest request)
         {
             try
             {
-                // Placeholder logic - in real implementation, delete from database
-                return Json(new { success = true, message = "Video deleted successfully" });
+                var deleted = await _videoService.DeleteAsync(request.VideoId);
+                if (deleted)
+                {
+                    return Json(new { success = true, message = "Video eliminado exitosamente" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Video no encontrado" });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error deleting video: {ex.Message}" });
+                _logger.LogError(ex, "Error deleting video");
+                return Json(new { success = false, message = $"Error al eliminar el video: {ex.Message}" });
             }
         }
 
         [HttpGet]
-        public JsonResult GetVideo(int id)
+        public async Task<JsonResult> GetVideo(int id)
         {
             try
             {
-                var video = GetSampleVideoById(id);
+                var video = await _videoService.GetByIdAsync(id);
                 if (video == null)
                 {
-                    return Json(new { success = false, message = "Video not found" });
+                    return Json(new { success = false, message = "Video no encontrado" });
                 }
 
-                return Json(new { success = true, data = video });
+                var viewModel = new VideoCreateEditViewModel
+                {
+                    Id = video.Id,
+                    Titulo = video.Titulo,
+                    DescripcionHTML = video.DescripcionHTML,
+                    AutorId = video.AutorId,
+                    TemaId = video.TemaId,
+                    TipoFuenteVideo = video.TipoFuenteVideo,
+                    UrlVideoExterno = video.UrlVideoExterno,
+                    NombreArchivoVideoSubido = video.NombreArchivoVideoSubido,
+                    PathVideoSubido = video.PathVideoSubido,
+                    Duracion = video.Duracion,
+                    MetaTituloSEO = video.MetaTituloSEO,
+                    MetaDescripcionSEO = video.MetaDescripcionSEO,
+                    PalabrasClaveSEO = video.PalabrasClaveSEO,
+                    EsDestacado = video.EsDestacado,
+                    EstadoVideo = video.EstadoVideo
+                };
+
+                return Json(new { success = true, data = viewModel });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error retrieving video: {ex.Message}" });
+                _logger.LogError(ex, "Error retrieving video {Id}", id);
+                return Json(new { success = false, message = "Error al obtener el video" });
             }
         }
 
         [HttpGet]
-        public JsonResult GetTopicsForDropdown()
+        public async Task<JsonResult> GetTopicsForDropdown()
         {
             try
             {
-                var topics = GetSampleTopics();
-                return Json(new { success = true, data = topics });
+                var topics = await _topicService.GetAllActiveAsync();
+                var topicViewModels = topics
+                    .Select(t => new VideoTopicViewModel
+                    {
+                        Id = t.Id,
+                        Name = t.Name,
+                        IsActive = t.IsActive
+                    })
+                    .OrderBy(t => t.Name)
+                    .ToList();
+                    
+                return Json(new { success = true, data = topicViewModels });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error loading topics: {ex.Message}" });
+                _logger.LogError(ex, "Error loading topics for dropdown");
+                return Json(new { success = false, message = "Error al cargar los temas" });
             }
         }
 
         [HttpGet]
-        public JsonResult GetUsersForDropdown()
+        public async Task<JsonResult> GetUsersForDropdown()
         {
             try
             {
-                var users = GetSampleUsers();
-                return Json(new { success = true, data = users });
+                // Get all active users
+                var users = await _userService.GetAllUsersAsync();
+                var userViewModels = users
+                    .Where(u => u.IsActive)
+                    .Select(u => new VideoAuthorViewModel
+                    {
+                        Id = u.Id,
+                        Name = u.FullName,
+                        Email = u.Email
+                    })
+                    .OrderBy(u => u.Name)
+                    .ToList();
+                    
+                return Json(new { success = true, data = userViewModels });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error loading users: {ex.Message}" });
+                _logger.LogError(ex, "Error loading users for dropdown");
+                return Json(new { success = false, message = "Error al cargar los usuarios" });
             }
         }
-
+        
         [HttpPost]
-        public JsonResult UploadVideoFile(IFormFile videoFile)
+        public async Task<JsonResult> ToggleFeatured([FromBody] ToggleFeaturedRequest request)
+        {
+            try
+            {
+                var toggled = await _videoService.ToggleFeaturedAsync(request.VideoId);
+                if (toggled)
+                {
+                    return Json(new { success = true, message = "Estado destacado actualizado" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Video no encontrado" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error toggling featured status for video");
+                return Json(new { success = false, message = "Error al actualizar estado destacado" });
+            }
+        }
+        
+        [HttpPost]
+        public async Task<JsonResult> UploadVideoFile(IFormFile videoFile)
         {
             try
             {
                 if (videoFile == null || videoFile.Length == 0)
                 {
-                    return Json(new { success = false, message = "No file selected" });
+                    return Json(new { success = false, message = "No se seleccionó ningún archivo" });
                 }
 
-                // Placeholder logic - simulate file upload
-                var fileName = $"video_{Guid.NewGuid()}{Path.GetExtension(videoFile.FileName)}";
-                var filePath = $"/uploads/videos/{fileName}";
+                // Validate file type
+                var allowedTypes = new[] { "video/mp4", "video/avi", "video/mov", "video/wmv", "video/webm" };
+                if (!allowedTypes.Contains(videoFile.ContentType.ToLower()))
+                {
+                    return Json(new { success = false, message = "Tipo de archivo no permitido. Use MP4, AVI, MOV, WMV o WebM" });
+                }
+
+                // Validate file size (500MB max)
+                const long maxSize = 500L * 1024L * 1024L;
+                if (videoFile.Length > maxSize)
+                {
+                    return Json(new { success = false, message = "El archivo es demasiado grande. Máximo 500MB" });
+                }
+
+                // Create uploads directory if it doesn't exist
+                var uploadsPath = Path.Combine("wwwroot", "uploads", "videos");
+                if (!Directory.Exists(uploadsPath))
+                {
+                    Directory.CreateDirectory(uploadsPath);
+                }
+
+                // Generate unique filename
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(videoFile.FileName)}";
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await videoFile.CopyToAsync(stream);
+                }
 
                 return Json(new 
                 { 
                     success = true, 
-                    message = "File uploaded successfully",
-                    data = new { fileName = fileName, filePath = filePath, fileSize = videoFile.Length }
+                    message = "Archivo subido exitosamente",
+                    data = new 
+                    { 
+                        fileName = videoFile.FileName,
+                        savedFileName = fileName,
+                        filePath = $"/uploads/videos/{fileName}",
+                        fileSize = videoFile.Length
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error uploading file: {ex.Message}" });
+                _logger.LogError(ex, "Error uploading video file");
+                return Json(new { success = false, message = "Error al subir el archivo" });
             }
         }
-
-        #region Sample Data Methods
-
-        private List<VideoViewModel> GetSampleVideos()
+        
+        [HttpGet]
+        public JsonResult TestConnection()
         {
-            return new List<VideoViewModel>
-            {
-                new VideoViewModel
-                {
-                    Id = 1,
-                    Title = "Introduction to Mindfulness Meditation",
-                    Description = "Learn the basics of mindfulness meditation and how to incorporate it into your daily routine.",
-                    VideoUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                    AuthorId = 1,
-                    AuthorName = "Carlos Checo",
-                    TopicId = 1,
-                    TopicName = "Mindfulness",
-                    MediaType = "youtube",
-                    IsFeatured = true,
-                    Duration = "15:30",
-                    UploadDate = DateTime.Now.AddDays(-10),
-                    ViewCount = 250,
-                    ThumbnailUrl = "/img/default-video-thumb.jpg"
-                },
-                new VideoViewModel
-                {
-                    Id = 2,
-                    Title = "Productivity Hacks for Remote Workers",
-                    Description = "Discover effective strategies to boost your productivity while working from home.",
-                    VideoUrl = "https://vimeo.com/123456789",
-                    AuthorId = 2,
-                    AuthorName = "Admin User",
-                    TopicId = 2,
-                    TopicName = "Productivity",
-                    MediaType = "vimeo",
-                    IsFeatured = false,
-                    Duration = "22:45",
-                    UploadDate = DateTime.Now.AddDays(-5),
-                    ViewCount = 180,
-                    ThumbnailUrl = "/img/default-video-thumb.jpg"
-                },
-                new VideoViewModel
-                {
-                    Id = 3,
-                    Title = "Leadership in Times of Change",
-                    Description = "How to lead effectively during challenging and uncertain times.",
-                    VideoFilePath = "/uploads/videos/leadership-change.mp4",
-                    AuthorId = 3,
-                    AuthorName = "Maria Rodriguez",
-                    TopicId = 3,
-                    TopicName = "Leadership",
-                    MediaType = "uploadedfile",
-                    IsFeatured = true,
-                    Duration = "18:20",
-                    UploadDate = DateTime.Now.AddDays(-2),
-                    ViewCount = 95,
-                    ThumbnailUrl = "/img/default-video-thumb.jpg"
-                }
-            };
+            return Json(new { success = true, message = "Video Management Controller is working", timestamp = DateTime.Now });
         }
-
-        private VideoViewModel? GetSampleVideoById(int id)
+        
+        private int GetCurrentUserId()
         {
-            return GetSampleVideos().FirstOrDefault(v => v.Id == id);
+            // TODO: Get actual user ID from authentication
+            return 1;
         }
+    }
 
-        private List<VideoTopicViewModel> GetSampleTopics()
-        {
-            return new List<VideoTopicViewModel>
-            {
-                new VideoTopicViewModel { Id = 1, Name = "Mindfulness" },
-                new VideoTopicViewModel { Id = 2, Name = "Productivity" },
-                new VideoTopicViewModel { Id = 3, Name = "Leadership" },
-                new VideoTopicViewModel { Id = 4, Name = "Communication" }
-            };
-        }
+    public class DeleteVideoRequest
+    {
+        public int VideoId { get; set; }
+    }
 
-        private List<VideoAuthorViewModel> GetSampleUsers()
-        {
-            return new List<VideoAuthorViewModel>
-            {
-                new VideoAuthorViewModel { Id = 1, Name = "Carlos Checo", Email = "carlos@toolbox.com" },
-                new VideoAuthorViewModel { Id = 2, Name = "Admin User", Email = "admin@toolbox.com" },
-                new VideoAuthorViewModel { Id = 3, Name = "Maria Rodriguez", Email = "maria@toolbox.com" }
-            };
-        }
-
-        #endregion
+    public class ToggleFeaturedRequest
+    {
+        public int VideoId { get; set; }
     }
 }

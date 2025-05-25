@@ -2,67 +2,62 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ToolBox.Models
 {
-    public class VideoViewModel
+    public class VideoListViewModel
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; } = string.Empty;
+        public string? AutorNombre { get; set; }
+        public string? TemaNombre { get; set; }
+        public string TipoFuenteVideo { get; set; } = string.Empty;
+        public string? Duracion { get; set; }
+        public bool EsDestacado { get; set; }
+        public string EstadoVideo { get; set; } = string.Empty;
+        public DateTime FechaSubida { get; set; }
+    }
+
+    public class VideoCreateEditViewModel
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El título es obligatorio")]
         [StringLength(200)]
-        public string Title { get; set; } = string.Empty;
+        public string Titulo { get; set; } = string.Empty;
 
-        [StringLength(2000)]
-        public string? Description { get; set; }
+        public string? DescripcionHTML { get; set; }
 
-        [StringLength(500)]
-        public string? VideoUrl { get; set; }
+        public int? AutorId { get; set; }
 
-        [StringLength(500)]
-        public string? VideoFilePath { get; set; }
+        public int? TemaId { get; set; }
 
         [Required]
-        public int AuthorId { get; set; }
+        public string TipoFuenteVideo { get; set; } = "YouTube"; // YouTube, Vimeo, Upload
 
-        public string AuthorName { get; set; } = string.Empty;
+        public string? UrlVideoExterno { get; set; }
+
+        public string? NombreArchivoVideoSubido { get; set; }
+        
+        public string? PathVideoSubido { get; set; }
+
+        public string? Duracion { get; set; }
+
+        public string? MetaTituloSEO { get; set; }
+
+        public string? MetaDescripcionSEO { get; set; }
+
+        public string? PalabrasClaveSEO { get; set; }
+
+        public bool EsDestacado { get; set; }
 
         [Required]
-        public int TopicId { get; set; }
+        public string EstadoVideo { get; set; } = "Borrador"; // Publicado, Borrador, Archivado
+    }
 
-        public string TopicName { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(50)]
-        public string MediaType { get; set; } = "youtube"; // youtube, vimeo, uploadedfile
-
-        public bool IsFeatured { get; set; } = false;
-
-        [StringLength(10)]
-        public string? Duration { get; set; } // Format: mm:ss
-
-        public DateTime UploadDate { get; set; } = DateTime.Now;
-
-        public DateTime? UpdatedAt { get; set; }
-
-        // SEO Fields
-        [StringLength(200)]
-        public string? MetaTitle { get; set; }
-
-        [StringLength(500)]
-        public string? MetaDescription { get; set; }
-
-        [StringLength(500)]
-        public string? MetaKeywords { get; set; }
-
-        // Additional properties for display
-        public string? ThumbnailUrl { get; set; }
-
-        public int ViewCount { get; set; } = 0;
-
-        public string Status { get; set; } = "published"; // draft, published, archived
-
-        // Properties for file upload simulation
-        public string? UploadedFileName { get; set; }
-
-        public long? FileSizeBytes { get; set; }
+    public class VideoPaginatedResponseViewModel
+    {
+        public List<VideoListViewModel> Videos { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int CurrentPage { get; set; }
+        public int PageSize { get; set; }
     }
 
     public class VideoAuthorViewModel
@@ -76,5 +71,25 @@ namespace ToolBox.Models
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+    }
+
+    public class VideoSaveRequest
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; } = string.Empty;
+        public string? DescripcionHTML { get; set; }
+        public int? AutorId { get; set; }
+        public int? TemaId { get; set; }
+        public string TipoFuenteVideo { get; set; } = "YouTube";
+        public string? UrlVideoExterno { get; set; }
+        public string? NombreArchivoVideoSubido { get; set; }
+        public string? PathVideoSubido { get; set; }
+        public string? Duracion { get; set; }
+        public string? MetaTituloSEO { get; set; }
+        public string? MetaDescripcionSEO { get; set; }
+        public string? PalabrasClaveSEO { get; set; }
+        public bool EsDestacado { get; set; }
+        public string EstadoVideo { get; set; } = "Borrador";
     }
 }
