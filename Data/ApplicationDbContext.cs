@@ -28,6 +28,7 @@ namespace ToolBox.Data
         public DbSet<CategoriaHabito> CategoriasHabitos { get; set; }
         public DbSet<FrecuenciaHabito> FrecuenciasHabitos { get; set; }
         public DbSet<WelcomeMessageSettings> WelcomeMessageSettings { get; set; }
+        public DbSet<Topic> Topics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

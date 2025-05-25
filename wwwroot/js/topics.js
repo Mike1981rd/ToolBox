@@ -5,20 +5,61 @@
 
 let topicsData = [];
 let currentEditingTopicId = 0;
+let currentPage = 1;
+let pageSize = 10;
+let totalCount = 0;
+let currentSearchTerm = '';
+let currentStatusFilter = 'active';
+let searchDebounceTimer = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeTopicsModule();
 });
 
 function initializeTopicsModule() {
+    // Set initial values from elements
+    const pageSizeSelect = document.getElementById('pageSize');
+    if (pageSizeSelect) {
+        pageSize = parseInt(pageSizeSelect.value);
+        
+        // Add page size change listener
+        pageSizeSelect.addEventListener('change', function() {
+            pageSize = parseInt(this.value);
+            currentPage = 1; // Reset to first page
+            loadTopics();
+        });
+    }
+    
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        currentStatusFilter = statusFilter.value;
+        
+        // Add status filter change listener
+        statusFilter.addEventListener('change', function() {
+            currentStatusFilter = this.value;
+            currentPage = 1; // Reset to first page
+            loadTopics();
+        });
+    }
+    
+    // Initialize search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                currentSearchTerm = this.value.trim();
+                currentPage = 1; // Reset to first page on new search
+                loadTopics();
+            }, 300); // 300ms debounce delay
+        });
+    }
+    
     // Load initial topics data
     loadTopics();
     
     // Set up event listeners
     setupEventListeners();
-    
-    // Initialize search functionality
-    initializeSearch();
 }
 
 function setupEventListeners() {
@@ -48,49 +89,73 @@ function setupEventListeners() {
     }
 }
 
-function initializeSearch() {
-    const searchInput = document.getElementById('topicsSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value;
-            filterTopics(searchTerm);
-        });
-    }
-}
-
-function loadTopics(searchTerm = '') {
+async function loadTopics() {
     // Show loading state
     showLoadingState();
     
-    // Make AJAX call to get topics
-    fetch(`/Topics/GetTopics?searchTerm=${encodeURIComponent(searchTerm)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                topicsData = data.data;
-                renderTopicsTable();
-                updateTableInfo();
-            } else {
-                console.error('Error loading topics:', data.message);
-                showError('Error loading topics');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('Error loading topics');
+    try {
+        // Build query parameters
+        const params = new URLSearchParams({
+            page: currentPage,
+            pageSize: pageSize,
+            searchTerm: currentSearchTerm,
+            statusFilter: currentStatusFilter
         });
+        
+        // Make AJAX call to get topics
+        console.log('Fetching topics with params:', params.toString());
+        const response = await fetch(`/Topics/GetTopics?${params}`);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Check if response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            console.error('Non-JSON response:', text.substring(0, 200));
+            throw new Error("Server returned non-JSON response");
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            topicsData = data.topics || data.data || [];
+            totalCount = data.totalCount || topicsData.length;
+            renderTopicsTable();
+            updatePagination();
+            updateTableInfo();
+        } else {
+            console.error('Error loading topics:', data.message);
+            topicsData = []; // Ensure topicsData is an empty array
+            renderTopicsTable(); // Show empty state
+            showError(data.message || 'Error loading topics');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        topicsData = []; // Ensure topicsData is an empty array
+        renderTopicsTable(); // Show empty state
+        showError('Error loading topics: ' + error.message);
+    }
 }
 
 function renderTopicsTable() {
     const tbody = document.getElementById('topicsTableBody');
     if (!tbody) return;
     
+    // Ensure topicsData is an array
+    if (!Array.isArray(topicsData)) {
+        topicsData = [];
+    }
+    
     if (topicsData.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="4" class="text-center text-muted py-4">
                     <i class="fas fa-search fa-2x mb-2 d-block"></i>
-                    No topics found
+                    <span data-translate-key="no_topics_found">No topics found</span>
                 </td>
             </tr>
         `;
@@ -116,7 +181,9 @@ function renderTopicsTable() {
                 </div>
             </td>
             <td>
-                <span class="badge bg-${topic.status === 'active' ? 'success' : 'secondary'}">${capitalizeFirst(topic.status)}</span>
+                <span class="badge bg-${topic.isActive ? 'success' : 'secondary'}">
+                    ${topic.isActive ? getTranslation('status_active') || 'Active' : getTranslation('status_inactive') || 'Inactive'}
+                </span>
             </td>
             <td>
                 <div class="d-inline-block text-nowrap">
@@ -133,6 +200,74 @@ function renderTopicsTable() {
     
     // Attach event listeners to action buttons
     attachActionListeners();
+}
+
+function updatePagination() {
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (!paginationContainer) return;
+    
+    const totalPages = Math.ceil(totalCount / pageSize);
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+    `;
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            paginationHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+            `;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            paginationHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    `;
+    
+    paginationContainer.innerHTML = paginationHTML;
+    
+    // Add pagination click handlers
+    paginationContainer.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = parseInt(this.dataset.page);
+            if (!isNaN(page) && page >= 1 && page <= totalPages && page !== currentPage) {
+                currentPage = page;
+                loadTopics();
+            }
+        });
+    });
+}
+
+function updateTableInfo() {
+    const infoElement = document.getElementById('topicsTableInfo');
+    if (infoElement) {
+        const start = totalCount > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
+        const end = Math.min(currentPage * pageSize, totalCount);
+        infoElement.textContent = `Showing ${start} to ${end} of ${totalCount} entries`;
+    }
 }
 
 function attachActionListeners() {
@@ -181,7 +316,7 @@ function editTopic(topicId) {
     document.getElementById('topicId').value = topic.id;
     document.getElementById('topicName').value = topic.name;
     document.getElementById('topicDescription').value = topic.description || '';
-    document.getElementById('topicStatus').value = topic.status;
+    document.getElementById('topicStatus').value = topic.isActive ? 'active' : 'inactive';
     
     // Update offcanvas title
     updateOffcanvasTitle('offcanvas_titles.editTopic');
@@ -199,14 +334,14 @@ function saveTopic() {
     const formData = new FormData(form);
     
     const topicData = {
-        id: currentEditingTopicId,
-        name: formData.get('Name'),
-        description: formData.get('Description'),
-        status: formData.get('Status')
+        Id: currentEditingTopicId,
+        Name: formData.get('Name'),
+        Description: formData.get('Description'),
+        IsActive: formData.get('Status') === 'active'
     };
     
     // Basic validation
-    if (!topicData.name.trim()) {
+    if (!topicData.Name.trim()) {
         showError('Topic name is required');
         return;
     }
@@ -222,6 +357,7 @@ function saveTopic() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
         },
         body: JSON.stringify(topicData)
     })
@@ -270,8 +406,9 @@ function deleteTopic(topicId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
         },
-        body: JSON.stringify({ topicId: topicId })
+        body: JSON.stringify({ TopicId: topicId })
     })
     .then(response => response.json())
     .then(data => {
@@ -286,10 +423,6 @@ function deleteTopic(topicId) {
         console.error('Error:', error);
         showError('Error deleting topic');
     });
-}
-
-function filterTopics(searchTerm) {
-    loadTopics(searchTerm);
 }
 
 function resetForm() {
@@ -321,14 +454,6 @@ function updateSubmitButton(translationKey) {
     }
 }
 
-function updateTableInfo() {
-    const infoElement = document.getElementById('topicsTableInfo');
-    if (infoElement && topicsData) {
-        const total = topicsData.length;
-        infoElement.textContent = `Showing 1 to ${total} of ${total} entries`;
-    }
-}
-
 function showLoadingState() {
     const tbody = document.getElementById('topicsTableBody');
     if (tbody) {
@@ -336,7 +461,7 @@ function showLoadingState() {
             <tr>
                 <td colspan="4" class="text-center py-4">
                     <i class="fas fa-spinner fa-spin fa-2x mb-2 d-block"></i>
-                    Loading topics...
+                    <span data-translate-key="loading_topics">Loading topics...</span>
                 </td>
             </tr>
         `;
@@ -344,13 +469,21 @@ function showLoadingState() {
 }
 
 function showSuccess(message) {
-    // Simple alert for now - in a real app, you might use a toast notification
-    alert(message);
+    // Use the global showToast function if available
+    if (typeof showToast === 'function') {
+        showToast(message, 'success');
+    } else {
+        alert(message);
+    }
 }
 
 function showError(message) {
-    // Simple alert for now - in a real app, you might use a toast notification
-    alert('Error: ' + message);
+    // Use the global showToast function if available
+    if (typeof showToast === 'function') {
+        showToast(message, 'error');
+    } else {
+        alert('Error: ' + message);
+    }
 }
 
 function escapeHtml(text) {

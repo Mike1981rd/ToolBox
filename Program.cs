@@ -29,6 +29,7 @@ builder.Services.AddScoped<IWheelOfProgressService, WheelOfProgressService>();
 builder.Services.AddScoped<ITareaService, TareaService>();
 builder.Services.AddScoped<IHabitoService, HabitoService>();
 builder.Services.AddScoped<IWelcomeMessageService, WelcomeMessageService>();
+builder.Services.AddScoped<ITopicService, TopicService>();
 
 var app = builder.Build();
 
