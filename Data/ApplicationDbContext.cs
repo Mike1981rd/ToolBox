@@ -27,6 +27,7 @@ namespace ToolBox.Data
         public DbSet<RegistroCumplimientoHabito> RegistrosCumplimientoHabitos { get; set; }
         public DbSet<CategoriaHabito> CategoriasHabitos { get; set; }
         public DbSet<FrecuenciaHabito> FrecuenciasHabitos { get; set; }
+        public DbSet<WelcomeMessageSettings> WelcomeMessageSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

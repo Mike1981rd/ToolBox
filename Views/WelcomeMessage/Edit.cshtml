@@ -178,54 +178,5 @@
 
 @section Scripts {
     <script src="https://cdn.tiny.cloud/1/1ch6ln9g0ak7n4uqhevfwfodp03d49kcdiwwygiue9gc291x/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-        // Función para inicializar TinyMCE
-        function initializeTinyMCEEditor() {
-            if (typeof tinymce !== 'undefined') {
-                console.log('TinyMCE está cargado. Intentando inicializar para #description.');
-                try {
-                    tinymce.init({
-                        selector: '#description', // El ID de tu textarea
-                        height: 300,
-                        menubar: true, // Muestra la barra de menú (File, Edit, View, etc.)
-                        plugins: [
-                            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                            'insertdatetime', 'media', 'table', 'help', 'wordcount'
-                        ],
-                        toolbar: 'undo redo | blocks | ' +
-                                 'bold italic forecolor backcolor | alignleft aligncenter ' +
-                                 'alignright alignjustify | bullist numlist outdent indent | ' +
-                                 'removeformat | image media link | code fullscreen preview | help',
-                        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                        language: 'es', // Para el idioma español
-                        
-                        // Configuración básica para subida de imágenes (comentada por ahora)
-                        // images_upload_url: '/WelcomeMessage/UploadImage',
-                        // images_upload_base_path: '/uploads',
-                        // automatic_uploads: true,
-                        // file_picker_types: 'image',
-                        
-                        setup: function(editor) {
-                            editor.on('init', function() {
-                                console.log('TinyMCE inicializado correctamente');
-                            });
-                        }
-                    });
-                    console.log('Llamada a tinymce.init() para #description realizada.');
-                } catch (e) {
-                    console.error('Error durante la inicialización de TinyMCE:', e);
-                }
-            } else {
-                console.warn('TinyMCE no está definido aún. Reintentando en 500ms...');
-                setTimeout(initializeTinyMCEEditor, 500); // Reintentar
-            }
-        }
-
-        // Llamar a la función de inicialización cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado. Iniciando proceso de inicialización de TinyMCE...');
-            initializeTinyMCEEditor();
-        });
-    </script>
+    <script src="~/js/welcome-message.js" asp-append-version="true"></script>
 }
