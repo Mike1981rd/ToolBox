@@ -6,11 +6,16 @@ const ToolboxAcademy = {
     // Configuration
     config: {
         baseUrl: '/ToolboxAcademy',
-        currentCategory: 'all',
+        currentTemaId: null,
         currentSearch: '',
         currentPage: 1,
         isLoading: false,
-        translations: window.translations || {}
+        translations: window.translations || {},
+        apiEndpoints: {
+            getVideos: '/ToolboxAcademy/GetPortalVideos',
+            getTemas: '/ToolboxAcademy/GetTemasConConteo',
+            getStats: '/ToolboxAcademy/GetEstadisticasPortal'
+        }
     },
 
     // Initialize the module
@@ -31,10 +36,11 @@ const ToolboxAcademy = {
 
     // Get current filters from page data
     getCurrentFilters: function() {
-        // Try to get current category from active category item
+        // Try to get current tema from active category item
         const activeCategoryEl = document.querySelector('.category-item-enhanced.active');
         if (activeCategoryEl) {
-            this.config.currentCategory = activeCategoryEl.getAttribute('data-category') || 'all';
+            const temaId = activeCategoryEl.getAttribute('data-category');
+            this.config.currentTemaId = temaId === '0' ? null : parseInt(temaId) || null;
         }
         
         // Get search query from search input
@@ -43,7 +49,7 @@ const ToolboxAcademy = {
             this.config.currentSearch = searchInput.value || '';
         }
         
-        console.log(`Current filters - Category: ${this.config.currentCategory}, Search: "${this.config.currentSearch}"`);
+        console.log(`Current filters - TemaId: ${this.config.currentTemaId}, Search: "${this.config.currentSearch}"`);
     },
 
     // Bind all event handlers
@@ -68,20 +74,20 @@ const ToolboxAcademy = {
         $(document).on('click', '.category-item-enhanced', (e) => {
             e.preventDefault();
             
-            const categorySlug = $(e.currentTarget).data('category');
-            const categoryName = $(e.currentTarget).find('.category-name').text().trim();
+            const temaId = $(e.currentTarget).data('category');
+            const temaName = $(e.currentTarget).find('.category-name').text().trim();
             
-            console.log(`Category filter clicked: ${categorySlug} (${categoryName})`);
+            console.log(`Tema filter clicked: ${temaId} (${temaName})`);
             
             // Update active state
             $('.category-item-enhanced').removeClass('active');
             $(e.currentTarget).addClass('active');
             
-            // Update current category
-            this.config.currentCategory = categorySlug;
+            // Update current tema
+            this.config.currentTemaId = temaId === '0' ? null : parseInt(temaId) || null;
             
             // Filter videos
-            this.filterVideos(categorySlug, this.config.currentSearch, 1);
+            this.filterVideos(this.config.currentTemaId, this.config.currentSearch, 1);
         });
     },
 
@@ -106,7 +112,7 @@ const ToolboxAcademy = {
             const searchValue = $('#videoSearchInput').val().trim();
             if (searchValue === '' && this.config.currentSearch !== '') {
                 this.config.currentSearch = '';
-                this.filterVideos(this.config.currentCategory, '', 1);
+                this.filterVideos(this.config.currentTemaId, '', 1);
             }
         }, 500));
     },
@@ -117,7 +123,7 @@ const ToolboxAcademy = {
         console.log(`Performing search: "${searchQuery}"`);
         
         this.config.currentSearch = searchQuery;
-        this.filterVideos(this.config.currentCategory, searchQuery, 1);
+        this.filterVideos(this.config.currentTemaId, searchQuery, 1);
     },
 
     // Bind video card events
@@ -162,22 +168,22 @@ const ToolboxAcademy = {
         });
     },
 
-    // Filter videos (AJAX call or page redirect)
-    filterVideos: function(categorySlug, searchQuery = '', page = 1) {
+    // Filter videos (page redirect for now, AJAX ready)
+    filterVideos: function(temaId, searchQuery = '', page = 1) {
         if (this.config.isLoading) {
             console.log('Already loading, ignoring filter request');
             return;
         }
         
-        console.log(`Filtering videos - Category: ${categorySlug}, Search: "${searchQuery}", Page: ${page}`);
+        console.log(`Filtering videos - TemaId: ${temaId}, Search: "${searchQuery}", Page: ${page}`);
         
         this.config.isLoading = true;
         this.showLoadingState();
         
         // Build URL parameters
         const params = new URLSearchParams();
-        if (categorySlug && categorySlug !== 'all') {
-            params.append('categorySlug', categorySlug);
+        if (temaId && temaId !== null) {
+            params.append('temaId', temaId);
         }
         if (searchQuery) {
             params.append('search', searchQuery);
@@ -190,24 +196,26 @@ const ToolboxAcademy = {
         const url = `${this.config.baseUrl}${params.toString() ? '?' + params.toString() : ''}`;
         window.location.href = url;
         
-        // Alternative: AJAX approach (commented out for now)
+        // Alternative: AJAX approach ready to use
         /*
-        $.get(`${this.config.baseUrl}/GetVideos`, {
-            categorySlug: categorySlug === 'all' ? null : categorySlug,
+        $.get(this.config.apiEndpoints.getVideos, {
+            temaId: temaId,
             search: searchQuery,
-            page: page
+            page: page,
+            pageSize: 6
         })
         .done((response) => {
             if (response.success) {
-                this.renderVideos(response.videos);
+                this.renderVideos(response.data);
                 this.updatePagination(response);
-                this.updateUrl(categorySlug, searchQuery, page);
+                this.updateUrl(temaId, searchQuery, page);
+                this.updateStats();
             } else {
                 this.showError(response.message);
             }
         })
         .fail(() => {
-            this.showError('Error loading videos');
+            this.showError('Error al cargar los videos');
         })
         .always(() => {
             this.config.isLoading = false;
@@ -250,6 +258,74 @@ const ToolboxAcademy = {
         
         // Initialize enhanced interactions
         this.initializeEnhancedInteractions();
+        
+        // Load dynamic data if using AJAX mode
+        // this.loadDynamicData();
+    },
+    
+    // Load dynamic data (for AJAX mode)
+    loadDynamicData: function() {
+        // Load temas with counts
+        this.loadTemasWithCounts();
+        
+        // Load statistics
+        this.updateStats();
+    },
+    
+    // Load temas with video counts
+    loadTemasWithCounts: function() {
+        $.get(this.config.apiEndpoints.getTemas)
+            .done((response) => {
+                if (response.success) {
+                    this.renderTemasList(response.data);
+                }
+            })
+            .fail(() => {
+                console.error('Error loading temas');
+            });
+    },
+    
+    // Update statistics
+    updateStats: function() {
+        $.get(this.config.apiEndpoints.getStats)
+            .done((response) => {
+                if (response.success) {
+                    this.renderStats(response.data);
+                }
+            })
+            .fail(() => {
+                console.error('Error loading statistics');
+            });
+    },
+    
+    // Render temas list
+    renderTemasList: function(temas) {
+        const temasHtml = temas.map(tema => `
+            <a href="#" 
+               class="category-item-enhanced ${tema.id === this.config.currentTemaId ? 'active' : ''}"
+               data-category="${tema.id}">
+                <div class="category-item-left">
+                    <span class="category-emoji">📁</span>
+                    <div class="category-info">
+                        <div class="category-name">${tema.nombre}</div>
+                        <div class="category-description">${tema.descripcion}</div>
+                    </div>
+                </div>
+                <span class="category-count-badge">${tema.conteoVideos}</span>
+            </a>
+        `).join('');
+        
+        $('.categories-list').html(temasHtml);
+    },
+    
+    // Render statistics
+    renderStats: function(stats) {
+        $('.stat-number').each(function() {
+            const statType = $(this).data('stat-type');
+            if (statType && stats[statType] !== undefined) {
+                $(this).text(stats[statType].toLocaleString());
+            }
+        });
     },
 
     // Initialize Bootstrap tooltips

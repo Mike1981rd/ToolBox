@@ -274,7 +274,7 @@
             align-items: center;
             gap: 0.5rem;
             background: #f8f9fa;
-            color: #495057;
+            color: white !important;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -284,10 +284,15 @@
             transition: all 0.2s ease;
         }
         
+        .category-badge-enhanced span {
+            color: white !important;
+        }
+        
         .category-badge-enhanced:hover {
-            color: white;
+            color: white !important;
             text-decoration: none;
             transform: scale(1.05);
+            filter: brightness(0.9);
         }
         
         .video-title-enhanced {
@@ -563,6 +568,20 @@
             opacity: 0.5;
         }
         
+        /* Video Upload Styles */
+        .video-thumbnail video {
+            cursor: pointer;
+        }
+        
+        .video-card-enhanced:hover video {
+            opacity: 0.9;
+        }
+        
+        /* Better placeholder styling */
+        .video-thumbnail[poster] {
+            background: #f0f0f0;
+        }
+        
         /* Responsive Design */
         @@media (max-width: 1200px) {
             .featured-card-floating {
@@ -722,10 +741,23 @@
                                     
                                     @if (video.IsVideoAvailable)
                                     {
-                                        <img src="@video.ThumbnailUrl" alt="@video.Title" class="video-thumbnail">
-                                        <div class="video-play-overlay">
-                                            <i class="fas fa-play"></i>
-                                        </div>
+                                        @if (video.EmbedUrl != null && video.EmbedUrl.StartsWith("/"))
+                                        {
+                                            <!-- For uploaded videos, show a video element with poster -->
+                                            <video class="video-thumbnail" poster="@video.ThumbnailUrl" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <source src="@video.EmbedUrl" type="video/mp4">
+                                            </video>
+                                            <div class="video-play-overlay" data-video-type="Upload" data-video-url="@video.EmbedUrl">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <img src="@video.ThumbnailUrl" alt="@video.Title" class="video-thumbnail">
+                                            <div class="video-play-overlay" data-video-type="@(video.EmbedUrl.Contains("youtube") ? "YouTube" : video.EmbedUrl.Contains("vimeo") ? "Vimeo" : "Other")" data-video-url="@video.EmbedUrl">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        }
                                         <div class="video-duration-badge">@video.DurationFormatted</div>
                                     }
                                     else
@@ -739,11 +771,11 @@
                                 <!-- Video Card Body -->
                                 <div class="video-card-body">
                                     <!-- Category Badge -->
-                                    <a href="@Url.Action("Index", "ToolboxAcademy", new { categorySlug = video.CategorySlug })" 
+                                    <a href="@Url.Action("Index", "ToolboxAcademy", new { temaId = video.CategoryId })" 
                                        class="category-badge-enhanced" 
-                                       style="background-color: @video.CategoryColor; color: white;">
-                                        <span>@video.CategoryIcon</span>
-                                        <span>@video.CategoryName</span>
+                                       style="background-color: @video.CategoryColor; color: white !important;">
+                                        <span style="color: white !important;">@video.CategoryIcon</span>
+                                        <span style="color: white !important;">@video.CategoryName</span>
                                     </a>
 
                                     <!-- Video Title -->
@@ -811,7 +843,7 @@
                                 @if (Model.CurrentPage > 1)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" href="@Url.Action("Index", new { categorySlug = Model.CurrentCategorySlug, search = Model.SearchQuery, page = Model.CurrentPage - 1 })">
+                                        <a class="page-link" href="@Url.Action("Index", new { temaId = string.IsNullOrEmpty(Model.CurrentCategorySlug) || Model.CurrentCategorySlug == "all" ? (int?)null : int.Parse(Model.CurrentCategorySlug), search = Model.SearchQuery, page = Model.CurrentPage - 1 })">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
@@ -820,14 +852,14 @@
                                 @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
                                 {
                                     <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                        <a class="page-link" href="@Url.Action("Index", new { categorySlug = Model.CurrentCategorySlug, search = Model.SearchQuery, page = i })">@i</a>
+                                        <a class="page-link" href="@Url.Action("Index", new { temaId = string.IsNullOrEmpty(Model.CurrentCategorySlug) || Model.CurrentCategorySlug == "all" ? (int?)null : int.Parse(Model.CurrentCategorySlug), search = Model.SearchQuery, page = i })">@i</a>
                                     </li>
                                 }
                                 
                                 @if (Model.CurrentPage < Model.TotalPages)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" href="@Url.Action("Index", new { categorySlug = Model.CurrentCategorySlug, search = Model.SearchQuery, page = Model.CurrentPage + 1 })">
+                                        <a class="page-link" href="@Url.Action("Index", new { temaId = string.IsNullOrEmpty(Model.CurrentCategorySlug) || Model.CurrentCategorySlug == "all" ? (int?)null : int.Parse(Model.CurrentCategorySlug), search = Model.SearchQuery, page = Model.CurrentPage + 1 })">
                                             <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>
@@ -859,19 +891,19 @@
                 <div class="sidebar-card-header">
                     <h5 class="sidebar-card-title">
                         <i class="fas fa-th-large"></i>
-                        <span data-translate-key="labels.categories">Categorías</span>
+                        <span data-translate-key="labels.temas">Temas</span>
                     </h5>
                 </div>
                 <div class="categories-list">
                     @foreach (var category in Model.Categories)
                     {
-                        <a href="@Url.Action("Index", "ToolboxAcademy", new { categorySlug = category.Slug == "all" ? (string)null : category.Slug })" 
-                           class="category-item-enhanced @(category.Slug == Model.CurrentCategorySlug ? "active" : "")"
-                           data-category="@category.Slug">
+                        <a href="@Url.Action("Index", "ToolboxAcademy", new { temaId = category.Id == 0 ? (int?)null : category.Id })" 
+                           class="category-item-enhanced @(category.IsActive ? "active" : "")"
+                           data-category="@category.Id">
                             <div class="category-item-left">
                                 <span class="category-emoji">@category.IconEmoji</span>
                                 <div class="category-info">
-                                    <div class="category-name" data-translate-key="@GetCategoryTranslateKey(category.Slug)">@category.Name</div>
+                                    <div class="category-name">@category.Name</div>
                                     <div class="category-description">@category.Description</div>
                                 </div>
                             </div>
@@ -922,8 +954,110 @@
     </div>
 </div>
 
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="videoContainer" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                    <!-- Video content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/toolbox-academy.js"></script>
+    <script>
+        // Video modal handler
+        $(document).on('click', '.watch-video-btn, .video-play-overlay', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const $this = $(this);
+            const videoCard = $this.closest('.video-card-enhanced');
+            const videoTitle = videoCard.find('.video-title-enhanced a').text().trim();
+            
+            // For play overlay on video thumbnail
+            if ($this.hasClass('video-play-overlay')) {
+                const videoType = $this.attr('data-video-type');
+                const videoUrl = $this.attr('data-video-url');
+                
+                if (videoUrl) {
+                    // Open modal for all video types
+                    openVideoModal(videoTitle, videoUrl, videoType);
+                    return;
+                }
+            }
+            
+            // For watch video button, navigate to detail page
+            const detailUrl = $this.attr('href') || $this.closest('a').attr('href');
+            if (detailUrl) {
+                window.location.href = detailUrl;
+            }
+        });
+        
+        // Function to open video modal
+        function openVideoModal(title, videoUrl, videoType) {
+            $('#videoModalLabel').text(title);
+            
+            let embedHtml = '';
+            
+            if (videoType === 'YouTube') {
+                const videoId = extractYouTubeId(videoUrl);
+                embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                            frameborder="0" allowfullscreen></iframe>`;
+            } else if (videoType === 'Vimeo') {
+                const videoId = extractVimeoId(videoUrl);
+                embedHtml = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                            frameborder="0" allowfullscreen></iframe>`;
+            } else {
+                // For uploaded videos
+                embedHtml = `<video controls autoplay style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                            <source src="${videoUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                            </video>`;
+            }
+            
+            $('#videoContainer').html(embedHtml);
+            $('#videoModal').modal('show');
+        }
+        
+        // Extract YouTube video ID
+        function extractYouTubeId(url) {
+            const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+        
+        // Extract Vimeo video ID
+        function extractVimeoId(url) {
+            const regex = /vimeo\.com\/(\d+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+        
+        // Clean up video when modal closes
+        $('#videoModal').on('hidden.bs.modal', function() {
+            $('#videoContainer').empty();
+        });
+        
+        // Handle clicks on video thumbnails
+        $(document).on('click', '.video-thumbnail', function(e) {
+            e.preventDefault();
+            const playOverlay = $(this).siblings('.video-play-overlay');
+            if (playOverlay.length) {
+                playOverlay.click();
+            }
+        });
+    </script>
 }
 
 @functions {
