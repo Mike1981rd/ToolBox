@@ -10,7 +10,8 @@
       "Bash(dotnet build)",
       "Bash(node:*)",
       "Bash(dotnet ef migrations add:*)",
-      "Bash(dotnet run)"
+      "Bash(dotnet run)",
+      "Bash(dotnet --version)"
     ],
     "deny": []
   }

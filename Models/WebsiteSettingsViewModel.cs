@@ -50,7 +50,7 @@ namespace ToolBox.Models
 
         [Url]
         [StringLength(200)]
-        public string? TiktokUrl { get; set; }
+        public string? TikTokUrl { get; set; }
 
         [Url]
         [StringLength(200)]
@@ -93,7 +93,7 @@ namespace ToolBox.Models
                 new SocialMediaConfig { Name = "YouTube", Icon = "fab fa-youtube", Url = YouTubeUrl, Key = "YouTubeUrl" },
                 new SocialMediaConfig { Name = "Instagram", Icon = "fab fa-instagram", Url = InstagramUrl, Key = "InstagramUrl" },
                 new SocialMediaConfig { Name = "Telegram", Icon = "fab fa-telegram-plane", Url = TelegramUrl, Key = "TelegramUrl" },
-                new SocialMediaConfig { Name = "TikTok", Icon = "fab fa-tiktok", Url = TiktokUrl, Key = "TiktokUrl" },
+                new SocialMediaConfig { Name = "TikTok", Icon = "fab fa-tiktok", Url = TikTokUrl, Key = "TikTokUrl" },
                 new SocialMediaConfig { Name = "Discord", Icon = "fab fa-discord", Url = DiscordUrl, Key = "DiscordUrl" },
                 new SocialMediaConfig { Name = "Reddit", Icon = "fab fa-reddit-alien", Url = RedditUrl, Key = "RedditUrl" }
             };

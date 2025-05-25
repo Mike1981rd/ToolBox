@@ -1,17 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 using ToolBox.Models;
+using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
     public class WebsiteSettingsController : Controller
     {
-        public IActionResult Index()
+        private readonly IWebsiteConfigurationService _configService;
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<WebsiteSettingsController> _logger;
+
+        public WebsiteSettingsController(
+            IWebsiteConfigurationService configService,
+            IWebHostEnvironment environment,
+            ILogger<WebsiteSettingsController> logger)
+        {
+            _configService = configService;
+            _environment = environment;
+            _logger = logger;
+        }
+
+        public async Task<IActionResult> Index()
         {
             ViewBag.BreadcrumbActiveKey = "breadcrumb_website_settings";
             ViewBag.HideTitleInLayout = true;
 
-            // Load current settings (placeholder - in real implementation, load from database)
-            var model = GetCurrentSettings();
+            // Load current settings from database
+            var config = await _configService.GetConfigurationAsync();
+            var model = MapToViewModel(config);
             
             return View(model);
         }
@@ -21,12 +38,6 @@ namespace ToolBox.Controllers
         {
             try
             {
-                // Validate model
-                if (!ModelState.IsValid)
-                {
-                    return Json(new { success = false, message = "Please correct the validation errors" });
-                }
-
                 // Process logo upload if provided
                 if (appLogo != null && appLogo.Length > 0)
                 {
@@ -37,25 +48,29 @@ namespace ToolBox.Controllers
                     }
                 }
 
-                // Save settings (placeholder - in real implementation, save to database)
-                var result = await SaveSettingsToDatabase(model);
+                // Map to entity and save
+                var config = MapToEntity(model);
+                config.LastUpdatedByUserId = GetCurrentUserId();
+                
+                var updatedConfig = await _configService.UpdateConfigurationAsync(config);
 
-                if (result)
+                // Update logo path if changed
+                if (!string.IsNullOrEmpty(model.CurrentLogoPath) && model.CurrentLogoPath != updatedConfig.LogoPath)
                 {
-                    return Json(new { 
-                        success = true, 
-                        message = "Settings saved successfully",
-                        logoPath = model.CurrentLogoPath
-                    });
+                    await _configService.UpdateLogoAsync(model.CurrentLogoPath);
                 }
-                else
-                {
-                    return Json(new { success = false, message = "Error saving settings" });
-                }
+
+                return Json(new { 
+                    success = true, 
+                    message = "Configuración guardada exitosamente",
+                    logoPath = model.CurrentLogoPath,
+                    lastUpdated = updatedConfig.LastUpdated.ToString("dd/MM/yyyy HH:mm")
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
+                _logger.LogError(ex, "Error saving website settings");
+                return Json(new { success = false, message = "Error al guardar la configuración" });
             }
         }
 
@@ -91,65 +106,100 @@ namespace ToolBox.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetSettings()
+        public async Task<IActionResult> GetSettings()
         {
             try
             {
-                var settings = GetCurrentSettings();
+                var config = await _configService.GetConfigurationAsync();
+                var settings = MapToViewModel(config);
                 return Json(new { success = true, data = settings });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error retrieving settings: {ex.Message}" });
+                _logger.LogError(ex, "Error retrieving settings");
+                return Json(new { success = false, message = "Error al obtener la configuración" });
             }
         }
 
         [HttpPost]
-        public IActionResult ResetLogo()
+        public async Task<IActionResult> ResetLogo()
         {
             try
             {
-                // Reset to default logo (placeholder)
+                await _configService.ResetLogoAsync();
                 var defaultLogoPath = "/img/toolbox-logo.svg";
                 
                 return Json(new { 
                     success = true, 
-                    message = "Logo reset to default",
+                    message = "Logo restablecido a predeterminado",
                     logoPath = defaultLogoPath
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error resetting logo: {ex.Message}" });
+                _logger.LogError(ex, "Error resetting logo");
+                return Json(new { success = false, message = "Error al restablecer el logo" });
             }
         }
 
         #region Private Methods
 
-        private WebsiteSettingsViewModel GetCurrentSettings()
+        private WebsiteSettingsViewModel MapToViewModel(WebsiteConfiguration config)
         {
-            // Placeholder - in real implementation, load from database or configuration
             return new WebsiteSettingsViewModel
             {
-                SiteEmail = "info@toolbox.com",
-                SiteAddress = "123 Business Street, City, State 12345",
-                SitePhone = "+1 (555) 123-4567",
-                FooterMessage = "© 2024 ToolBox. All rights reserved. Empowering your journey to success.",
-                SiteName = "ToolBox Admin Dashboard",
-                SiteDescription = "Comprehensive coaching and life management platform",
-                CurrentLogoPath = "/img/toolbox-logo.svg",
-                TimeZone = "UTC-5",
-                DefaultLanguage = "en",
+                SiteEmail = config.SiteEmail ?? "",
+                SiteAddress = config.SiteAddress ?? "",
+                SitePhone = config.SitePhone ?? "",
+                FooterMessage = config.FooterMessage ?? "",
+                SiteName = config.SiteName ?? "",
+                SiteDescription = config.SiteDescription ?? "",
+                CurrentLogoPath = config.LogoPath ?? "/img/toolbox-logo.svg",
+                TimeZone = config.DefaultTimeZone ?? "America/Mexico_City",
+                DefaultLanguage = config.DefaultLanguage ?? "es",
                 
-                // Sample social media links
-                FacebookUrl = "https://facebook.com/toolbox",
-                TwitterUrl = "https://twitter.com/toolbox",
-                LinkedInUrl = "https://linkedin.com/company/toolbox",
-                InstagramUrl = "https://instagram.com/toolbox",
-                YouTubeUrl = "https://youtube.com/c/toolbox",
+                // Social media links
+                FacebookUrl = config.FacebookUrl ?? "",
+                TwitterUrl = config.TwitterUrl ?? "",
+                GoogleUrl = config.GoogleUrl ?? "",
+                LinkedInUrl = config.LinkedInUrl ?? "",
+                InstagramUrl = config.InstagramUrl ?? "",
+                YouTubeUrl = config.YouTubeUrl ?? "",
+                TelegramUrl = config.TelegramUrl ?? "",
+                TikTokUrl = config.TikTokUrl ?? "",
+                DiscordUrl = config.DiscordUrl ?? "",
+                RedditUrl = config.RedditUrl ?? "",
                 
-                LastUpdated = DateTime.Now.AddDays(-7),
-                UpdatedBy = "Admin User"
+                LastUpdated = config.LastUpdated,
+                UpdatedBy = config.LastUpdatedByUser?.FullName ?? "Sistema"
+            };
+        }
+
+        private WebsiteConfiguration MapToEntity(WebsiteSettingsViewModel model)
+        {
+            return new WebsiteConfiguration
+            {
+                SiteEmail = model.SiteEmail,
+                SiteAddress = model.SiteAddress,
+                SitePhone = model.SitePhone,
+                FooterMessage = model.FooterMessage,
+                SiteName = model.SiteName,
+                SiteDescription = model.SiteDescription,
+                LogoPath = model.CurrentLogoPath,
+                DefaultTimeZone = model.TimeZone,
+                DefaultLanguage = model.DefaultLanguage,
+                
+                // Social media links
+                FacebookUrl = model.FacebookUrl,
+                TwitterUrl = model.TwitterUrl,
+                GoogleUrl = model.GoogleUrl,
+                LinkedInUrl = model.LinkedInUrl,
+                InstagramUrl = model.InstagramUrl,
+                YouTubeUrl = model.YouTubeUrl,
+                TelegramUrl = model.TelegramUrl,
+                TikTokUrl = model.TikTokUrl,
+                DiscordUrl = model.DiscordUrl,
+                RedditUrl = model.RedditUrl
             };
         }
 
@@ -175,7 +225,7 @@ namespace ToolBox.Controllers
 
                 // Generate unique filename
                 var fileName = $"logo_{Guid.NewGuid()}{fileExtension}";
-                var uploadPath = Path.Combine("wwwroot", "img", "branding");
+                var uploadPath = Path.Combine(_environment.WebRootPath, "img", "branding");
                 var fullPath = Path.Combine(uploadPath, fileName);
 
                 // Create directory if it doesn't exist
@@ -184,8 +234,11 @@ namespace ToolBox.Controllers
                     Directory.CreateDirectory(uploadPath);
                 }
 
-                // Simulate file save (in real implementation, save the actual file)
-                await Task.Delay(100); // Simulate async operation
+                // Save the file
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await logoFile.CopyToAsync(stream);
+                }
                 
                 // Return the web path
                 return $"/img/branding/{fileName}";
@@ -198,26 +251,11 @@ namespace ToolBox.Controllers
             }
         }
 
-        private async Task<bool> SaveSettingsToDatabase(WebsiteSettingsViewModel model)
+        private int GetCurrentUserId()
         {
-            try
-            {
-                // Placeholder - in real implementation, save to database
-                await Task.Delay(100); // Simulate async operation
-                
-                // Update model properties
-                model.LastUpdated = DateTime.Now;
-                model.UpdatedBy = "Current User"; // In real implementation, get from authenticated user
-                
-                // Simulate successful save
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // Log error in real implementation
-                Console.WriteLine($"Error saving settings: {ex.Message}");
-                return false;
-            }
+            // TODO: Obtener el usuario actual desde la sesión o claims
+            // Por ahora retornamos un ID hardcodeado para pruebas
+            return 1;
         }
 
         #endregion

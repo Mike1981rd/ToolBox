@@ -30,6 +30,7 @@ namespace ToolBox.Data
         public DbSet<WelcomeMessageSettings> WelcomeMessageSettings { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<WebsiteConfiguration> WebsiteConfiguration { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -289,6 +290,13 @@ namespace ToolBox.Data
                 
             modelBuilder.Entity<Video>()
                 .HasIndex(v => v.EstadoVideo);
+                
+            // WebsiteConfiguration configuration
+            modelBuilder.Entity<WebsiteConfiguration>()
+                .HasOne(w => w.LastUpdatedByUser)
+                .WithMany()
+                .HasForeignKey(w => w.LastUpdatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)

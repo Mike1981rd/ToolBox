@@ -582,6 +582,15 @@
             background: #f0f0f0;
         }
         
+        /* Uploaded video preview styles */
+        .uploaded-video-preview {
+            pointer-events: none; /* Prevent video controls from showing */
+        }
+        
+        .generated-thumbnail {
+            cursor: pointer;
+        }
+        
         /* Responsive Design */
         @@media (max-width: 1200px) {
             .featured-card-floating {
@@ -743,10 +752,15 @@
                                     {
                                         @if (video.EmbedUrl != null && video.EmbedUrl.StartsWith("/"))
                                         {
-                                            <!-- For uploaded videos, show a video element with poster -->
-                                            <video class="video-thumbnail" poster="@video.ThumbnailUrl" style="width: 100%; height: 100%; object-fit: cover;">
-                                                <source src="@video.EmbedUrl" type="video/mp4">
+                                            <!-- For uploaded videos, show a video element to capture frame -->
+                                            <video class="video-thumbnail uploaded-video-preview" 
+                                                   data-src="@video.EmbedUrl" 
+                                                   style="width: 100%; height: 100%; object-fit: cover;"
+                                                   muted
+                                                   preload="metadata">
+                                                <source src="@video.EmbedUrl#t=0.1" type="video/mp4">
                                             </video>
+                                            <canvas class="video-thumbnail-canvas" style="display: none; width: 100%; height: 100%; object-fit: cover;"></canvas>
                                             <div class="video-play-overlay" data-video-type="Upload" data-video-url="@video.EmbedUrl">
                                                 <i class="fas fa-play"></i>
                                             </div>
@@ -1056,6 +1070,59 @@
             if (playOverlay.length) {
                 playOverlay.click();
             }
+        });
+        
+        // Generate thumbnails for uploaded videos
+        $(document).ready(function() {
+            $('.uploaded-video-preview').each(function() {
+                const video = this;
+                const $video = $(video);
+                const canvas = $video.siblings('.video-thumbnail-canvas')[0];
+                
+                // Wait for video metadata to load
+                video.addEventListener('loadedmetadata', function() {
+                    // Seek to first frame
+                    video.currentTime = 0.1;
+                });
+                
+                // When first frame is loaded, capture it
+                video.addEventListener('loadeddata', function() {
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        
+                        // Draw the video frame to canvas
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        
+                        // Convert canvas to image and replace video element
+                        canvas.toBlob(function(blob) {
+                            const url = URL.createObjectURL(blob);
+                            const img = new Image();
+                            img.className = 'video-thumbnail generated-thumbnail';
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'cover';
+                            img.src = url;
+                            
+                            // Replace video with image
+                            $video.replaceWith(img);
+                            $(canvas).remove();
+                        }, 'image/jpeg', 0.8);
+                    }
+                });
+                
+                // Fallback if video fails to load
+                video.addEventListener('error', function() {
+                    const img = new Image();
+                    img.className = 'video-thumbnail';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.src = '/img/video-upload-placeholder.jpg';
+                    $video.replaceWith(img);
+                });
+            });
         });
     </script>
 }
