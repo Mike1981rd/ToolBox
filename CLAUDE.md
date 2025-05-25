@@ -171,6 +171,91 @@ if (result.success) {
 - **Lección clave**: Hard delete a veces es mejor que soft delete
 - **Problema resuelto**: Reutilizar estructura existente vs crear desde cero
 
+## 🚨 PROBLEMA CRÍTICO: GetCurrentUserId() Hardcodeado
+
+### Descripción del Problema
+Múltiples controladores tienen el método `GetCurrentUserId()` hardcodeado que retorna siempre ID=1:
+
+**Controladores Afectados:**
+- TasksController ✅
+- UsersController ✅ 
+- WheelOfLifeController ✅
+- WheelOfProgressController ✅
+- XRayLifeController ✅
+
+**Código Problemático Actual:**
+```csharp
+private int GetCurrentUserId()
+{
+    // TODO: Obtener el usuario actual desde la sesión o claims
+    // Por ahora retornamos un ID hardcodeado para pruebas
+    return 1;
+}
+```
+
+### Problemas en Producción
+1. **Todas las tareas/datos se asignan al mismo usuario** (ID=1)
+2. **No hay diferenciación entre usuarios reales**
+3. **Problemas de seguridad** - cualquiera puede ver/editar datos de todos
+4. **Foreign Key Issues** - Si no existe usuario con ID=1, falla la creación
+
+### Solución Temporal Actual (Desarrollo)
+Para desarrollo, se creó manualmente un usuario con ID=1:
+```sql
+INSERT INTO "Users" ("Id", "FullName", "UserName", "Email", "PasswordHash", "RoleId", "IsActive", "CreatedAt", "UpdatedAt")
+VALUES (1, 'Test User', 'testuser', 'test@example.com', 'temp', 2, true, NOW(), NOW());
+```
+
+**IMPORTANTE:** Este usuario temporal debe eliminarse antes de producción.
+
+### Solución para Implementación de Autenticación Real
+
+#### 1. Configurar Autenticación en Program.cs
+```csharp
+// En Program.cs - Agregar Identity o JWT
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+    });
+
+builder.Services.AddAuthorization();
+
+// En el pipeline
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
+#### 2. Actualizar GetCurrentUserId() en TODOS los Controladores
+```csharp
+private int GetCurrentUserId()
+{
+    // Implementación real con Claims
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    if (int.TryParse(userIdClaim, out int userId))
+    {
+        return userId;
+    }
+    
+    // Fallback para desarrollo
+    throw new UnauthorizedAccessException("Usuario no autenticado");
+}
+```
+
+#### 3. Checklist de Migración a Autenticación Real
+- [ ] Configurar autenticación en Program.cs
+- [ ] Crear AuthController con Login/Logout
+- [ ] Actualizar GetCurrentUserId() en TasksController
+- [ ] Actualizar GetCurrentUserId() en UsersController
+- [ ] Actualizar GetCurrentUserId() en WheelOfLifeController
+- [ ] Actualizar GetCurrentUserId() en WheelOfProgressController
+- [ ] Actualizar GetCurrentUserId() en XRayLifeController
+- [ ] Agregar [Authorize] a controladores protegidos
+- [ ] Crear vistas de Login/Register
+- [ ] Eliminar usuario temporal ID=1
+- [ ] Testear flujo completo de autenticación
+
 ## 💡 Soluciones Rápidas a Problemas Comunes
 
 ```csharp

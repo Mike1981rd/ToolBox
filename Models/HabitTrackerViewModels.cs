@@ -205,4 +205,91 @@ namespace ToolBox.Models
         public bool IsActive { get; set; } = false;
         public string CssClass { get; set; } = string.Empty;
     }
+
+    /// <summary>
+    /// ViewModel for creating/editing habits
+    /// </summary>
+    public class HabitoCreateEditViewModel
+    {
+        public int Id { get; set; }
+        
+        public string? Nombre { get; set; } = string.Empty;
+        
+        public string? Descripcion { get; set; }
+        
+        public string? Color { get; set; } = "#3498db";
+        
+        public int CategoriaHabitoId { get; set; }
+        
+        public int FrecuenciaHabitoId { get; set; }
+        
+        public bool HabilitarRecordatorios { get; set; } = false;
+    }
+
+    /// <summary>
+    /// ViewModel for habit categories
+    /// </summary>
+    public class CategoriaHabitoViewModel
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string? Descripcion { get; set; }
+        public string IconClass { get; set; } = "fas fa-star";
+        public string Color { get; set; } = "#3498db";
+        public int OrdenVisualizacion { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel for habit frequencies
+    /// </summary>
+    public class FrecuenciaHabitoViewModel
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string? Descripcion { get; set; }
+        public int DiasIntervalo { get; set; }
+        public int OrdenVisualizacion { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel for habit compliance records
+    /// </summary>
+    public class RegistroCumplimientoViewModel
+    {
+        public int HabitoId { get; set; }
+        public DateTime Fecha { get; set; }
+        public bool Cumplido { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel for batch saving compliance records
+    /// </summary>
+    public class GuardarRegistrosViewModel
+    {
+        public List<RegistroCumplimientoViewModel> Registros { get; set; } = new List<RegistroCumplimientoViewModel>();
+    }
+
+    /// <summary>
+    /// ViewModel for habits with their compliance records in a date range
+    /// </summary>
+    public class HabitosConRegistrosViewModel
+    {
+        public List<HabitViewModel> Habitos { get; set; } = new List<HabitViewModel>();
+        public Dictionary<int, List<RegistroCumplimientoViewModel>> RegistrosPorHabito { get; set; } = new Dictionary<int, List<RegistroCumplimientoViewModel>>();
+        public DateTime FechaDesde { get; set; }
+        public DateTime FechaHasta { get; set; }
+        public HabitStatisticsViewModel Estadisticas { get; set; } = new HabitStatisticsViewModel();
+        public List<CategoriaHabitoViewModel> Categorias { get; set; } = new List<CategoriaHabitoViewModel>();
+        public List<FrecuenciaHabitoViewModel> Frecuencias { get; set; } = new List<FrecuenciaHabitoViewModel>();
+    }
+
+    /// <summary>
+    /// ViewModel for habit progress chart data
+    /// </summary>
+    public class HabitoProgresoChartViewModel
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public decimal Porcentaje { get; set; }
+        public string Color { get; set; } = "#3498db";
+    }
 }

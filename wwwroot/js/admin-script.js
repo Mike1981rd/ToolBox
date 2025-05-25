@@ -2823,64 +2823,88 @@ function initializeChart() {
     const lightPurple = 'rgba(163, 180, 252, 0.3)';
     const borderPurple = '#4338ca';
     
+    // Create gradient for bars
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.8)');
+    
+    // Register the plugin
+    Chart.register(ChartDataLabels);
+    
     habitProgressChart = new Chart(ctx, {
-        type: 'radar',
+        type: 'bar',
         data: {
             labels: [],
             datasets: [{
-                label: 'Tasa de Compleción (%)',
+                label: 'Progreso del Hábito',
                 data: [],
-                backgroundColor: lightPurple,
+                backgroundColor: gradient,
                 borderColor: primaryPurple,
-                borderWidth: 3,
-                pointBackgroundColor: primaryPurple,
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverBackgroundColor: '#ffffff',
-                pointHoverBorderColor: borderPurple,
-                pointHoverRadius: 7,
-                pointHoverBorderWidth: 3
+                borderWidth: 0,
+                borderRadius: 8,
+                barThickness: 30,
+                maxBarThickness: 40,
+                borderSkipped: false
             }]
         },
         options: {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             devicePixelRatio: devicePixelRatio,
             animation: {
-                duration: 800,
-                easing: 'easeInOutQuart'
+                duration: 1000,
+                easing: 'easeInOutCubic',
+                delay: (context) => {
+                    let delay = 0;
+                    if (context.type === 'data' && context.mode === 'default') {
+                        delay = context.dataIndex * 100;
+                    }
+                    return delay;
+                }
+            },
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                }
             },
             scales: {
-                r: {
+                x: {
                     beginAtZero: true,
                     max: 100,
-                    min: 0,
+                    grid: {
+                        display: true,
+                        drawBorder: false,
+                        color: 'rgba(226, 232, 240, 0.5)',
+                        lineWidth: 1
+                    },
                     ticks: {
-                        stepSize: 20,
+                        stepSize: 25,
                         color: '#64748b',
                         font: {
                             size: 12,
-                            weight: '500'
+                            weight: '500',
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
                         },
-                        backdropColor: 'transparent',
                         callback: function(value) {
                             return value + '%';
                         }
-                    },
+                    }
+                },
+                y: {
                     grid: {
-                        color: '#e2e8f0',
-                        lineWidth: 1
+                        display: false,
+                        drawBorder: false
                     },
-                    angleLines: {
-                        color: '#e2e8f0',
-                        lineWidth: 1
-                    },
-                    pointLabels: {
+                    ticks: {
                         color: '#1e293b',
                         font: {
-                            size: 13,
-                            weight: '600'
+                            size: 14,
+                            weight: '600',
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
                         },
                         padding: 10
                     }
@@ -2891,37 +2915,71 @@ function initializeChart() {
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
                     titleColor: '#ffffff',
-                    bodyColor: '#ffffff',
+                    bodyColor: '#e2e8f0',
                     borderColor: primaryPurple,
-                    borderWidth: 2,
-                    cornerRadius: 8,
-                    padding: 12,
+                    borderWidth: 1,
+                    cornerRadius: 12,
+                    padding: 16,
+                    displayColors: false,
                     titleFont: {
-                        size: 14,
-                        weight: '600'
+                        size: 15,
+                        weight: '600',
+                        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
                     },
                     bodyFont: {
-                        size: 13,
-                        weight: '500'
+                        size: 14,
+                        weight: '400',
+                        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
                     },
                     callbacks: {
                         title: function(context) {
                             return context[0].label;
                         },
                         label: function(context) {
-                            return `Compleción: ${context.parsed.r}%`;
+                            const value = context.parsed.x;
+                            const progressBar = '█'.repeat(Math.floor(value / 10)) + '░'.repeat(10 - Math.floor(value / 10));
+                            return [`Progreso: ${value}%`, progressBar];
+                        },
+                        afterLabel: function(context) {
+                            const dataIndex = context.dataIndex;
+                            const totalDays = 7; // You can make this dynamic
+                            const daysCompleted = Math.round((context.parsed.x / 100) * totalDays);
+                            return `${daysCompleted} de ${totalDays} días completados`;
                         }
                     }
-                }
-            },
-            elements: {
-                line: {
-                    tension: 0.2
+                },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#1e293b',
+                    font: {
+                        size: 14,
+                        weight: '700',
+                        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                    },
+                    formatter: function(value) {
+                        return value + '%';
+                    },
+                    padding: {
+                        right: 10
+                    }
                 }
             }
-        }
+        },
+        plugins: [{
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart) => {
+                const ctx = chart.canvas.getContext('2d');
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        }]
     });
     
     console.log('Habit tracker chart initialized successfully with enhanced clarity');
@@ -2969,19 +3027,34 @@ function updateChart() {
             habitProgressChart.data.labels = labels;
             habitProgressChart.data.datasets[0].data = completionRates;
             
-            // Handle colors
-            if (colors.length > 0) {
-                habitProgressChart.data.datasets[0].backgroundColor = colors.map(color => color + '33');
-                habitProgressChart.data.datasets[0].borderColor = colors;
-                habitProgressChart.data.datasets[0].pointBackgroundColor = colors;
+            // Create individual gradients for each bar based on habit colors
+            const ctx = habitProgressChart.ctx;
+            const chartArea = habitProgressChart.chartArea;
+            
+            if (colors.length > 0 && chartArea) {
+                const gradients = colors.map(color => {
+                    const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+                    gradient.addColorStop(0, color + '40'); // 25% opacity
+                    gradient.addColorStop(0.5, color + '80'); // 50% opacity
+                    gradient.addColorStop(1, color + 'CC'); // 80% opacity
+                    return gradient;
+                });
+                
+                habitProgressChart.data.datasets[0].backgroundColor = gradients;
+                habitProgressChart.data.datasets[0].borderColor = colors.map(color => color + 'FF');
+                habitProgressChart.data.datasets[0].borderWidth = 2;
             } else {
-                // Default colors when no data
-                habitProgressChart.data.datasets[0].backgroundColor = 'rgba(54, 162, 235, 0.2)';
-                habitProgressChart.data.datasets[0].borderColor = 'rgba(54, 162, 235, 1)';
-                habitProgressChart.data.datasets[0].pointBackgroundColor = 'rgba(54, 162, 235, 1)';
+                // Default gradient when no data
+                const defaultGradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+                defaultGradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+                defaultGradient.addColorStop(1, 'rgba(99, 102, 241, 0.8)');
+                habitProgressChart.data.datasets[0].backgroundColor = defaultGradient;
+                habitProgressChart.data.datasets[0].borderColor = '#6366f1';
+                habitProgressChart.data.datasets[0].borderWidth = 0;
             }
             
-            habitProgressChart.update();
+            // Smooth update with animation
+            habitProgressChart.update('active');
             console.log('Chart updated successfully');
             
             // Update statistics
@@ -3012,20 +3085,49 @@ function updateStatistics(data) {
  * Save habit log entry
  */
 function saveHabitLog(habitId, date, isCompleted) {
-    const formData = new FormData();
-    formData.append('habitId', habitId);
-    formData.append('date', date);
-    formData.append('isCompleted', isCompleted);
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : '';
+    
+    // Ensure date is in correct format (YYYY-MM-DD)
+    const formattedDate = new Date(date).toISOString().split('T')[0];
+    
+    const logData = {
+        Registros: [
+            {
+                HabitoId: parseInt(habitId),
+                Fecha: formattedDate + 'T00:00:00.000Z', // ISO format for compatibility
+                Cumplido: isCompleted
+            }
+        ]
+    };
     
     fetch('/HabitTracker/SaveHabitLog', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify(logData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update progress display for this habit
-            updateHabitProgress(habitId, data.completionPercentage, data.currentStreak);
+            // Calculate completion percentage locally
+            const habitRow = document.querySelector(`tr:has(.habit-checkbox[data-habit-id="${habitId}"])`);
+            if (habitRow) {
+                const checkboxes = habitRow.querySelectorAll(`.habit-checkbox[data-habit-id="${habitId}"]`);
+                const checkedCount = habitRow.querySelectorAll(`.habit-checkbox[data-habit-id="${habitId}"]:checked`).length;
+                const totalCount = checkboxes.length;
+                const completionPercentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+                
+                // Update progress display for this habit
+                updateHabitProgress(habitId, completionPercentage, 0); // currentStreak not provided by server
+            }
+            
+            // Update overall success rate if provided
+            if (data.data && data.data.OverallSuccessRate !== undefined) {
+                document.getElementById('overallSuccessRate').textContent = `${Math.round(data.data.OverallSuccessRate)}%`;
+            }
             
             // Update chart if we're on the chart tab
             if (document.getElementById('progress-chart-tab').classList.contains('active')) {
@@ -3034,7 +3136,7 @@ function saveHabitLog(habitId, date, isCompleted) {
             
             showToast('Habit updated successfully', 'success');
         } else {
-            showToast('Error updating habit', 'error');
+            showToast(data.message || 'Error updating habit', 'error');
         }
     })
     .catch(error => {
@@ -3158,19 +3260,26 @@ function updateOverallSuccessRate() {
  * Save all habit logs
  */
 function saveAllHabitLogs() {
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : '';
+    
     const checkboxes = document.querySelectorAll('.habit-checkbox');
     const logEntries = [];
     
     checkboxes.forEach(checkbox => {
+        const date = checkbox.getAttribute('data-date');
+        const formattedDate = new Date(date).toISOString().split('T')[0] + 'T00:00:00.000Z';
+        
         logEntries.push({
-            habitId: checkbox.getAttribute('data-habit-id'),
-            date: checkbox.getAttribute('data-date'),
-            isCompleted: checkbox.checked
+            HabitoId: parseInt(checkbox.getAttribute('data-habit-id')),
+            Fecha: formattedDate,
+            Cumplido: checkbox.checked
         });
     });
     
-    const formData = new FormData();
-    formData.append('logEntries', JSON.stringify(logEntries));
+    const logData = {
+        Registros: logEntries
+    };
     
     // Show loading state
     const saveLogBtn = document.getElementById('saveLogBtn');
@@ -3178,9 +3287,13 @@ function saveAllHabitLogs() {
     saveLogBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
     saveLogBtn.disabled = true;
     
-    fetch('/HabitTracker/SaveAllHabitLogs', {
+    fetch('/HabitTracker/SaveHabitLog', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify(logData)
     })
     .then(response => response.json())
     .then(data => {
@@ -3210,25 +3323,30 @@ function saveAllHabitLogs() {
  * Add new habit
  */
 window.addNewHabit = function(habitData) {
-    const formData = new FormData();
-    Object.keys(habitData).forEach(key => {
-        if (Array.isArray(habitData[key])) {
-            habitData[key].forEach(value => formData.append(key, value));
-        } else {
-            formData.append(key, habitData[key]);
-        }
-    });
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : '';
     
     fetch('/HabitTracker/AddHabit', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify({
+            Nombre: habitData.nombre || "",
+            Descripcion: habitData.descripcion || "",
+            Color: habitData.color || "#3498db",
+            CategoriaHabitoId: parseInt(habitData.categoriaHabitoId || 1),
+            FrecuenciaHabitoId: parseInt(habitData.frecuenciaHabitoId || 1),
+            HabilitarRecordatorios: habitData.habilitarRecordatorios || false
+        })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addHabitModal'));
-            modal.hide();
+            // Close offcanvas
+            const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('addHabitModal'));
+            offcanvas.hide();
             
             // Reset form
             document.getElementById('addHabitForm').reset();
@@ -3251,11 +3369,17 @@ window.addNewHabit = function(habitData) {
  * Delete habit
  */
 function deleteHabit(habitId) {
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : '';
+    
     const formData = new FormData();
-    formData.append('id', habitId);
+    formData.append('habitId', habitId);
     
     fetch('/HabitTracker/DeleteHabit', {
         method: 'POST',
+        headers: {
+            'RequestVerificationToken': token
+        },
         body: formData
     })
     .then(response => response.json())
@@ -3267,8 +3391,13 @@ function deleteHabit(habitId) {
                 habitRow.remove();
             }
             
-            // Update chart
-            updateChart();
+            // Update overall success rate after deletion
+            updateOverallSuccessRate();
+            
+            // Update chart if on chart tab
+            if (document.getElementById('progress-chart-tab').classList.contains('active')) {
+                updateChart();
+            }
             
             showToast('Habit deleted successfully', 'success');
         } else {

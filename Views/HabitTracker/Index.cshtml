@@ -22,7 +22,7 @@
                 <div class="habit-tracker-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="habit-tracker-title" data-translate-key="habitTracker.title">Habit Tracker</h1>
-                        <button type="button" class="habit-add-button" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+                        <button type="button" class="habit-add-button" data-bs-toggle="offcanvas" data-bs-target="#addHabitModal">
                             <i class="fas fa-plus me-2"></i>
                             <span data-translate-key="habitTracker.addHabit">Add Habit</span>
                         </button>
@@ -257,12 +257,16 @@
     </div>
 </div>
 
+<!-- CSRF Token -->
+@Html.AntiForgeryToken()
+
 <!-- Add Habit Modal -->
 @await Html.PartialAsync("_AddHabitModal")
 
 @section Scripts {
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
     <!-- Custom JavaScript -->
     <script>

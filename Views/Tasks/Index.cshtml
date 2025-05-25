@@ -818,16 +818,15 @@
                         <textarea id="taskDescription" 
                                   class="form-textarea" 
                                   placeholder="Describe tu tarea..."
-                                  maxlength="500"
-                                  required></textarea>
+                                  maxlength="500"></textarea>
                     </div>
                     
                     <div class="checkbox-group">
-                        <div class="checkbox-item" onclick="toggleCheckbox('taskUrgent')">
+                        <div class="checkbox-item">
                             <input type="checkbox" id="taskUrgent" name="urgent">
                             <label for="taskUrgent" data-translate-key="labels.urgent">Urgente</label>
                         </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox('taskImportant')">
+                        <div class="checkbox-item">
                             <input type="checkbox" id="taskImportant" name="important">
                             <label for="taskImportant" data-translate-key="labels.important">Importante</label>
                         </div>
@@ -861,6 +860,9 @@
     </div>
 </div>
 
+<!-- CSRF Token -->
+@Html.AntiForgeryToken()
+
 <!-- Edit Task Modal -->
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -876,16 +878,15 @@
                         <label class="form-label" data-translate-key="labels.taskDescription">Descripción de la Tarea</label>
                         <textarea id="editTaskDescription" 
                                   class="form-textarea" 
-                                  maxlength="500"
-                                  required></textarea>
+                                  maxlength="500"></textarea>
                     </div>
                     
                     <div class="checkbox-group">
-                        <div class="checkbox-item" onclick="toggleCheckbox('editTaskUrgent')">
+                        <div class="checkbox-item">
                             <input type="checkbox" id="editTaskUrgent" name="urgent">
                             <label for="editTaskUrgent" data-translate-key="labels.urgent">Urgente</label>
                         </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox('editTaskImportant')">
+                        <div class="checkbox-item">
                             <input type="checkbox" id="editTaskImportant" name="important">
                             <label for="editTaskImportant" data-translate-key="labels.important">Importante</label>
                         </div>
@@ -975,11 +976,6 @@
                 const isUrgent = $('#taskUrgent').is(':checked');
                 const isImportant = $('#taskImportant').is(':checked');
 
-                if (!description) {
-                    this.showFormMessage('error', 'Por favor, ingresa una descripción para la tarea.');
-                    return;
-                }
-
                 this.config.isLoading = true;
                 const $submitBtn = $('.btn-add-task');
                 const originalText = $submitBtn.html();
@@ -987,15 +983,20 @@
                 $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Añadiendo...');
 
                 const taskData = {
-                    description: description,
-                    isUrgent: isUrgent,
-                    isImportant: isImportant
+                    Description: description,
+                    IsUrgent: isUrgent,
+                    IsImportant: isImportant
                 };
 
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
                 $.ajax({
                     url: `${this.config.baseUrl}/AddTask`,
                     method: 'POST',
                     contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     data: JSON.stringify(taskData),
                     success: (response) => {
                         if (response.success) {
@@ -1026,22 +1027,22 @@
                 const isUrgent = $('#editTaskUrgent').is(':checked');
                 const isImportant = $('#editTaskImportant').is(':checked');
 
-                if (!description) {
-                    alert('Por favor, ingresa una descripción para la tarea.');
-                    return;
-                }
-
                 const taskData = {
-                    taskId: taskId,
-                    description: description,
-                    isUrgent: isUrgent,
-                    isImportant: isImportant
+                    TaskId: taskId,
+                    Description: description,
+                    IsUrgent: isUrgent,
+                    IsImportant: isImportant
                 };
 
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
                 $.ajax({
                     url: `${this.config.baseUrl}/UpdateTask`,
                     method: 'POST',
                     contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     data: JSON.stringify(taskData),
                     success: (response) => {
                         if (response.success) {
@@ -1070,10 +1071,15 @@
                     return;
                 }
 
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
                 $.ajax({
                     url: `${this.config.baseUrl}/DeleteTask`,
                     method: 'POST',
-                    data: { taskId: taskId },
+                    data: { 
+                        taskId: taskId,
+                        __RequestVerificationToken: token
+                    },
                     success: (response) => {
                         if (response.success) {
                             // Remove task from local array
@@ -1093,10 +1099,15 @@
 
             // Toggle task completion
             toggleTaskCompletion: function(taskId) {
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
                 $.ajax({
                     url: `${this.config.baseUrl}/ToggleTaskCompletion`,
                     method: 'POST',
-                    data: { taskId: taskId },
+                    data: { 
+                        taskId: taskId,
+                        __RequestVerificationToken: token
+                    },
                     success: (response) => {
                         if (response.success) {
                             // Update task in local array
@@ -1276,16 +1287,23 @@
             }
         };
 
-        // Toggle checkbox function for styling
-        function toggleCheckbox(checkboxId) {
-            const checkbox = document.getElementById(checkboxId);
-            checkbox.checked = !checkbox.checked;
-            TasksManager.updateCheckboxStyles();
-        }
-
         // Initialize when document is ready
         $(document).ready(function() {
             TasksManager.init();
+            
+            // Handle checkbox clicks properly
+            $('.checkbox-item').on('click', function(e) {
+                if (e.target.tagName !== 'INPUT') {
+                    const checkbox = $(this).find('input[type="checkbox"]');
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                    TasksManager.updateCheckboxStyles();
+                }
+            });
+            
+            // Update styles when checkbox is clicked directly
+            $('.checkbox-item input[type="checkbox"]').on('change', function() {
+                TasksManager.updateCheckboxStyles();
+            });
         });
     </script>
 }

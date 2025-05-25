@@ -1,26 +1,43 @@
 using Microsoft.AspNetCore.Mvc;
 using ToolBox.Models;
+using ToolBox.Interfaces;
+using ToolBox.Data;
 
 namespace ToolBox.Controllers
 {
     public class TasksController : Controller
     {
-        private static List<TaskViewModel> _mockTasks = new List<TaskViewModel>();
-        private static int _nextTaskId = 1;
+        private readonly ITareaService _tareaService;
+        private readonly ILogger<TasksController> _logger;
+
+        public TasksController(ITareaService tareaService, ILogger<TasksController> logger)
+        {
+            _tareaService = tareaService;
+            _logger = logger;
+        }
 
         public async Task<IActionResult> Index()
         {
-            // Initialize with some mock data if empty
-            if (!_mockTasks.Any())
+            var userId = GetCurrentUserId();
+            var tareas = await _tareaService.GetAllTareasAsync(userId);
+            var statistics = await _tareaService.GetEstadisticasAsync(userId);
+            
+            // Convertir Tarea a TaskViewModel
+            var taskViewModels = tareas.Select(t => new TaskViewModel
             {
-                InitializeMockData();
-            }
-
-            var statistics = CalculateStatistics(_mockTasks);
+                TaskId = t.Id,
+                Description = t.Descripcion,
+                IsUrgent = t.EsUrgente,
+                IsImportant = t.EsImportante,
+                IsCompleted = t.EstaCompletada,
+                CreatedAt = t.FechaCreacion,
+                CompletedAt = t.FechaCompletado,
+                UpdatedAt = t.FechaActualizacion
+            }).ToList();
             
             var viewModel = new TasksPageViewModel
             {
-                Tasks = _mockTasks.OrderByDescending(t => t.CreatedAt).ToList(),
+                Tasks = taskViewModels,
                 Statistics = statistics
             };
 
@@ -28,194 +45,191 @@ namespace ToolBox.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> AddTask([FromBody] TaskFormViewModel taskForm)
         {
             try
             {
-                // Validate input
-                if (string.IsNullOrWhiteSpace(taskForm.Description))
+                // No validar ModelState para permitir cualquier tipo de guardado
+                var userId = GetCurrentUserId();
+                
+                // Log para debugging
+                _logger.LogInformation($"Attempting to create task for userId: {userId}");
+                _logger.LogInformation($"Task description: '{taskForm.Description}'");
+                
+                var nuevaTarea = new Tarea
                 {
-                    return Json(new TaskResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Task description is required",
-                        Errors = new List<string> { "Description cannot be empty" }
-                    });
-                }
-
-                // Create new task
-                var newTask = new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = taskForm.Description.Trim(),
-                    IsUrgent = taskForm.IsUrgent,
-                    IsImportant = taskForm.IsImportant,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
+                    UsuarioId = userId,
+                    Descripcion = taskForm.Description?.Trim() ?? "",
+                    EsUrgente = taskForm.IsUrgent,
+                    EsImportante = taskForm.IsImportant
                 };
 
-                // Simulate async operation
-                await Task.Delay(300);
+                var tareaCreada = await _tareaService.CreateTareaAsync(nuevaTarea);
 
-                // Add to mock storage
-                _mockTasks.Add(newTask);
+                var taskViewModel = new TaskViewModel
+                {
+                    TaskId = tareaCreada.Id,
+                    Description = tareaCreada.Descripcion,
+                    IsUrgent = tareaCreada.EsUrgente,
+                    IsImportant = tareaCreada.EsImportante,
+                    IsCompleted = tareaCreada.EstaCompletada,
+                    CreatedAt = tareaCreada.FechaCreacion,
+                    UpdatedAt = tareaCreada.FechaActualizacion
+                };
 
                 return Json(new TaskResponseViewModel
                 {
                     Success = true,
-                    Message = "Task added successfully!",
-                    Task = newTask,
+                    Message = "Tarea agregada exitosamente",
+                    Task = taskViewModel,
                     ActionDate = DateTime.Now
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error adding task");
                 return Json(new TaskResponseViewModel
                 {
                     Success = false,
-                    Message = "An error occurred while adding the task",
-                    Errors = new List<string> { ex.Message }
+                    Message = $"Error al agregar la tarea: {ex.Message}",
+                    Errors = new List<string> { ex.Message, ex.InnerException?.Message ?? "" }
                 });
             }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> UpdateTask([FromBody] TaskViewModel task)
         {
             try
             {
-                var existingTask = _mockTasks.FirstOrDefault(t => t.TaskId == task.TaskId);
-                
-                if (existingTask == null)
+
+                var userId = GetCurrentUserId();
+                var tareaToUpdate = new Tarea
+                {
+                    Id = task.TaskId,
+                    UsuarioId = userId,
+                    Descripcion = task.Description?.Trim() ?? "",
+                    EsUrgente = task.IsUrgent,
+                    EsImportante = task.IsImportant
+                };
+
+                var success = await _tareaService.UpdateTareaAsync(tareaToUpdate);
+
+                if (!success)
                 {
                     return Json(new TaskResponseViewModel
                     {
                         Success = false,
-                        Message = "Task not found",
-                        Errors = new List<string> { "The task you're trying to update doesn't exist" }
+                        Message = "Tarea no encontrada"
                     });
                 }
 
-                // Validate input
-                if (string.IsNullOrWhiteSpace(task.Description))
-                {
-                    return Json(new TaskResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Task description is required",
-                        Errors = new List<string> { "Description cannot be empty" }
-                    });
-                }
-
-                // Update task properties
-                existingTask.Description = task.Description.Trim();
-                existingTask.IsUrgent = task.IsUrgent;
-                existingTask.IsImportant = task.IsImportant;
-                existingTask.UpdatedAt = DateTime.Now;
-
-                // Simulate async operation
-                await Task.Delay(200);
-
-                return Json(new TaskResponseViewModel
-                {
-                    Success = true,
-                    Message = "Task updated successfully!",
-                    Task = existingTask,
-                    ActionDate = DateTime.Now
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new TaskResponseViewModel
-                {
-                    Success = false,
-                    Message = "An error occurred while updating the task",
-                    Errors = new List<string> { ex.Message }
-                });
-            }
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> DeleteTask(int taskId)
-        {
-            try
-            {
-                var taskToDelete = _mockTasks.FirstOrDefault(t => t.TaskId == taskId);
-                
-                if (taskToDelete == null)
-                {
-                    return Json(new TaskResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Task not found",
-                        Errors = new List<string> { "The task you're trying to delete doesn't exist" }
-                    });
-                }
-
-                // Simulate async operation
-                await Task.Delay(200);
-
-                // Remove from mock storage
-                _mockTasks.Remove(taskToDelete);
-
-                return Json(new TaskResponseViewModel
-                {
-                    Success = true,
-                    Message = "Task deleted successfully!",
-                    ActionDate = DateTime.Now
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new TaskResponseViewModel
-                {
-                    Success = false,
-                    Message = "An error occurred while deleting the task",
-                    Errors = new List<string> { ex.Message }
-                });
-            }
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> ToggleTaskCompletion(int taskId)
-        {
-            try
-            {
-                var task = _mockTasks.FirstOrDefault(t => t.TaskId == taskId);
-                
-                if (task == null)
-                {
-                    return Json(new TaskResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Task not found"
-                    });
-                }
-
-                // Toggle completion status
-                task.IsCompleted = !task.IsCompleted;
-                task.CompletedAt = task.IsCompleted ? DateTime.Now : null;
                 task.UpdatedAt = DateTime.Now;
 
-                // Simulate async operation
-                await Task.Delay(150);
-
                 return Json(new TaskResponseViewModel
                 {
                     Success = true,
-                    Message = task.IsCompleted ? "Task marked as completed!" : "Task marked as pending!",
+                    Message = "Tarea actualizada exitosamente",
                     Task = task,
                     ActionDate = DateTime.Now
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating task {TaskId}", task.TaskId);
                 return Json(new TaskResponseViewModel
                 {
                     Success = false,
-                    Message = "An error occurred while updating the task",
-                    Errors = new List<string> { ex.Message }
+                    Message = "Error al actualizar la tarea"
+                });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> DeleteTask(int taskId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var success = await _tareaService.DeleteTareaAsync(taskId, userId);
+
+                if (!success)
+                {
+                    return Json(new TaskResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Tarea no encontrada"
+                    });
+                }
+
+                return Json(new TaskResponseViewModel
+                {
+                    Success = true,
+                    Message = "Tarea eliminada exitosamente",
+                    ActionDate = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting task {TaskId}", taskId);
+                return Json(new TaskResponseViewModel
+                {
+                    Success = false,
+                    Message = "Error al eliminar la tarea"
+                });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> ToggleTaskCompletion(int taskId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var success = await _tareaService.ToggleCompletadaAsync(taskId, userId);
+
+                if (!success)
+                {
+                    return Json(new TaskResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Tarea no encontrada"
+                    });
+                }
+
+                // Obtener la tarea actualizada para devolver
+                var tarea = await _tareaService.GetTareaByIdAsync(taskId, userId);
+                var taskViewModel = new TaskViewModel
+                {
+                    TaskId = tarea.Id,
+                    Description = tarea.Descripcion,
+                    IsUrgent = tarea.EsUrgente,
+                    IsImportant = tarea.EsImportante,
+                    IsCompleted = tarea.EstaCompletada,
+                    CreatedAt = tarea.FechaCreacion,
+                    CompletedAt = tarea.FechaCompletado,
+                    UpdatedAt = tarea.FechaActualizacion
+                };
+
+                return Json(new TaskResponseViewModel
+                {
+                    Success = true,
+                    Message = tarea.EstaCompletada ? "Tarea marcada como completada" : "Tarea marcada como pendiente",
+                    Task = taskViewModel,
+                    ActionDate = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error toggling task completion {TaskId}", taskId);
+                return Json(new TaskResponseViewModel
+                {
+                    Success = false,
+                    Message = "Error al actualizar el estado de la tarea"
                 });
             }
         }
@@ -223,80 +237,16 @@ namespace ToolBox.Controllers
         [HttpGet]
         public async Task<JsonResult> GetTaskStatistics()
         {
-            var statistics = CalculateStatistics(_mockTasks);
+            var userId = GetCurrentUserId();
+            var statistics = await _tareaService.GetEstadisticasAsync(userId);
             return Json(statistics);
         }
 
-        private void InitializeMockData()
+        private int GetCurrentUserId()
         {
-            _mockTasks.AddRange(new List<TaskViewModel>
-            {
-                new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = "Fix critical production bug",
-                    IsUrgent = true,
-                    IsImportant = true,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now.AddHours(-2),
-                    UpdatedAt = DateTime.Now.AddHours(-2)
-                },
-                new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = "Plan next quarter strategy",
-                    IsUrgent = false,
-                    IsImportant = true,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now.AddHours(-4),
-                    UpdatedAt = DateTime.Now.AddHours(-4)
-                },
-                new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = "Respond to client email",
-                    IsUrgent = true,
-                    IsImportant = false,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now.AddHours(-1),
-                    UpdatedAt = DateTime.Now.AddHours(-1)
-                },
-                new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = "Check social media notifications",
-                    IsUrgent = false,
-                    IsImportant = false,
-                    IsCompleted = true,
-                    CreatedAt = DateTime.Now.AddHours(-3),
-                    UpdatedAt = DateTime.Now.AddMinutes(-30),
-                    CompletedAt = DateTime.Now.AddMinutes(-30)
-                },
-                new TaskViewModel
-                {
-                    TaskId = _nextTaskId++,
-                    Description = "Review team performance reports",
-                    IsUrgent = false,
-                    IsImportant = true,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now.AddHours(-6),
-                    UpdatedAt = DateTime.Now.AddHours(-6)
-                }
-            });
-        }
-
-        private TaskStatisticsViewModel CalculateStatistics(List<TaskViewModel> tasks)
-        {
-            return new TaskStatisticsViewModel
-            {
-                TotalTasks = tasks.Count,
-                CompletedTasks = tasks.Count(t => t.IsCompleted),
-                PendingTasks = tasks.Count(t => !t.IsCompleted),
-                UrgentImportantCount = tasks.Count(t => t.IsUrgent && t.IsImportant),
-                NotUrgentImportantCount = tasks.Count(t => !t.IsUrgent && t.IsImportant),
-                UrgentNotImportantCount = tasks.Count(t => t.IsUrgent && !t.IsImportant),
-                NotUrgentNotImportantCount = tasks.Count(t => !t.IsUrgent && !t.IsImportant)
-            };
+            // TODO: Obtener el usuario actual desde la sesión o claims
+            // Por ahora retornamos un ID hardcodeado para pruebas
+            return 1;
         }
     }
 }

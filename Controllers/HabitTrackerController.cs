@@ -1,194 +1,284 @@
 using Microsoft.AspNetCore.Mvc;
 using ToolBox.Models;
+using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
     public class HabitTrackerController : Controller
     {
-        private static List<HabitViewModel> _mockHabits = new List<HabitViewModel>();
-        private static List<HabitLogEntryViewModel> _mockLogEntries = new List<HabitLogEntryViewModel>();
-        private static int _nextHabitId = 1;
+        private readonly IHabitoService _habitoService;
+        private readonly ILogger<HabitTrackerController> _logger;
+
+        public HabitTrackerController(IHabitoService habitoService, ILogger<HabitTrackerController> logger)
+        {
+            _habitoService = habitoService;
+            _logger = logger;
+        }
 
         public async Task<IActionResult> Index()
         {
-            // Initialize with some mock data if empty
-            if (!_mockHabits.Any())
-            {
-                InitializeMockData();
-            }
-
+            var userId = GetCurrentUserId();
             var currentWeekStart = GetStartOfWeek(DateTime.Now);
             var currentWeekEnd = currentWeekStart.AddDays(6);
 
-            // Generate daily statuses for current week
-            foreach (var habit in _mockHabits)
+            // Obtener hábitos con registros para la semana actual
+            var habitosConRegistros = await _habitoService.GetHabitosConRegistrosAsync(userId, currentWeekStart, currentWeekEnd);
+
+            // Convertir a formato compatible con la vista existente
+            var habits = habitosConRegistros.Habitos.Select(h => 
             {
-                habit.DailyStatuses = GenerateDailyStatuses(habit.HabitId, currentWeekStart, currentWeekEnd);
-                CalculateHabitMetrics(habit);
-            }
+                var habitViewModel = new HabitViewModel
+                {
+                    HabitId = h.HabitId,
+                    HabitName = h.HabitName,
+                    Description = h.Description,
+                    IconOrColor = h.IconOrColor,
+                    CreatedAt = h.CreatedAt,
+                    IsActive = h.IsActive,
+                    DailyStatuses = new List<DailyStatusViewModel>()
+                };
+
+                // Generar estados diarios para la semana actual
+                for (var date = currentWeekStart; date <= currentWeekEnd; date = date.AddDays(1))
+                {
+                    var registro = habitosConRegistros.RegistrosPorHabito.ContainsKey(h.HabitId)
+                        ? habitosConRegistros.RegistrosPorHabito[h.HabitId].FirstOrDefault(r => r.Fecha.Date == date.Date)
+                        : null;
+
+                    habitViewModel.DailyStatuses.Add(new DailyStatusViewModel
+                    {
+                        Date = date,
+                        IsCompleted = registro?.Cumplido ?? false
+                    });
+                }
+
+                // Calcular métricas
+                habitViewModel.DaysMet = habitViewModel.DailyStatuses.Count(d => d.IsCompleted);
+                var totalDays = habitViewModel.DailyStatuses.Count;
+                habitViewModel.PercentageMet = totalDays > 0 ? Math.Round((decimal)habitViewModel.DaysMet / totalDays * 100, 1) : 0;
+
+                return habitViewModel;
+            }).ToList();
 
             var viewModel = new HabitTrackerPageViewModel
             {
-                Habits = _mockHabits.Where(h => h.IsActive).ToList(),
+                Habits = habits,
                 WeekStartDate = currentWeekStart,
                 WeekEndDate = currentWeekEnd,
                 CurrentWeekStart = currentWeekStart,
                 CurrentWeekEnd = currentWeekEnd,
-                CurrentPeriod = "last7days"
+                CurrentPeriod = "last7days",
+                OverallSuccessRate = habits.Any() ? Math.Round(habits.Average(h => h.PercentageMet), 1) : 0,
+                TotalHabits = habits.Count,
+                ActiveDays = 7
             };
-
-            // Calculate overall success rate
-            viewModel.OverallSuccessRate = CalculateOverallSuccessRate(viewModel.Habits);
-            viewModel.TotalHabits = viewModel.Habits.Count;
-            viewModel.ActiveDays = 7; // Current week
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddHabit([FromBody] HabitViewModel habitData)
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AddHabit([FromBody] HabitoCreateEditViewModel habitData)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(habitData.HabitName))
+                var userId = GetCurrentUserId();
+                
+                var nuevoHabito = new Habito
                 {
-                    return Json(new HabitTrackerResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Habit name is required",
-                        Errors = new List<string> { "Please provide a habit name" }
-                    });
-                }
-
-                var newHabit = new HabitViewModel
-                {
-                    HabitId = _nextHabitId++,
-                    HabitName = habitData.HabitName.Trim(),
-                    IconOrColor = habitData.IconOrColor ?? GetRandomColor(),
-                    CreatedAt = DateTime.Now,
-                    IsActive = true,
-                    CurrentStreak = 0,
-                    BestStreak = 0
+                    UsuarioId = userId,
+                    Nombre = habitData.Nombre?.Trim() ?? "",
+                    Descripcion = habitData.Descripcion?.Trim(),
+                    Color = habitData.Color,
+                    CategoriaHabitoId = habitData.CategoriaHabitoId,
+                    FrecuenciaHabitoId = habitData.FrecuenciaHabitoId,
+                    HabilitarRecordatorios = habitData.HabilitarRecordatorios
                 };
 
-                // Generate daily statuses for current week
-                var weekStart = GetStartOfWeek(DateTime.Now);
-                var weekEnd = weekStart.AddDays(6);
-                newHabit.DailyStatuses = GenerateDailyStatuses(newHabit.HabitId, weekStart, weekEnd);
-                CalculateHabitMetrics(newHabit);
+                var habitoCreado = await _habitoService.CreateHabitoAsync(nuevoHabito);
 
-                await Task.Delay(300); // Simulate async operation
-
-                _mockHabits.Add(newHabit);
+                var habitViewModel = new HabitViewModel
+                {
+                    HabitId = habitoCreado.Id,
+                    HabitName = habitoCreado.Nombre,
+                    Description = habitoCreado.Descripcion ?? string.Empty,
+                    IconOrColor = habitoCreado.Color,
+                    CreatedAt = habitoCreado.FechaCreacion,
+                    IsActive = habitoCreado.IsActive
+                };
 
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = true,
-                    Message = "Habit added successfully!",
-                    Habit = newHabit,
-                    ActionDate = DateTime.Now
+                    Message = "Hábito agregado exitosamente",
+                    Habit = habitViewModel,
+                    ActionDate = DateTime.UtcNow
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error adding habit");
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = false,
-                    Message = "An error occurred while adding the habit",
+                    Message = $"Error al agregar el hábito: {ex.Message}",
                     Errors = new List<string> { ex.Message }
                 });
             }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UpdateHabit([FromBody] HabitoCreateEditViewModel habitData)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                
+                var habitoToUpdate = new Habito
+                {
+                    Id = habitData.Id,
+                    UsuarioId = userId,
+                    Nombre = habitData.Nombre?.Trim() ?? "",
+                    Descripcion = habitData.Descripcion?.Trim(),
+                    Color = habitData.Color,
+                    CategoriaHabitoId = habitData.CategoriaHabitoId,
+                    FrecuenciaHabitoId = habitData.FrecuenciaHabitoId,
+                    HabilitarRecordatorios = habitData.HabilitarRecordatorios
+                };
+
+                var success = await _habitoService.UpdateHabitoAsync(habitoToUpdate);
+
+                if (!success)
+                {
+                    return Json(new HabitTrackerResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Hábito no encontrado"
+                    });
+                }
+
+                return Json(new HabitTrackerResponseViewModel
+                {
+                    Success = true,
+                    Message = "Hábito actualizado exitosamente",
+                    ActionDate = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating habit {HabitId}", habitData.Id);
+                return Json(new HabitTrackerResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Error al actualizar el hábito: {ex.Message}",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteHabit(int habitId)
         {
             try
             {
-                var habit = _mockHabits.FirstOrDefault(h => h.HabitId == habitId);
-                
-                if (habit == null)
+                var userId = GetCurrentUserId();
+                var success = await _habitoService.DeleteHabitoAsync(habitId, userId);
+
+                if (!success)
                 {
                     return Json(new HabitTrackerResponseViewModel
                     {
                         Success = false,
-                        Message = "Habit not found"
+                        Message = "Hábito no encontrado"
                     });
                 }
-
-                // Mark as inactive instead of deleting to preserve historical data
-                habit.IsActive = false;
-
-                // Remove related log entries
-                _mockLogEntries.RemoveAll(entry => entry.HabitId == habitId);
-
-                await Task.Delay(200); // Simulate async operation
 
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = true,
-                    Message = "Habit deleted successfully!",
-                    ActionDate = DateTime.Now
+                    Message = "Hábito eliminado exitosamente",
+                    ActionDate = DateTime.UtcNow
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting habit {HabitId}", habitId);
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = false,
-                    Message = "An error occurred while deleting the habit",
-                    Errors = new List<string> { ex.Message }
+                    Message = "Error al eliminar el hábito"
                 });
             }
         }
 
         [HttpPost]
-        public async Task<JsonResult> SaveHabitLog([FromBody] List<HabitLogEntryViewModel> logEntries)
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> SaveHabitLog([FromBody] GuardarRegistrosViewModel logData)
         {
             try
             {
-                foreach (var entry in logEntries)
+                var userId = GetCurrentUserId();
+                var success = await _habitoService.GuardarRegistrosCumplimientoAsync(userId, logData.Registros);
+
+                if (!success)
                 {
-                    // Remove existing entry for this habit and date
-                    _mockLogEntries.RemoveAll(e => e.HabitId == entry.HabitId && e.Date.Date == entry.Date.Date);
-                    
-                    // Add new entry
-                    _mockLogEntries.Add(new HabitLogEntryViewModel
+                    return Json(new HabitTrackerResponseViewModel
                     {
-                        HabitId = entry.HabitId,
-                        Date = entry.Date.Date,
-                        IsCompleted = entry.IsCompleted
+                        Success = false,
+                        Message = "Error al guardar los registros"
                     });
                 }
 
-                // Update habit metrics
-                foreach (var habit in _mockHabits.Where(h => h.IsActive))
-                {
-                    var weekStart = GetStartOfWeek(DateTime.Now);
-                    var weekEnd = weekStart.AddDays(6);
-                    habit.DailyStatuses = GenerateDailyStatuses(habit.HabitId, weekStart, weekEnd);
-                    CalculateHabitMetrics(habit);
-                }
-
-                await Task.Delay(400); // Simulate async operation
-
-                var overallSuccessRate = CalculateOverallSuccessRate(_mockHabits.Where(h => h.IsActive).ToList());
+                // Calcular estadísticas actualizadas
+                var fechaDesde = DateTime.UtcNow.AddDays(-7);
+                var fechaHasta = DateTime.UtcNow;
+                var estadisticas = await _habitoService.GetEstadisticasAsync(userId, fechaDesde, fechaHasta);
 
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = true,
-                    Message = "Habit log saved successfully!",
-                    ActionDate = DateTime.Now,
-                    Data = new { OverallSuccessRate = overallSuccessRate }
+                    Message = "Registros guardados exitosamente",
+                    ActionDate = DateTime.UtcNow,
+                    Data = new { OverallSuccessRate = estadisticas.AverageCompletion }
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error saving habit log for user {UserId}", GetCurrentUserId());
                 return Json(new HabitTrackerResponseViewModel
                 {
                     Success = false,
-                    Message = "An error occurred while saving the habit log",
-                    Errors = new List<string> { ex.Message }
+                    Message = "Error al guardar los registros"
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetHabitsWithRecords(DateTime? fechaDesde = null, DateTime? fechaHasta = null)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var fechaDesdeReal = fechaDesde ?? DateTime.UtcNow.AddDays(-7);
+                var fechaHastaReal = fechaHasta ?? DateTime.UtcNow;
+
+                var habitosConRegistros = await _habitoService.GetHabitosConRegistrosAsync(userId, fechaDesdeReal, fechaHastaReal);
+
+                return Json(new
+                {
+                    success = true,
+                    data = habitosConRegistros
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting habits with records for user {UserId}", GetCurrentUserId());
+                return Json(new
+                {
+                    success = false,
+                    message = "Error al obtener los hábitos"
                 });
             }
         }
@@ -198,78 +288,32 @@ namespace ToolBox.Controllers
         {
             try
             {
-                var activeHabits = _mockHabits.Where(h => h.IsActive).ToList();
-                var chartData = new HabitChartDataViewModel
-                {
-                    Period = period,
-                    ChartTitle = GetChartTitle(period)
-                };
-
-                if (!activeHabits.Any())
-                {
-                    return Json(new {
-                        labels = new List<string>(),
-                        completionRates = new List<decimal>(),
-                        colors = new List<string>(),
-                        totalHabits = 0,
-                        averageCompletion = 0,
-                        bestStreak = 0,
-                        activeStreaks = 0,
-                        period = period,
-                        success = true
-                    });
-                }
-
-                // Calculate date range based on period
+                var userId = GetCurrentUserId();
                 var (startDate, endDate) = GetDateRangeForPeriod(period);
-                
-                // Set labels (habit names)
-                chartData.Labels = activeHabits.Select(h => h.HabitName).ToList();
 
-                // Calculate completion rates for each habit in the period
-                var completionRates = new List<decimal>();
-                
-                foreach (var habit in activeHabits)
+                var datosChart = await _habitoService.GetDatosGraficoProgresoAsync(userId, startDate, endDate);
+                var estadisticas = await _habitoService.GetEstadisticasAsync(userId, startDate, endDate);
+
+                return Json(new
                 {
-                    var periodEntries = _mockLogEntries
-                        .Where(e => e.HabitId == habit.HabitId && 
-                                   e.Date >= startDate && 
-                                   e.Date <= endDate)
-                        .ToList();
-
-                    var totalDays = (endDate - startDate).Days + 1;
-                    var completedDays = periodEntries.Count(e => e.IsCompleted);
-                    var completionRate = totalDays > 0 ? (decimal)completedDays / totalDays * 100 : 0;
-                    
-                    completionRates.Add(Math.Round(completionRate, 1));
-                }
-
-                // Calculate additional statistics
-                var totalHabits = activeHabits.Count();
-                var averageCompletion = totalHabits > 0 ? Math.Round(completionRates.Average(), 1) : 0;
-                var bestStreak = activeHabits.Any() ? activeHabits.Max(h => h.CurrentStreak) : 0;
-                var activeStreaks = activeHabits.Count(h => h.CurrentStreak > 0);
-
-                await Task.Delay(200); // Simulate async operation
-
-                // Return data in the format expected by JavaScript
-                return Json(new {
-                    labels = chartData.Labels,
-                    completionRates = completionRates,
-                    colors = activeHabits.Select(h => h.IconOrColor).ToList(),
-                    totalHabits = totalHabits,
-                    averageCompletion = averageCompletion,
-                    bestStreak = bestStreak,
-                    activeStreaks = activeStreaks,
+                    labels = datosChart.Select(d => d.Nombre).ToList(),
+                    completionRates = datosChart.Select(d => d.Porcentaje).ToList(),
+                    colors = datosChart.Select(d => d.Color).ToList(),
+                    totalHabits = estadisticas.TotalHabits,
+                    averageCompletion = estadisticas.AverageCompletion,
+                    bestStreak = estadisticas.BestStreak,
+                    activeStreaks = estadisticas.CurrentActiveStreaks,
                     period = period,
                     success = true
                 });
             }
             catch (Exception ex)
             {
-                return Json(new {
+                _logger.LogError(ex, "Error getting chart data for user {UserId}", GetCurrentUserId());
+                return Json(new
+                {
                     success = false,
-                    message = "An error occurred while getting chart data: " + ex.Message,
+                    message = "Error al obtener datos del gráfico",
                     labels = new List<string>(),
                     completionRates = new List<decimal>(),
                     colors = new List<string>(),
@@ -277,162 +321,118 @@ namespace ToolBox.Controllers
                     averageCompletion = 0,
                     bestStreak = 0,
                     activeStreaks = 0,
-                    period = period ?? "Last7Days"
+                    period = period ?? "last7days"
                 });
             }
         }
 
-        private void InitializeMockData()
+        [HttpGet]
+        public async Task<JsonResult> GetCategorias()
         {
-            var baseDate = GetStartOfWeek(DateTime.Now);
-            
-            _mockHabits.AddRange(new List<HabitViewModel>
+            try
             {
-                new HabitViewModel
+                var categorias = await _habitoService.GetCategoriasHabitosAsync();
+                return Json(new
                 {
-                    HabitId = _nextHabitId++,
-                    HabitName = "Read for 30 minutes",
-                    IconOrColor = "#4f46e5",
-                    CreatedAt = DateTime.Now.AddDays(-30),
-                    IsActive = true
-                },
-                new HabitViewModel
-                {
-                    HabitId = _nextHabitId++,
-                    HabitName = "Morning exercise",
-                    IconOrColor = "#059669",
-                    CreatedAt = DateTime.Now.AddDays(-25),
-                    IsActive = true
-                },
-                new HabitViewModel
-                {
-                    HabitId = _nextHabitId++,
-                    HabitName = "Meditate",
-                    IconOrColor = "#7c3aed",
-                    CreatedAt = DateTime.Now.AddDays(-20),
-                    IsActive = true
-                },
-                new HabitViewModel
-                {
-                    HabitId = _nextHabitId++,
-                    HabitName = "Drink 8 glasses of water",
-                    IconOrColor = "#0891b2",
-                    CreatedAt = DateTime.Now.AddDays(-15),
-                    IsActive = true
-                }
-            });
-
-            // Generate some mock log entries
-            var random = new Random();
-            foreach (var habit in _mockHabits)
-            {
-                for (int i = 0; i < 14; i++) // Last 2 weeks
-                {
-                    var date = baseDate.AddDays(i - 7);
-                    if (random.NextDouble() > 0.3) // 70% completion rate
+                    success = true,
+                    data = categorias.Select(c => new
                     {
-                        _mockLogEntries.Add(new HabitLogEntryViewModel
-                        {
-                            HabitId = habit.HabitId,
-                            Date = date,
-                            IsCompleted = true
-                        });
-                    }
-                }
-            }
-        }
-
-        private List<DailyStatusViewModel> GenerateDailyStatuses(int habitId, DateTime startDate, DateTime endDate)
-        {
-            var statuses = new List<DailyStatusViewModel>();
-            
-            for (var date = startDate; date <= endDate; date = date.AddDays(1))
-            {
-                var logEntry = _mockLogEntries.FirstOrDefault(e => 
-                    e.HabitId == habitId && e.Date.Date == date.Date);
-                
-                statuses.Add(new DailyStatusViewModel
-                {
-                    Date = date,
-                    IsCompleted = logEntry?.IsCompleted ?? false
+                        id = c.Id,
+                        nombre = c.Nombre,
+                        descripcion = c.Descripcion,
+                        iconClass = c.IconClass,
+                        color = c.Color
+                    })
                 });
             }
-            
-            return statuses;
-        }
-
-        private void CalculateHabitMetrics(HabitViewModel habit)
-        {
-            habit.DaysMet = habit.DailyStatuses.Count(d => d.IsCompleted);
-            var totalDays = habit.DailyStatuses.Count;
-            habit.PercentageMet = totalDays > 0 ? Math.Round((decimal)habit.DaysMet / totalDays * 100, 1) : 0;
-
-            // Calculate current streak
-            habit.CurrentStreak = CalculateCurrentStreak(habit.HabitId);
-            habit.BestStreak = CalculateBestStreak(habit.HabitId);
-        }
-
-        private int CalculateCurrentStreak(int habitId)
-        {
-            var recentEntries = _mockLogEntries
-                .Where(e => e.HabitId == habitId)
-                .OrderByDescending(e => e.Date)
-                .Take(30)
-                .ToList();
-
-            int streak = 0;
-            var currentDate = DateTime.Now.Date;
-
-            foreach (var entry in recentEntries.OrderByDescending(e => e.Date))
+            catch (Exception ex)
             {
-                if (entry.Date.Date == currentDate && entry.IsCompleted)
+                _logger.LogError(ex, "Error getting habit categories");
+                return Json(new
                 {
-                    streak++;
-                    currentDate = currentDate.AddDays(-1);
-                }
-                else if (entry.Date.Date < currentDate)
-                {
-                    break;
-                }
+                    success = false,
+                    message = "Error al obtener las categorías"
+                });
             }
-
-            return streak;
         }
 
-        private int CalculateBestStreak(int habitId)
+        [HttpGet]
+        public async Task<JsonResult> GetFrecuencias()
         {
-            var allEntries = _mockLogEntries
-                .Where(e => e.HabitId == habitId && e.IsCompleted)
-                .OrderBy(e => e.Date)
-                .ToList();
-
-            if (!allEntries.Any()) return 0;
-
-            int bestStreak = 0;
-            int currentStreak = 1;
-            DateTime lastDate = allEntries.First().Date;
-
-            for (int i = 1; i < allEntries.Count; i++)
+            try
             {
-                if (allEntries[i].Date == lastDate.AddDays(1))
+                var frecuencias = await _habitoService.GetFrecuenciasHabitosAsync();
+                return Json(new
                 {
-                    currentStreak++;
-                }
-                else
-                {
-                    bestStreak = Math.Max(bestStreak, currentStreak);
-                    currentStreak = 1;
-                }
-                lastDate = allEntries[i].Date;
+                    success = true,
+                    data = frecuencias.Select(f => new
+                    {
+                        id = f.Id,
+                        nombre = f.Nombre,
+                        descripcion = f.Descripcion,
+                        diasIntervalo = f.DiasIntervalo
+                    })
+                });
             }
-
-            return Math.Max(bestStreak, currentStreak);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting habit frequencies");
+                return Json(new
+                {
+                    success = false,
+                    message = "Error al obtener las frecuencias"
+                });
+            }
         }
 
-        private decimal CalculateOverallSuccessRate(List<HabitViewModel> habits)
+        [HttpGet]
+        public async Task<JsonResult> GetHabitById(int id)
         {
-            if (!habits.Any()) return 0;
-            return Math.Round(habits.Average(h => h.PercentageMet), 1);
+            try
+            {
+                var userId = GetCurrentUserId();
+                var habito = await _habitoService.GetHabitoByIdAsync(id, userId);
+
+                if (habito == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Hábito no encontrado"
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = habito.Id,
+                        nombre = habito.Nombre,
+                        descripcion = habito.Descripcion,
+                        color = habito.Color,
+                        categoriaHabitoId = habito.CategoriaHabitoId,
+                        frecuenciaHabitoId = habito.FrecuenciaHabitoId,
+                        habilitarRecordatorios = habito.HabilitarRecordatorios
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting habit {HabitId}", id);
+                return Json(new
+                {
+                    success = false,
+                    message = "Error al obtener el hábito"
+                });
+            }
+        }
+
+        private int GetCurrentUserId()
+        {
+            // TODO: Obtener el usuario actual desde la sesión o claims
+            // Por ahora retornamos un ID hardcodeado para pruebas
+            return 1;
         }
 
         private DateTime GetStartOfWeek(DateTime date)
@@ -441,111 +441,18 @@ namespace ToolBox.Controllers
             return date.AddDays(-1 * diff).Date;
         }
 
-        [HttpPost]
-        public async Task<JsonResult> SaveAllHabitLogs(string logEntries)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(logEntries))
-                {
-                    return Json(new HabitTrackerResponseViewModel
-                    {
-                        Success = false,
-                        Message = "No log entries provided"
-                    });
-                }
-
-                var entries = System.Text.Json.JsonSerializer.Deserialize<List<HabitLogEntryViewModel>>(logEntries);
-
-                if (entries == null || !entries.Any())
-                {
-                    return Json(new HabitTrackerResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Invalid log entries data"
-                    });
-                }
-
-                foreach (var entry in entries)
-                {
-                    // Remove existing entry if it exists
-                    _mockLogEntries.RemoveAll(e => e.HabitId == entry.HabitId && e.Date.Date == entry.Date.Date);
-                    
-                    // Add new entry
-                    _mockLogEntries.Add(new HabitLogEntryViewModel
-                    {
-                        HabitId = entry.HabitId,
-                        Date = entry.Date,
-                        IsCompleted = entry.IsCompleted
-                    });
-                }
-
-                await Task.Delay(200); // Simulate async operation
-
-                // Recalculate metrics for all habits
-                var currentWeekStart = GetStartOfWeek(DateTime.Now);
-                var currentWeekEnd = currentWeekStart.AddDays(6);
-
-                foreach (var habit in _mockHabits.Where(h => h.IsActive))
-                {
-                    habit.DailyStatuses = GenerateDailyStatuses(habit.HabitId, currentWeekStart, currentWeekEnd);
-                    CalculateHabitMetrics(habit);
-                }
-
-                return Json(new HabitTrackerResponseViewModel
-                {
-                    Success = true,
-                    Message = "All habit logs saved successfully!",
-                    ActionDate = DateTime.Now
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new HabitTrackerResponseViewModel
-                {
-                    Success = false,
-                    Message = "An error occurred while saving habit logs",
-                    Errors = new List<string> { ex.Message }
-                });
-            }
-        }
-
         private (DateTime start, DateTime end) GetDateRangeForPeriod(string period)
         {
-            var today = DateTime.Now.Date;
-            
+            var today = DateTime.UtcNow.Date;
+
             return period.ToLower() switch
             {
                 "last7days" => (today.AddDays(-6), today),
                 "last30days" => (today.AddDays(-29), today),
                 "thismonth" => (new DateTime(today.Year, today.Month, 1), today),
-                "alltime" => (_mockLogEntries.Any() ? _mockLogEntries.Min(e => e.Date) : today.AddDays(-30), today),
+                "alltime" => (today.AddDays(-365), today), // Último año para "all time"
                 _ => (today.AddDays(-6), today)
             };
-        }
-
-        private string GetChartTitle(string period)
-        {
-            return period.ToLower() switch
-            {
-                "last7days" => "Últimos 7 Días",
-                "last30days" => "Últimos 30 Días", 
-                "thismonth" => "Este Mes",
-                "alltime" => "Todo el Tiempo",
-                _ => "Progreso de Hábitos"
-            };
-        }
-
-        private string GetRandomColor()
-        {
-            var colors = new[]
-            {
-                "#4f46e5", "#059669", "#7c3aed", "#0891b2", "#dc2626", 
-                "#ea580c", "#ca8a04", "#16a34a", "#2563eb", "#9333ea"
-            };
-            
-            var random = new Random();
-            return colors[random.Next(colors.Length)];
         }
     }
 }

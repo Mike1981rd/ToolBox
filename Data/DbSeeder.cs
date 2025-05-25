@@ -39,6 +39,7 @@ namespace ToolBox.Data
             {
                 new User
                 {
+                    Id = 1, // Forzar ID=1 para compatibilidad con GetCurrentUserId()
                     FullName = "John Smith",
                     UserName = "jsmith",
                     Email = "admin@example.com",

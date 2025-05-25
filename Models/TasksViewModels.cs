@@ -183,9 +183,7 @@ namespace ToolBox.Models
     {
         public int? TaskId { get; set; }
         
-        [Required(ErrorMessage = "Task description is required")]
-        [StringLength(500, ErrorMessage = "Task description cannot exceed 500 characters")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
         
         public bool IsUrgent { get; set; } = false;
         public bool IsImportant { get; set; } = false;

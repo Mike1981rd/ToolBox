@@ -26,6 +26,8 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IUserAnswerService, UserAnswerService>();
 builder.Services.AddScoped<IWheelOfLifeService, WheelOfLifeService>();
 builder.Services.AddScoped<IWheelOfProgressService, WheelOfProgressService>();
+builder.Services.AddScoped<ITareaService, TareaService>();
+builder.Services.AddScoped<IHabitoService, HabitoService>();
 
 var app = builder.Build();
 

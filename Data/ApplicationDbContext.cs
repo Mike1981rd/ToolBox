@@ -22,6 +22,11 @@ namespace ToolBox.Data
         public DbSet<AreaProgreso> AreasProgreso { get; set; }
         public DbSet<CategoriaProgreso> CategoriasProgreso { get; set; }
         public DbSet<ProgresoMetaUsuario> ProgresosMetasUsuarios { get; set; }
+        public DbSet<Tarea> Tareas { get; set; }
+        public DbSet<Habito> Habitos { get; set; }
+        public DbSet<RegistroCumplimientoHabito> RegistrosCumplimientoHabitos { get; set; }
+        public DbSet<CategoriaHabito> CategoriasHabitos { get; set; }
+        public DbSet<FrecuenciaHabito> FrecuenciasHabitos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -182,6 +187,80 @@ namespace ToolBox.Data
             
             // Seed Wheel of Progress data
             SeedWheelOfProgressData(modelBuilder);
+            
+            // Tarea configuration
+            modelBuilder.Entity<Tarea>()
+                .HasKey(t => t.Id);
+                
+            modelBuilder.Entity<Tarea>()
+                .Property(t => t.Descripcion)
+                .IsRequired(false);
+                
+            modelBuilder.Entity<Tarea>()
+                .HasOne(t => t.Usuario)
+                .WithMany()
+                .HasForeignKey(t => t.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<Tarea>()
+                .HasIndex(t => new { t.UsuarioId, t.FechaCreacion });
+                
+            // Habito configuration
+            modelBuilder.Entity<Habito>()
+                .HasKey(h => h.Id);
+                
+            modelBuilder.Entity<Habito>()
+                .HasOne(h => h.Usuario)
+                .WithMany()
+                .HasForeignKey(h => h.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<Habito>()
+                .HasOne(h => h.CategoriaHabito)
+                .WithMany(c => c.Habitos)
+                .HasForeignKey(h => h.CategoriaHabitoId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<Habito>()
+                .HasOne(h => h.FrecuenciaHabito)
+                .WithMany(f => f.Habitos)
+                .HasForeignKey(h => h.FrecuenciaHabitoId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<Habito>()
+                .HasIndex(h => new { h.UsuarioId, h.FechaCreacion });
+                
+            // RegistroCumplimientoHabito configuration
+            modelBuilder.Entity<RegistroCumplimientoHabito>()
+                .HasKey(r => r.Id);
+                
+            modelBuilder.Entity<RegistroCumplimientoHabito>()
+                .HasOne(r => r.Habito)
+                .WithMany(h => h.RegistrosCumplimiento)
+                .HasForeignKey(r => r.HabitoId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Índice único para evitar registros duplicados del mismo hábito en la misma fecha
+            modelBuilder.Entity<RegistroCumplimientoHabito>()
+                .HasIndex(r => new { r.HabitoId, r.Fecha })
+                .IsUnique();
+                
+            // CategoriaHabito configuration
+            modelBuilder.Entity<CategoriaHabito>()
+                .HasKey(c => c.Id);
+                
+            modelBuilder.Entity<CategoriaHabito>()
+                .HasIndex(c => c.OrdenVisualizacion);
+                
+            // FrecuenciaHabito configuration
+            modelBuilder.Entity<FrecuenciaHabito>()
+                .HasKey(f => f.Id);
+                
+            modelBuilder.Entity<FrecuenciaHabito>()
+                .HasIndex(f => f.OrdenVisualizacion);
+                
+            // Seed Habit Tracker data
+            SeedHabitTrackerData(modelBuilder);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -374,6 +453,38 @@ namespace ToolBox.Data
 
             modelBuilder.Entity<AreaProgreso>().HasData(areasProgreso);
             modelBuilder.Entity<CategoriaProgreso>().HasData(categoriasProgreso);
+        }
+        
+        private void SeedHabitTrackerData(ModelBuilder modelBuilder)
+        {
+            var now = DateTime.UtcNow;
+            
+            // Seed CategoriaHabito
+            var categoriasHabitos = new[]
+            {
+                new CategoriaHabito { Id = 1, Nombre = "Salud", Descripcion = "Hábitos relacionados con bienestar físico y mental", IconClass = "fas fa-heartbeat", Color = "#e74c3c", OrdenVisualizacion = 1, CreatedAt = now },
+                new CategoriaHabito { Id = 2, Nombre = "Productividad", Descripcion = "Hábitos que mejoran el rendimiento y eficiencia", IconClass = "fas fa-chart-line", Color = "#3498db", OrdenVisualizacion = 2, CreatedAt = now },
+                new CategoriaHabito { Id = 3, Nombre = "Aprendizaje", Descripcion = "Hábitos de educación y desarrollo personal", IconClass = "fas fa-graduation-cap", Color = "#f39c12", OrdenVisualizacion = 3, CreatedAt = now },
+                new CategoriaHabito { Id = 4, Nombre = "Mindfulness", Descripcion = "Hábitos de meditación y atención plena", IconClass = "fas fa-leaf", Color = "#27ae60", OrdenVisualizacion = 4, CreatedAt = now },
+                new CategoriaHabito { Id = 5, Nombre = "Social", Descripcion = "Hábitos relacionados con relaciones y vida social", IconClass = "fas fa-users", Color = "#9b59b6", OrdenVisualizacion = 5, CreatedAt = now },
+                new CategoriaHabito { Id = 6, Nombre = "Creatividad", Descripcion = "Hábitos artísticos y de expresión creativa", IconClass = "fas fa-palette", Color = "#e67e22", OrdenVisualizacion = 6, CreatedAt = now },
+                new CategoriaHabito { Id = 7, Nombre = "Finanzas", Descripcion = "Hábitos de manejo financiero y ahorro", IconClass = "fas fa-dollar-sign", Color = "#16a085", OrdenVisualizacion = 7, CreatedAt = now },
+                new CategoriaHabito { Id = 8, Nombre = "Hogar", Descripcion = "Hábitos de organización y cuidado del hogar", IconClass = "fas fa-home", Color = "#95a5a6", OrdenVisualizacion = 8, CreatedAt = now }
+            };
+
+            // Seed FrecuenciaHabito
+            var frecuenciasHabitos = new[]
+            {
+                new FrecuenciaHabito { Id = 1, Nombre = "Diario", Descripcion = "Todos los días", DiasIntervalo = 1, OrdenVisualizacion = 1, CreatedAt = now },
+                new FrecuenciaHabito { Id = 2, Nombre = "Semanal", Descripcion = "Una vez por semana", DiasIntervalo = 7, OrdenVisualizacion = 2, CreatedAt = now },
+                new FrecuenciaHabito { Id = 3, Nombre = "3 veces por semana", Descripcion = "Lunes, miércoles y viernes", DiasIntervalo = 2, OrdenVisualizacion = 3, CreatedAt = now },
+                new FrecuenciaHabito { Id = 4, Nombre = "Fines de semana", Descripcion = "Sábados y domingos", DiasIntervalo = 7, OrdenVisualizacion = 4, CreatedAt = now },
+                new FrecuenciaHabito { Id = 5, Nombre = "Días laborales", Descripcion = "Lunes a viernes", DiasIntervalo = 1, OrdenVisualizacion = 5, CreatedAt = now },
+                new FrecuenciaHabito { Id = 6, Nombre = "Mensual", Descripcion = "Una vez al mes", DiasIntervalo = 30, OrdenVisualizacion = 6, CreatedAt = now }
+            };
+
+            modelBuilder.Entity<CategoriaHabito>().HasData(categoriasHabitos);
+            modelBuilder.Entity<FrecuenciaHabito>().HasData(frecuenciasHabitos);
         }
     }
 }
