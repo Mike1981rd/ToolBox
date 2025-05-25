@@ -472,18 +472,16 @@ function showSuccess(message) {
     // Use the global showToast function if available
     if (typeof showToast === 'function') {
         showToast(message, 'success');
-    } else {
-        alert(message);
     }
+    // Remove the alert fallback to avoid incorrect messages
 }
 
 function showError(message) {
     // Use the global showToast function if available
     if (typeof showToast === 'function') {
         showToast(message, 'error');
-    } else {
-        alert('Error: ' + message);
     }
+    // Remove the alert fallback to avoid incorrect messages
 }
 
 function escapeHtml(text) {

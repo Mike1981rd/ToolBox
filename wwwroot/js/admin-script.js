@@ -3430,7 +3430,7 @@ function showToast(message, type = 'info') {
         <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <i class="fas fa-${type === 'success' ? 'check-circle text-success' : type === 'error' ? 'exclamation-circle text-danger' : 'info-circle text-info'} me-2"></i>
-                <strong class="me-auto">Habit Tracker</strong>
+                <strong class="me-auto">Notification</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
