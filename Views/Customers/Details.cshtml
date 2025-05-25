@@ -1,104 +1,202 @@
+@model ToolBox.Models.ViewModels.CustomerDetailsViewModel
+
 @{
-    ViewData["Title"] = "Customer Details";
+    ViewData["Title"] = "Detalles del Cliente";
     Layout = "_AdminLayout";
-    ViewBag.HideTitleInLayout = true;
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-    <div>
-        <h4 class="fw-bold mb-0"><span data-translate-key="customer_details_title_prefix">Customer ID #</span>@ViewBag.CustomerId</h4>
-        <small class="text-muted">@ViewBag.CustomerJoinDate</small>
-    </div>
-    <div>
-        <button class="btn btn-sm btn-outline-danger" data-translate-key="button_deactivate_customer">Deactivate Customer</button>
-    </div>
-</div>
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Customers" asp-action="Index" data-translate-key="breadcrumb_customers_list">Clientes</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_customer_details">Detalles del Cliente</li>
+    </ol>
+</nav>
 
-<div class="row g-4">
-    <!-- Columna Izquierda: Perfil del Cliente y Tarjeta de Upgrade -->
-    <div class="col-12 col-lg-4 col-xl-3">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body text-center">
-                <img src="https://via.placeholder.com/120x120/7367F0/FFFFFF?Text=LH" alt="Customer Avatar" class="img-fluid rounded-circle mb-3" style="width:120px; height:120px; object-fit:cover;"
-                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iIzczNjdmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSI+TEg8L3RleHQ+PC9zdmc+'">
-                <h5 class="card-title">@ViewBag.CustomerName</h5>
-                <p class="text-muted small">Customer ID #@ViewBag.CustomerId</p>
-                <div class="d-flex justify-content-around mb-3">
-                    <div class="text-center">
-                        <h6 class="mb-0">184</h6> 
-                        <small data-translate-key="overview_orders_title">Orders</small>
-                    </div>
-                    <div class="text-center">
-                        <h6 class="mb-0">$12,378</h6> 
-                        <small data-translate-key="overview_spent_title">Spent</small>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4" data-translate-key="customer_details_title">Detalles del Cliente</h1>
+            <p class="lead" data-translate-key="customer_details_subtitle">Información completa de @Model.FullName</p>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> <span data-translate-key="btn_back_to_list">Volver a la Lista</span>
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit me-1"></i> <span data-translate-key="btn_edit_customer">Editar Cliente</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Customer Profile Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/img/default-avatar.png" : Model.AvatarUrl)"
+                                 alt="Avatar de @Model.FullName" 
+                                 class="rounded-circle" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);"
+                                 onerror="this.onerror=null; this.src='/img/default-avatar.png';">
+                        </div>
+                        <div>
+                            <h5 class="mb-1">@Model.FullName</h5>
+                            <p class="mb-0 opacity-75">@Model.CustomerNumber</p>
+                        </div>
+                        <div class="ms-auto">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> <span data-translate-key="status_active">Activo</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-pause-circle me-1"></i> <span data-translate-key="status_inactive">Inactivo</span>
+                                </span>
+                            }
+                        </div>
                     </div>
                 </div>
-                <hr>
-                <h6 class="mb-2 text-start" data-translate-key="overview_details_section_title">Details</h6>
-                <ul class="list-unstyled text-start mb-0">
-                    <li class="mb-1"><strong data-translate-key="overview_username_label">Username:</strong> lorine.hischke</li>
-                    <li class="mb-1"><strong data-translate-key="overview_email_label">Email:</strong> vofgon@ultr.org</li>
-                    <li class="mb-1"><strong data-translate-key="overview_status_label">Status:</strong> <span class="badge bg-success-subtle text-success-emphasis" data-translate-key="status_active">Active</span></li>
-                    <li class="mb-1"><strong data-translate-key="overview_contact_label">Contact:</strong> (123) 456-7890</li>
-                    <li class="mb-1"><strong data-translate-key="overview_country_label">Country:</strong> USA</li>
-                </ul>
-                <a href="@Url.Action("Edit", "Customers", new { id = ViewBag.CustomerId })" class="btn btn-primary w-100 mt-3" data-translate-key="button_edit_details">Edit Details</a>
-            </div>
-        </div>
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <img src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/illustrations/rocket.png" alt="Upgrade" height="80"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNiIgZmlsbD0iIzk5OTk5OSI+🚀PC90ZXh0Pjwvc3ZnPg=='">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1" data-translate-key="form_email">Email</h6>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1" data-translate-key="form_phone">Teléfono</h6>
+                            <p class="mb-0">
+                                <i class="fas fa-phone text-success me-2"></i>
+                                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                {
+                                    <a href="tel:@Model.PhoneNumber" class="text-decoration-none">@Model.PhoneNumber</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificado</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.CompanyName) || !string.IsNullOrEmpty(Model.Country))
+                    {
+                        <hr class="my-3">
+                        <div class="row g-3">
+                            @if (!string.IsNullOrEmpty(Model.CompanyName))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-1" data-translate-key="form_company">Empresa</h6>
+                                    <p class="mb-0">
+                                        <i class="fas fa-building text-info me-2"></i>
+                                        @Model.CompanyName
+                                    </p>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Country))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-1" data-translate-key="form_country">País</h6>
+                                    <p class="mb-0">
+                                        <i class="fas fa-globe text-secondary me-2"></i>
+                                        @Model.Country
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.StatusDetail))
+                    {
+                        <hr class="my-3">
+                        <div>
+                            <h6 class="text-muted mb-1" data-translate-key="form_status_detail">Detalle del Estado</h6>
+                            <p class="mb-0">
+                                <i class="fas fa-info-circle text-warning me-2"></i>
+                                @Model.StatusDetail
+                            </p>
+                        </div>
+                    }
                 </div>
-                <h5 data-translate-key="card_upgrade_to_premium_title">Upgrade to premium</h5>
-                <p class="small text-muted" data-translate-key="card_upgrade_to_premium_text">Upgrade customer to premium membership to access pro features.</p>
-                <button class="btn btn-info w-100" data-translate-key="button_upgrade_to_premium">Upgrade to premium</button>
             </div>
         </div>
-    </div>
 
-    <!-- Columna Derecha: Contenido de las Pestañas -->
-    <div class="col-12 col-lg-8 col-xl-9">
-        <ul class="nav nav-pills flex-column flex-md-row mb-3 nav-fill">
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#overview" data-translate-key="tab_overview"><i class="fas fa-user-circle me-1"></i>Overview</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#security" data-translate-key="tab_security"><i class="fas fa-shield-alt me-1"></i>Security</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#addressBilling" data-translate-key="tab_address_billing"><i class="fas fa-map-marker-alt me-1"></i>Address & Billing</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#notifications" data-translate-key="tab_notifications"><i class="fas fa-bell me-1"></i>Notifications</a>
-            </li>
-        </ul>
+        <!-- Right sidebar with customer summary -->
+        <div class="col-md-4">
+            <!-- Customer Summary Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0" data-translate-key="customer_summary_title">Resumen del Cliente</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-light rounded">
+                                <small class="text-muted d-block" data-translate-key="customer_id_label">ID</small>
+                                <strong class="text-primary">#@Model.Id</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-light rounded">
+                                <small class="text-muted d-block" data-translate-key="customer_number_label">Número</small>
+                                <strong class="text-info">@Model.CustomerNumber</strong>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="tab-content shadow-sm">
-            <!-- Pestaña Overview (Contenido de la Imagen 1) -->
-            <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                @await Html.PartialAsync("_CustomerDetailsOverviewTab")
+                    <div class="mb-3">
+                        <strong class="d-block text-muted mb-1" data-translate-key="creation_date_label">Fecha de Creación</strong>
+                        <span><i class="fas fa-calendar-alt text-primary me-2"></i>@Model.CreatedAt.ToString("dd/MM/yyyy")</span><br>
+                        <small class="text-muted"><i class="fas fa-clock text-secondary me-2"></i>@Model.CreatedAt.ToString("HH:mm")</small>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.CreatedByUserName))
+                    {
+                        <div class="mb-0">
+                            <strong class="d-block text-muted mb-1" data-translate-key="created_by_label">Creado por</strong>
+                            <span><i class="fas fa-user text-success me-2"></i>@Model.CreatedByUserName</span>
+                        </div>
+                    }
+                </div>
             </div>
-            <!-- Pestaña Security (Contenido de la Imagen 2) -->
-            <div class="tab-pane fade" id="security" role="tabpanel">
-                @await Html.PartialAsync("_CustomerDetailsSecurityTab")
-            </div>
-            <!-- Pestaña Address & Billing (Contenido de la Imagen 3) -->
-            <div class="tab-pane fade" id="addressBilling" role="tabpanel">
-                @await Html.PartialAsync("_CustomerDetailsAddressBillingTab")
-            </div>
-            <!-- Pestaña Notifications (Contenido de la Imagen 4) -->
-            <div class="tab-pane fade" id="notifications" role="tabpanel">
-                @await Html.PartialAsync("_CustomerDetailsNotificationsTab")
+
+            <!-- Quick Actions Card -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="card-title mb-0" data-translate-key="quick_actions_title">Acciones Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-2"></i> <span data-translate-key="btn_edit_customer">Editar Cliente</span>
+                        </a>
+                        
+                        <a href="mailto:@Model.Email" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-envelope me-2"></i> <span data-translate-key="btn_send_email">Enviar Email</span>
+                        </a>
+                        
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                        {
+                            <a href="tel:@Model.PhoneNumber" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-phone me-2"></i> <span data-translate-key="btn_call_customer">Llamar</span>
+                            </a>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Offcanvas/Modal para Editar Cliente (se definirá luego) -->
-<!-- @await Html.PartialAsync("_AddEditCustomerOffcanvas", new { IsEditMode = true }) -->
 
 @section Scripts {
-    <script src="~/js/customers-script.js"></script>
+    <script src="~/js/customers-script.js" asp-append-version="true"></script>
 }

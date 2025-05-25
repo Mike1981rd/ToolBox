@@ -1,0 +1,203 @@
+@model ToolBox.Models.ViewModels.CustomerCreateViewModel
+
+@{
+    ViewData["Title"] = "Crear Cliente";
+    Layout = "_AdminLayout";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Customers" asp-action="Index" data-translate-key="breadcrumb_customers_list">Clientes</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_customer_create">Crear Cliente</li>
+    </ol>
+</nav>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4" data-translate-key="create_customer_title">Crear Cliente</h1>
+            <p class="lead" data-translate-key="create_customer_subtitle">Agregar un nuevo cliente al sistema</p>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> <span data-translate-key="btn_back_to_list">Volver a la Lista</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" data-translate-key="customer_information_title">Información del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Avatar Upload -->
+                        <div class="mb-4 text-center">
+                            <label class="form-label" data-translate-key="form_customer_avatar">Avatar del Cliente</label>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="me-3">
+                                    <img src="/img/default-avatar.png"
+                                         alt="Customer Avatar" 
+                                         class="img-fluid rounded" 
+                                         id="avatarPreview" 
+                                         style="width: 100px; height: 100px; object-fit: cover; border: 2px solid #dee2e6;">
+                                </div>
+                                <div>
+                                    <input type="file" asp-for="AvatarFile" class="form-control" accept="image/*" id="avatarInput">
+                                    <div class="form-text" data-translate-key="avatar_help_text">Permitido JPG, PNG, GIF. Máximo 800KB</div>
+                                    <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- First Name - REQUIRED -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">
+                                    <span data-translate-key="form_first_name">Nombre</span> 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Juan" required />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+
+                            <!-- Last Name - REQUIRED -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">
+                                    <span data-translate-key="form_last_name">Apellido</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="LastName" class="form-control" placeholder="Pérez" required />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Email - REQUIRED -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">
+                                <span data-translate-key="form_email">Email</span>
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="juan.perez@example.com" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Phone Number - REQUIRED -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <span data-translate-key="form_phone">Teléfono</span>
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="+1 (609) 988-44-11" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <!-- Company Name - OPTIONAL -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CompanyName" class="form-label" data-translate-key="form_company">Empresa</label>
+                                <input asp-for="CompanyName" class="form-control" placeholder="Mi Empresa S.A." />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+
+                            <!-- Country - OPTIONAL -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Country" class="form-label" data-translate-key="form_country">País</label>
+                                <select asp-for="Country" class="form-select">
+                                    <option value="" data-translate-key="form_select_country">Seleccionar país</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="BO">Bolivia</option>
+                                    <option value="BR">Brasil</option>
+                                    <option value="CL">Chile</option>
+                                    <option value="CO">Colombia</option>
+                                    <option value="CR">Costa Rica</option>
+                                    <option value="ES">España</option>
+                                    <option value="MX">México</option>
+                                    <option value="US">Estados Unidos</option>
+                                    <option value="VE">Venezuela</option>
+                                </select>
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label asp-for="IsActive" class="form-label" data-translate-key="form_status">Estado</label>
+                            <select asp-for="IsActive" class="form-select">
+                                <option value="true" data-translate-key="status_active">Activo</option>
+                                <option value="false" data-translate-key="status_inactive">Inactivo</option>
+                            </select>
+                            <span asp-validation-for="IsActive" class="text-danger"></span>
+                        </div>
+
+                        <!-- Status Detail -->
+                        <div class="mb-4">
+                            <label asp-for="StatusDetail" class="form-label" data-translate-key="form_status_detail">Detalle del Estado (Opcional)</label>
+                            <input asp-for="StatusDetail" class="form-control" placeholder="Notas adicionales sobre el estado" />
+                            <span asp-validation-for="StatusDetail" class="text-danger"></span>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i> <span data-translate-key="btn_cancel">Cancelar</span>
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> <span data-translate-key="btn_create_customer">Crear Cliente</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right sidebar with customer info (similar to users) -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="card-title mb-0" data-translate-key="help_title">Ayuda</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary" data-translate-key="required_fields_title">Campos Obligatorios</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><i class="fas fa-check text-success me-2"></i> <span data-translate-key="form_first_name">Nombre</span></li>
+                        <li><i class="fas fa-check text-success me-2"></i> <span data-translate-key="form_last_name">Apellido</span></li>
+                        <li><i class="fas fa-check text-success me-2"></i> <span data-translate-key="form_email">Email</span></li>
+                        <li><i class="fas fa-check text-success me-2"></i> <span data-translate-key="form_phone">Teléfono</span></li>
+                    </ul>
+                    
+                    <h6 class="text-info" data-translate-key="optional_fields_title">Campos Opcionales</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-circle text-muted me-2" style="font-size: 0.5rem;"></i> <span data-translate-key="form_company">Empresa</span></li>
+                        <li><i class="fas fa-circle text-muted me-2" style="font-size: 0.5rem;"></i> <span data-translate-key="form_country">País</span></li>
+                        <li><i class="fas fa-circle text-muted me-2" style="font-size: 0.5rem;"></i> <span data-translate-key="form_customer_avatar">Avatar</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Avatar preview functionality
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

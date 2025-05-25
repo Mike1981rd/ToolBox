@@ -31,6 +31,8 @@ builder.Services.AddScoped<IHabitoService, HabitoService>();
 builder.Services.AddScoped<IWelcomeMessageService, WelcomeMessageService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IWebsiteConfigurationService, WebsiteConfigurationService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 

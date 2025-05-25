@@ -31,6 +31,7 @@ namespace ToolBox.Data
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Video> Videos { get; set; }
         public DbSet<WebsiteConfiguration> WebsiteConfiguration { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -297,6 +298,27 @@ namespace ToolBox.Data
                 .WithMany()
                 .HasForeignKey(w => w.LastUpdatedByUserId)
                 .OnDelete(DeleteBehavior.SetNull);
+                
+            // Customer configuration
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CreatedByUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            // Índice único para email de clientes
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.Email)
+                .IsUnique();
+                
+            // Índice para búsquedas por nombre
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => new { c.FirstName, c.LastName });
+                
+            // Índice por fecha de creación
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.CreatedAt);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)

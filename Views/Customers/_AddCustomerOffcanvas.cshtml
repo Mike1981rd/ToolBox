@@ -1,0 +1,142 @@
+@* No se necesita ningún modelo específico para este formulario *@
+
+<div class="offcanvas offcanvas-end customer-offcanvas offcanvas-custom-width" tabindex="-1" id="addCustomerOffcanvas" aria-labelledby="addCustomerOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="addCustomerOffcanvasLabel" data-translate-key="add_customer_title">Agregar Cliente</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body flex-grow-1">
+        <form class="add-new-customer needs-validation pt-0" id="addNewCustomerForm" novalidate enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            
+            <!-- Customer Avatar -->
+            <div class="mb-4 text-center">
+                <label class="form-label" data-translate-key="offcanvas_customer_avatar">Avatar del Cliente</label>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="me-3">
+                        <img src="https://via.placeholder.com/250x250/DFE3E7/8C98A4?text=Cliente"
+                             alt="Customer Avatar" 
+                             class="img-fluid rounded" 
+                             id="customerAvatarPreview" 
+                             style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #dee2e6; transition: all 0.3s ease;"
+                             onerror="this.onerror=null; this.src='/img/default-avatar.png'">
+                    </div>
+                    <div>
+                        <label for="uploadCustomerAvatarInput" class="btn btn-primary btn-sm mb-2 d-block" data-translate-key="offcanvas_upload_new_photo">
+                            <i class="fas fa-upload me-1"></i> Subir foto
+                        </label>
+                        <input type="file" id="uploadCustomerAvatarInput" name="avatarFile" class="d-none" accept="image/*">
+                        <button type="button" class="btn btn-outline-secondary btn-sm d-block w-100" id="resetCustomerAvatarButton" data-translate-key="offcanvas_reset_avatar">
+                            <i class="fas fa-trash-alt me-1"></i> Restablecer
+                        </button>
+                    </div>
+                </div>
+                <p class="text-muted small mt-2" data-translate-key="offcanvas_avatar_allowed_formats">Permitido JPG, GIF o PNG. Tamaño máximo 800KB</p>
+            </div>
+
+            <!-- Customer Info Section -->
+            <div class="row g-3">
+                <!-- First Name - REQUIRED -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-customer-firstname" class="form-label">
+                        <span data-translate-key="form_first_name">Nombre</span> 
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="add-customer-firstname" name="firstName" placeholder="Juan" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_firstname">Por favor ingrese un nombre válido</div>
+                </div>
+
+                <!-- Last Name - REQUIRED -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-customer-lastname" class="form-label">
+                        <span data-translate-key="form_last_name">Apellido</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="add-customer-lastname" name="lastName" placeholder="Pérez" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_lastname">Por favor ingrese un apellido válido</div>
+                </div>
+
+                <!-- Email - REQUIRED -->
+                <div class="col-12 mb-3">
+                    <label for="add-customer-email" class="form-label">
+                        <span data-translate-key="form_email">Email</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" class="form-control" id="add-customer-email" name="email" placeholder="juan.perez@example.com" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_email">Por favor ingrese un email válido</div>
+                </div>
+
+                <!-- Phone Number - REQUIRED -->
+                <div class="col-12 mb-3">
+                    <label for="add-customer-phone" class="form-label">
+                        <span data-translate-key="form_phone">Teléfono</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="tel" class="form-control phone-mask" id="add-customer-phone" name="phoneNumber" placeholder="+1 (609) 988-44-11" required>
+                    <div class="invalid-feedback" data-translate-key="form_feedback_phone">Por favor ingrese un número de teléfono válido</div>
+                </div>
+            </div>
+
+            <div class="divider my-4">
+                <div class="divider-text" data-translate-key="form_section_additional_info">Información Adicional</div>
+            </div>
+
+            <!-- Additional Info Section -->
+            <div class="row g-3">
+                <!-- Company Name - OPTIONAL -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-customer-company" class="form-label" data-translate-key="form_company">Empresa</label>
+                    <input type="text" id="add-customer-company" name="companyName" class="form-control" placeholder="Mi Empresa S.A.">
+                </div>
+
+                <!-- Country - OPTIONAL -->
+                <div class="col-md-6 mb-3">
+                    <label for="add-customer-country" class="form-label" data-translate-key="form_country">País</label>
+                    <select id="add-customer-country" name="country" class="form-select">
+                        <option value="" data-translate-key="form_select_country">Seleccionar país</option>
+                        <option value="AR">Argentina</option>
+                        <option value="BO">Bolivia</option>
+                        <option value="BR">Brasil</option>
+                        <option value="CL">Chile</option>
+                        <option value="CO">Colombia</option>
+                        <option value="CR">Costa Rica</option>
+                        <option value="CU">Cuba</option>
+                        <option value="DO">República Dominicana</option>
+                        <option value="EC">Ecuador</option>
+                        <option value="SV">El Salvador</option>
+                        <option value="ES">España</option>
+                        <option value="GT">Guatemala</option>
+                        <option value="HN">Honduras</option>
+                        <option value="MX">México</option>
+                        <option value="NI">Nicaragua</option>
+                        <option value="PA">Panamá</option>
+                        <option value="PY">Paraguay</option>
+                        <option value="PE">Perú</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="UY">Uruguay</option>
+                        <option value="US">Estados Unidos</option>
+                        <option value="VE">Venezuela</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="row g-3">
+                <!-- Status -->
+                <div class="col-12 mb-3">
+                    <label for="add-customer-status" class="form-label" data-translate-key="form_status">Estado</label>
+                    <select id="add-customer-status" name="isActive" class="form-select">
+                        <option value="true" selected data-translate-key="status_active">Activo</option>
+                        <option value="false" data-translate-key="status_inactive">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="pt-4">
+                <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit" data-translate-key="btn_add_customer">Agregar Cliente</button>
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" data-translate-key="btn_cancel">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>

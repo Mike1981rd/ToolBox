@@ -1,0 +1,228 @@
+@model IEnumerable<ToolBox.Models.ViewModels.CustomerListItemViewModel>
+@{
+    Layout = "_AdminLayout";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_customers_list">Clientes</li>
+    </ol>
+</nav>
+
+<!-- Filtros de la tabla -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title" data-translate-key="customers_filters_title">Filtros de Clientes</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="selectStatus" data-translate-key="filter_select_status">Select Status</label>
+                <select id="selectStatus" class="form-select filter-select">
+                    @if (ViewBag.CurrentStatusFilter == "active")
+                    {
+                        <option value="active" selected data-translate-key="status_active">Active</option>
+                        <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                    }
+                    else
+                    {
+                        <option value="active" data-translate-key="status_active">Active</option>
+                        <option value="inactive" selected data-translate-key="status_inactive">Inactive</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divisor o directamente la tabla -->
+    <hr class="m-0">
+
+    <div class="card-datatable table-responsive pt-0">
+        <div class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row p-3 align-items-center">
+                <div class="col-sm-12 col-md-6">
+                    <div class="dataTables_length" id="DataTables_Table_0_length">
+                        <label>
+                            <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                        <input type="search" class="form-control form-control-sm" placeholder="Buscar Cliente" aria-controls="DataTables_Table_0" data-translate-placeholder-key="search_customer_placeholder">
+                    </div>
+                    <div class="dt-buttons btn-group flex-wrap ms-2">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" tabindex="0" aria-haspopup="true" type="button" aria-expanded="false" data-bs-toggle="dropdown">
+                                <i class="fas fa-share-square me-1"></i> <span data-translate-key="export_button">Export</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="@Url.Action("ExportToExcel", "Customers")" data-translate-key="export_to_excel"><i class="fas fa-file-excel me-1"></i> Excel</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("ExportToCsv", "Customers")" data-translate-key="export_to_csv"><i class="fas fa-file-csv me-1"></i> CSV</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-sm btn-primary ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#addCustomerOffcanvas" aria-controls="addCustomerOffcanvas">
+                            <i class="fas fa-plus me-1"></i> <span data-translate-key="add_new_customer_button">Agregar Cliente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover dataTable no-footer dtr-column" id="customersTable">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled" rowspan="1" colspan="1" style="width: 0px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 18px;" data-col="1" aria-label=""><input type="checkbox" class="form-check-input"></th>
+                        <th data-translate-key="th_customer_list_customer">CLIENTE</th>
+                        <th data-translate-key="th_customer_list_id">ID CLIENTE</th>
+                        <th data-translate-key="th_customer_list_phone">TELÉFONO</th>
+                        <th data-translate-key="th_customer_list_country">PAÍS</th>
+                        <th data-translate-key="th_customer_list_status">ESTADO</th>
+                        <th data-translate-key="th_customer_list_actions">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var customer in Model)
+                        {
+                            <tr>
+                                <td class="dt-checkboxes-cell"><input type="checkbox" class="form-check-input dt-checkboxes"></td>
+                                <td>
+                                    <div class="d-flex justify-content-start align-items-center user-name">
+                                        <div class="avatar-wrapper me-3">
+                                            <div class="avatar avatar-md">
+                                                @if (!string.IsNullOrEmpty(customer.AvatarUrl))
+                                                {
+                                                    <img src="@customer.AvatarUrl" alt="Avatar de @customer.FullName" 
+                                                         class="table-avatar rounded-circle" 
+                                                         asp-append-version="true"
+                                                         onerror="this.onerror=null; this.src='/img/default-avatar.png';"
+                                                         loading="lazy">
+                                                }
+                                                else
+                                                {
+                                                    <img src="/img/default-avatar.png" alt="Avatar por defecto" 
+                                                         class="table-avatar rounded-circle"
+                                                         loading="lazy">
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="user-name text-truncate mb-0">@customer.FullName</h6>
+                                            <small class="text-truncate text-muted">@customer.Email</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-medium text-primary">@customer.CustomerNumber</span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(customer.PhoneNumber))
+                                    {
+                                        <span class="fw-medium">@customer.PhoneNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(customer.Country))
+                                    {
+                                        <span class="fw-medium">@customer.Country</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (customer.IsActive)
+                                    {
+                                        <span class="badge rounded-pill bg-success text-white px-3 py-2" data-translate-key="status_active">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            <span class="fw-medium">Activo</span>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-warning text-dark px-3 py-2" data-translate-key="status_inactive">
+                                            <i class="fas fa-pause-circle me-1"></i>
+                                            <span class="fw-medium">Inactivo</span>
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-inline-block text-nowrap">
+                                        <a href="@Url.Action("Details", new { id = customer.Id })" class="btn btn-sm btn-icon" title="Ver Detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = customer.Id })" class="btn btn-sm btn-icon" title="Editar Cliente">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        
+                                        @if (customer.IsActive)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-icon text-warning toggle-status-btn" 
+                                                    title="Desactivar Cliente"
+                                                    data-customer-id="@customer.Id"
+                                                    data-customer-name="@customer.FullName"
+                                                    data-current-status="active"
+                                                    data-action="deactivate">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-icon text-success toggle-status-btn" 
+                                                    title="Activar Cliente"
+                                                    data-customer-id="@customer.Id"
+                                                    data-customer-name="@customer.FullName"
+                                                    data-current-status="inactive"
+                                                    data-action="activate">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted mb-0" data-translate-key="no_customers_found">No se encontraron clientes</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" data-translate-key="notification_title">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="notificationMessage">
+            <!-- Mensaje dinámico -->
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas para agregar cliente -->
+@await Html.PartialAsync("_AddCustomerOffcanvas")

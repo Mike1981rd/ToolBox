@@ -1,19 +1,192 @@
 /**
  * Customers Management JavaScript
- * Handles functionality for the customers module
+ * Handles form validation, avatar upload preview, status toggling, and filters
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize customer table functionality
+    // Get references to all interactive elements
+    const addCustomerForm = document.getElementById('addNewCustomerForm');
+    const uploadCustomerAvatarInput = document.getElementById('uploadCustomerAvatarInput');
+    const resetCustomerAvatarButton = document.getElementById('resetCustomerAvatarButton');
+    const customerAvatarPreview = document.getElementById('customerAvatarPreview');
+    const customersTable = document.getElementById('customersTable');
+    const statusFilter = document.getElementById('selectStatus');
+    const searchInput = document.querySelector('input[type="search"]');
+    
+    // Avatar por defecto local
+    const defaultAvatarUrl = '/img/default-avatar.png';
+    
+    // 1. Avatar Upload Preview - Mejorado
+    if (uploadCustomerAvatarInput && customerAvatarPreview) {
+        uploadCustomerAvatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Validación de tamaño (800KB max)
+                if (file.size > 800 * 1024) {
+                    alert('El archivo es demasiado grande. El tamaño máximo permitido es 800KB.');
+                    this.value = ''; // Limpiar input
+                    return;
+                }
+                
+                // Validación de tipo (solo imágenes)
+                if (!file.type.match('image.*')) {
+                    alert('Por favor, selecciona una imagen válida (JPG, PNG o GIF).');
+                    this.value = ''; // Limpiar input
+                    return;
+                }
+                
+                // Usar URL.createObjectURL para mejor rendimiento
+                const objectUrl = URL.createObjectURL(file);
+                customerAvatarPreview.src = objectUrl;
+                customerAvatarPreview.classList.add('avatar-highlight'); // Opcional: efecto visual
+                setTimeout(() => customerAvatarPreview.classList.remove('avatar-highlight'), 500);
+                
+                // Limpiar el objeto URL cuando se cambie la imagen
+                customerAvatarPreview.onload = function() {
+                    URL.revokeObjectURL(objectUrl);
+                };
+            }
+        });
+    }
+    
+    // 2. Reset Avatar to Default
+    if (resetCustomerAvatarButton && customerAvatarPreview) {
+        resetCustomerAvatarButton.addEventListener('click', function() {
+            // Usar la imagen por defecto local
+            customerAvatarPreview.src = defaultAvatarUrl;
+            
+            if (uploadCustomerAvatarInput) {
+                uploadCustomerAvatarInput.value = ''; // Limpiar input file
+            }
+        });
+    }
+    
+    // 3. Form Validation for Offcanvas
+    if (addCustomerForm) {
+        addCustomerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Add was-validated class to show validation feedback
+            this.classList.add('was-validated');
+            
+            // If form is valid
+            if (this.checkValidity()) {
+                // Preparar los datos del formulario
+                const formData = new FormData();
+                formData.append('FirstName', document.getElementById('add-customer-firstname').value);
+                formData.append('LastName', document.getElementById('add-customer-lastname').value);
+                formData.append('Email', document.getElementById('add-customer-email').value);
+                formData.append('PhoneNumber', document.getElementById('add-customer-phone').value);
+                formData.append('CompanyName', document.getElementById('add-customer-company').value || '');
+                formData.append('Country', document.getElementById('add-customer-country').value || '');
+                formData.append('IsActive', document.getElementById('add-customer-status').value === 'true');
+                
+                // Agregar el archivo de avatar si existe
+                const avatarInput = document.getElementById('uploadCustomerAvatarInput');
+                if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                    formData.append('AvatarFile', avatarInput.files[0]);
+                }
+                
+                // Obtener el token antiforgery
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                formData.append('__RequestVerificationToken', token);
+                
+                // Enviar la petición al servidor
+                fetch('/Customers/Create', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        // Si hay redirección, probablemente el cliente se creó exitosamente
+                        window.location.href = response.url;
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(html => {
+                    if (html) {
+                        // Si hay HTML, probablemente hay errores de validación
+                        alert('Error al crear el cliente. Por favor revise los datos.');
+                        console.error('Validation errors occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ocurrió un error al crear el cliente.');
+                });
+            }
+        });
+    }
+    
+    // 4. Status Filter functionality
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            const selectedStatus = this.value;
+            const currentUrl = new URL(window.location);
+            
+            // Update URL parameters
+            if (selectedStatus) {
+                currentUrl.searchParams.set('statusFilter', selectedStatus);
+            } else {
+                currentUrl.searchParams.delete('statusFilter');
+            }
+            
+            // Navigate to new URL
+            window.location.href = currentUrl.toString();
+        });
+    }
+    
+    // 5. Search functionality
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value.trim();
+                const currentUrl = new URL(window.location);
+                
+                if (searchTerm) {
+                    currentUrl.searchParams.set('searchTerm', searchTerm);
+                } else {
+                    currentUrl.searchParams.delete('searchTerm');
+                }
+                
+                window.location.href = currentUrl.toString();
+            }, 500); // Debounce search for 500ms
+        });
+    }
+    
+    // 6. Toggle Status functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.toggle-status-btn')) {
+            const button = e.target.closest('.toggle-status-btn');
+            const customerId = button.dataset.customerId;
+            const customerName = button.dataset.customerName;
+            const currentStatus = button.dataset.currentStatus;
+            const action = button.dataset.action;
+            
+            const actionText = action === 'activate' ? 'activar' : 'desactivar';
+            const confirmMessage = `¿Está seguro que desea ${actionText} el cliente "${customerName}"?`;
+            
+            if (confirm(confirmMessage)) {
+                toggleCustomerStatus(customerId, button);
+            }
+        }
+    });
+    
+    // 7. Initialize customer table checkboxes
     initCustomerTable();
     
-    // Initialize customer action buttons
-    initCustomerActions();
-
-    // Initialize customer offcanvas functionality
-    initCustomerOffcanvas();
-
-    // Initialize translation after DOM is ready
+    // 8. Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            boundary: document.body
+        });
+    });
+    
+    // 9. Initialize translation if available
     if (typeof translatePage === 'function') {
         translatePage();
     }
@@ -23,25 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize customer table functionality
  */
 function initCustomerTable() {
-    // Customer table search functionality
-    const searchInput = document.querySelector('#DataTables_Table_Customers_filter input');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            // TODO: Implement search functionality
-            console.log('Searching customers:', this.value);
-        });
-    }
-    
-    // Table pagination
-    const paginationLinks = document.querySelectorAll('#DataTables_Table_Customers_paginate .page-link');
-    paginationLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            // TODO: Implement pagination functionality
-            console.log('Pagination clicked');
-        });
-    });
-    
     // Select all checkbox
     const selectAllCheckbox = document.querySelector('.dt-checkboxes-select-all');
     if (selectAllCheckbox) {
@@ -55,162 +209,149 @@ function initCustomerTable() {
 }
 
 /**
- * Initialize customer action buttons
+ * Toggle customer status (activate/deactivate)
  */
-function initCustomerActions() {
-    // Edit customer buttons
-    document.querySelectorAll('.edit-customer-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const customerId = this.getAttribute('data-customer-id');
-            console.log('Edit customer:', customerId);
-            
-            // Change offcanvas title to Edit mode
-            const titleElement = document.getElementById('addCustomerOffcanvasLabel');
-            if (titleElement) {
-                titleElement.setAttribute('data-translate-key', 'offcanvas_edit_customer_title');
-                titleElement.textContent = 'Edit Customer';
-            }
-            
-            // Hide password section for edit mode
-            const passwordSection = document.getElementById('passwordSection');
-            if (passwordSection) {
-                passwordSection.style.display = 'none';
-            }
-            
-            // Show the offcanvas
-            const offcanvasElement = document.getElementById('addCustomerOffcanvas');
-            if (offcanvasElement && typeof bootstrap !== 'undefined') {
-                const offcanvas = new bootstrap.Offcanvas(offcanvasElement);
-                offcanvas.show();
-            }
-            
-            // Re-translate the page to update the changed title
-            if (typeof translatePage === 'function') {
-                translatePage();
-            }
-        });
-    });
+function toggleCustomerStatus(customerId, buttonElement) {
+    // Get the anti-forgery token
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || 
+                  document.querySelector('meta[name="RequestVerificationToken"]')?.getAttribute('content');
     
-    // Deactivate customer buttons
-    document.querySelectorAll('.deactivate-customer-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const customerId = this.getAttribute('data-customer-id');
-            if (confirm('Are you sure you want to deactivate this customer?')) {
-                console.log('Deactivate customer:', customerId);
-                // TODO: Implement deactivate functionality
-            }
-        });
-    });
+    const formData = new FormData();
+    formData.append('id', customerId);
+    if (token) {
+        formData.append('__RequestVerificationToken', token);
+    }
     
-    // Add customer button
-    const addCustomerBtn = document.querySelector('[data-bs-target="#addCustomerOffcanvas"]');
-    if (addCustomerBtn) {
-        addCustomerBtn.addEventListener('click', function() {
-            console.log('Add new customer');
+    // Disable button during request
+    buttonElement.disabled = true;
+    const originalHtml = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('/Customers/ToggleStatus', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Show success notification
+            showNotification(result.message, 'success');
             
-            // Reset offcanvas title to Add mode
-            const titleElement = document.getElementById('addCustomerOffcanvasLabel');
-            if (titleElement) {
-                titleElement.setAttribute('data-translate-key', 'offcanvas_add_customer_title');
-                titleElement.textContent = 'Add New Customer';
-            }
+            // Get current filter
+            const currentFilter = document.getElementById('selectStatus')?.value || 'active';
             
-            // Show password section for add mode
-            const passwordSection = document.getElementById('passwordSection');
-            if (passwordSection) {
-                passwordSection.style.display = 'block';
+            // If the new status doesn't match the current filter, remove the row with animation
+            if ((currentFilter === 'active' && !result.newIsActiveState) || 
+                (currentFilter === 'inactive' && result.newIsActiveState)) {
+                const row = buttonElement.closest('tr');
+                if (row) {
+                    row.style.transition = 'all 0.3s ease';
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        row.remove();
+                        
+                        // Check if table is empty and show empty state
+                        const tbody = document.querySelector('#customersTable tbody');
+                        if (tbody && tbody.children.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">No se encontraron clientes</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }, 300);
+                }
+            } else {
+                // Update the status badge and button in the same row
+                const row = buttonElement.closest('tr');
+                if (row) {
+                    const statusBadge = row.querySelector('.badge');
+                    const statusButton = row.querySelector('.toggle-status-btn');
+                    
+                    if (result.newIsActiveState) {
+                        // Update to active status
+                        statusBadge.className = 'badge rounded-pill bg-success text-white px-3 py-2';
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i><span class="fw-medium">Activo</span>';
+                        
+                        statusButton.className = 'btn btn-sm btn-icon text-warning toggle-status-btn';
+                        statusButton.title = 'Desactivar Cliente';
+                        statusButton.dataset.currentStatus = 'active';
+                        statusButton.dataset.action = 'deactivate';
+                        statusButton.innerHTML = '<i class="fas fa-user-slash"></i>';
+                    } else {
+                        // Update to inactive status
+                        statusBadge.className = 'badge rounded-pill bg-warning text-dark px-3 py-2';
+                        statusBadge.innerHTML = '<i class="fas fa-pause-circle me-1"></i><span class="fw-medium">Inactivo</span>';
+                        
+                        statusButton.className = 'btn btn-sm btn-icon text-success toggle-status-btn';
+                        statusButton.title = 'Activar Cliente';
+                        statusButton.dataset.currentStatus = 'inactive';
+                        statusButton.dataset.action = 'activate';
+                        statusButton.innerHTML = '<i class="fas fa-user-check"></i>';
+                    }
+                }
             }
-            
-            // Clear form
-            const form = document.getElementById('addNewCustomerForm');
-            if (form) {
-                form.reset();
-            }
-            
-            // Re-translate the page to update the changed title
-            if (typeof translatePage === 'function') {
-                translatePage();
-            }
+        } else {
+            // Show error notification
+            showNotification(result.message || 'Error al cambiar el estado del cliente', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error de conexión al cambiar el estado del cliente', 'error');
+    })
+    .finally(() => {
+        // Re-enable button
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = originalHtml;
+    });
+}
+
+/**
+ * Show notification toast
+ */
+function showNotification(message, type = 'info') {
+    const toast = document.getElementById('notificationToast');
+    const toastMessage = document.getElementById('notificationMessage');
+    
+    if (toast && toastMessage) {
+        // Set message
+        toastMessage.textContent = message;
+        
+        // Set toast type class
+        toast.className = 'toast';
+        if (type === 'success') {
+            toast.classList.add('bg-success', 'text-white');
+        } else if (type === 'error') {
+            toast.classList.add('bg-danger', 'text-white');
+        } else {
+            toast.classList.add('bg-info', 'text-white');
+        }
+        
+        // Show toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove classes after hiding
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.className = 'toast';
         });
     }
 }
 
 /**
- * Initialize customer offcanvas functionality
+ * Función auxiliar para manejar errores graciosamente
  */
-function initCustomerOffcanvas() {
-    // Password toggle functionality
-    document.querySelectorAll('.form-password-toggle .input-group-text').forEach(toggleBtn => {
-        toggleBtn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('input');
-            const icon = this.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        });
-    });
-
-    // Avatar upload functionality
-    const uploadInput = document.getElementById('upload');
-    if (uploadInput) {
-        uploadInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const avatarImg = document.getElementById('uploadedAvatar');
-                    if (avatarImg) {
-                        avatarImg.src = e.target.result;
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+function handleError(element, message) {
+    console.error(message);
+    if (element) {
+        // Añadir clase de error o hacer algo visual si es apropiado
     }
-
-    // Avatar reset functionality
-    const resetBtn = document.querySelector('.account-image-reset');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            const avatarImg = document.getElementById('uploadedAvatar');
-            const uploadInput = document.getElementById('upload');
-            
-            if (avatarImg) {
-                avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIGQ9Ik01MCA1MEMzNS44NTc5IDUwIDI1IDM5LjE0MjEgMjUgMjVDMjUgMTAuODU3OSAzNS44NTc5IDAgNTAgMEM2NC4xNDIxIDAgNzUgMTAuODU3OSA3NSAyNUM3NSAzOS4xNDIxIDY0LjE0MjEgNTAgNTAgNTBaIiBmaWxsPSIjOUI5Qjk5Ii8+CjxwYXRoIGQ9Ik01MCA1NUMzNS44NTc5IDU1IDI1IDQ0LjE0MjEgMjUgMzBDMjUgMTUuODU3OSAzNS44NTc5IDUgNTAgNUM2NC4xNDIxIDUgNzUgMTUuODU3OSA3NSAzMEM3NSA0NC4xNDIxIDY0LjE0MjEgNTUgNTAgNTVaIiBmaWxsPSIjOUI5Qjk5Ii8+CjxwYXRoIGQ9Ik01MCA2MEM0MS43MTU5IDYwIDM1IDY2LjcxNTkgMzUgNzVDMzUgODMuMjg0MSA0MS43MTU5IDkwIDUwIDkwQzU4LjI4NDEgOTAgNjUgODMuMjg0MSA2NSA3NUM2NSA2Ni43MTU5IDU4LjI4NDEgNjAgNTAgNjBaIiBmaWxsPSIjOUI5Qjk5Ii8+Cjwvc3ZnPg==';
-            }
-            if (uploadInput) {
-                uploadInput.value = '';
-            }
-        });
-    }
-
-    // Form submission
-    const form = document.getElementById('addNewCustomerForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Here you would typically send the data to your server
-            console.log('Customer form submitted');
-            
-            // Close the offcanvas
-            const offcanvasElement = document.getElementById('addCustomerOffcanvas');
-            if (offcanvasElement && typeof bootstrap !== 'undefined') {
-                const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
-                if (offcanvas) {
-                    offcanvas.hide();
-                }
-            }
-            
-            // Show success message (you can customize this)
-            // alert('Customer saved successfully!');
-        });
-    }
+    return false;
 }
