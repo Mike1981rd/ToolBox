@@ -20,7 +20,7 @@ using ToolBox.Documents; // Para UserListPdfDocument
 
 namespace ToolBox.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly IUserService _userService;
@@ -504,6 +504,33 @@ namespace ToolBox.Controllers
                     message = newStatusMessage 
                 });
             }
+        }
+
+        // GET: Users/GetCurrentUserInfo
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentUserInfo()
+        {
+            var userId = GetCurrentUserId();
+            var user = await _userService.GetUserByIdAsync(userId);
+            
+            if (user == null)
+            {
+                return Json(new { 
+                    success = false, 
+                    message = "Usuario no encontrado" 
+                });
+            }
+
+            return Json(new { 
+                success = true,
+                user = new {
+                    id = user.Id,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    avatarUrl = user.AvatarUrl ?? "/img/default-avatar.png",
+                    roleName = user.Role?.Name
+                }
+            });
         }
 
         private bool UserExists(int id)

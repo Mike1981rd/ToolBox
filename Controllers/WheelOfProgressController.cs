@@ -5,7 +5,7 @@ using ToolBox.Models;
 
 namespace ToolBox.Controllers
 {
-    public class WheelOfProgressController : Controller
+    public class WheelOfProgressController : BaseController
     {
         private readonly IWheelOfProgressService _wheelOfProgressService;
         private readonly ApplicationDbContext _context;
@@ -62,31 +62,5 @@ namespace ToolBox.Controllers
             }
         }
 
-        private int GetCurrentUserId()
-        {
-            try
-            {
-                // Para desarrollo/testing - obtener el primer usuario activo
-                var firstActiveUser = _context.Users
-                    .Where(u => u.IsActive)
-                    .OrderBy(u => u.Id)
-                    .FirstOrDefault();
-                    
-                if (firstActiveUser != null)
-                {
-                    _logger.LogDebug("Using test user: {UserId} - {UserName}", firstActiveUser.Id, firstActiveUser.FullName);
-                    return firstActiveUser.Id;
-                }
-                
-                // Fallback - crear usuario de prueba si no existe ninguno
-                _logger.LogWarning("No active users found. This should not happen in production.");
-                return 1; // Fallback ID
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting current user ID");
-                return 1; // Fallback ID
-            }
-        }
     }
 }

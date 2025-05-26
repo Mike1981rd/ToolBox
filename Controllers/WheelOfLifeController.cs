@@ -6,7 +6,7 @@ using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
-    public class WheelOfLifeController : Controller
+    public class WheelOfLifeController : BaseController
     {
         private readonly ILogger<WheelOfLifeController> _logger;
         private readonly IWheelOfLifeService _wheelOfLifeService;
@@ -186,32 +186,5 @@ namespace ToolBox.Controllers
             }
         }
 
-        // Helper method to get current user ID (same as LifeAssessmentController)
-        private int GetCurrentUserId()
-        {
-            try
-            {
-                var firstActiveUser = _context.Users
-                    .Where(u => u.IsActive)
-                    .OrderBy(u => u.Id)
-                    .FirstOrDefault();
-                    
-                if (firstActiveUser != null)
-                {
-                    _logger.LogDebug("Using test user: {UserId} - {UserName}", firstActiveUser.Id, firstActiveUser.FullName);
-                    return firstActiveUser.Id;
-                }
-                else
-                {
-                    _logger.LogError("No active users found in database!");
-                    return 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting test user ID");
-                return 0;
-            }
-        }
     }
 }

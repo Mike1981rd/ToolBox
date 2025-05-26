@@ -1,0 +1,140 @@
+@model ToolBox.Models.ViewModels.LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ToolBox</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Login Styles -->
+    <link href="~/css/login-style.css" rel="stylesheet" />
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-wrapper">
+            <!-- Left Side - Login Form -->
+            <div class="login-form-section">
+                <div class="login-form-container">
+                    
+                    <!-- Logo y Marca -->
+                    <div class="brand-section">
+                        <div class="logo-container">
+                            <img id="siteLogo" src="/img/logo.png" alt="Logo" class="brand-logo" />
+                        </div>
+                        <h4 class="brand-title" id="siteTitle">ToolBox Admin</h4>
+                        <p class="brand-subtitle" id="welcomeMessage">Por favor inicia sesión en tu cuenta.</p>
+                    </div>
+
+                    <!-- Formulario de Login -->
+                    <form asp-action="Login" asp-controller="Auth" method="post" class="login-form" id="loginForm">
+                        @Html.AntiForgeryToken()
+                        
+                        <!-- Campo Email o Username -->
+                        <div class="form-group">
+                            <label asp-for="EmailOrUsername" class="form-label">Email o Nombre de Usuario</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input asp-for="EmailOrUsername" class="form-control" placeholder="Ingresa tu email o username" autocomplete="username" type="text" />
+                            </div>
+                            <span asp-validation-for="EmailOrUsername" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo Contraseña -->
+                        <div class="form-group">
+                            <label asp-for="Password" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input asp-for="Password" class="form-control" placeholder="Ingresa tu contraseña" autocomplete="current-password" />
+                                <button class="btn btn-outline-secondary password-toggle" type="button" id="togglePassword">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- Opciones adicionales -->
+                        <div class="form-options">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
+                                <label asp-for="RememberMe" class="form-check-label" for="rememberMe">
+                                    Recordarme
+                                </label>
+                            </div>
+                            <a href="#" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <!-- Botón de Login -->
+                        <button type="submit" class="btn btn-login" id="loginButton">
+                            <span class="btn-text">Iniciar Sesión</span>
+                            <div class="spinner-border spinner-border-sm d-none" role="status" id="loginSpinner">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </button>
+
+                        <!-- Mensajes de Error -->
+                        <div asp-validation-summary="All" class="text-danger validation-summary"></div>
+                        
+                        <!-- Mensaje de error dinámico -->
+                        <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorText"></span>
+                        </div>
+
+                    </form>
+
+                    <!-- Separador opcional -->
+                    <div class="divider">
+                        <span>o</span>
+                    </div>
+
+                    <!-- Login Social (Opcional - por ahora comentado) -->
+                    <!--
+                    <div class="social-login">
+                        <button class="btn btn-social btn-google">
+                            <i class="fab fa-google"></i>
+                            Google
+                        </button>
+                        <button class="btn btn-social btn-github">
+                            <i class="fab fa-github"></i>
+                            GitHub
+                        </button>
+                    </div>
+                    -->
+
+                    <!-- Enlace de Registro -->
+                    <div class="register-link">
+                        <p>¿Nuevo en nuestra plataforma? <a href="#" class="create-account-link">Crea una cuenta</a></p>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/login.js"></script>
+    
+    <!-- Validation Scripts -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

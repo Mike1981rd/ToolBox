@@ -36,45 +36,98 @@
                 </button>
             </div>
             <div class="list-group list-group-flush sidebar-nav">
+                @{
+                    var readableModules = ViewBag.UserReadableModules as List<string> ?? new List<string>();
+                }
+                
+                @* Dashboard siempre visible para usuarios autenticados *@
                 <a href="@Url.Action("Dashboard", "Admin")" class="list-group-item list-group-item-action active" data-translate-key="dashboard">
                     <i class="fas fa-tachometer-alt fa-fw"></i><span class="sidebar-item-text">Dashboard</span>
                 </a>
-                <a href="@Url.Action("Index", "Roles")" class="list-group-item list-group-item-action" data-translate-key="roles_menu">
-                    <i class="fas fa-user-shield fa-fw"></i><span class="sidebar-item-text">Roles</span>
-                </a>
-                <a href="@Url.Action("Index", "Users")" class="list-group-item list-group-item-action" data-translate-key="users_menu">
-                    <i class="fas fa-users fa-fw"></i><span class="sidebar-item-text">Users</span>
-                </a>
-                <a href="@Url.Action("Index", "Customers")" class="list-group-item list-group-item-action" data-translate-key="customers_menu">
-                    <i class="fas fa-id-card-alt fa-fw"></i><span class="sidebar-item-text">Customers</span>
-                </a>
-                <a href="@Url.Action("Index", "LifeAreas")" class="list-group-item list-group-item-action" data-translate-key="areas_of_life">
-                    <i class="fas fa-heartbeat fa-fw"></i><span class="sidebar-item-text">Areas of Life</span>
-                </a>
-                <a href="@Url.Action("Index", "XRayLife")" class="list-group-item list-group-item-action" data-translate-key="xray_of_life">
-                    <i class="fas fa-x-ray fa-fw"></i><span class="sidebar-item-text">X-Ray of life</span>
-                </a>
-                <a href="@Url.Action("Index", "LifeAssessment")" class="list-group-item list-group-item-action" data-translate-key="sidebar.lifeAssessmentQuestionnaires">
-                    <i class="fas fa-clipboard-list fa-fw"></i><span class="sidebar-item-text">Life Assessment Questionnaires</span>
-                </a>
-                <a href="@Url.Action("Index", "WheelOfLife")" class="list-group-item list-group-item-action" data-translate-key="sidebar.wheelOfLife">
-                    <i class="fas fa-chart-pie fa-fw"></i><span class="sidebar-item-text">Wheel of Life</span>
-                </a>
-                <a href="@Url.Action("Index", "WheelOfProgress")" class="list-group-item list-group-item-action" data-translate-key="sidebar.wheelOfProgress">
-                    <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">Wheel of Progress</span>
-                </a>
-                <a href="@Url.Action("Index", "Tasks")" class="list-group-item list-group-item-action" data-translate-key="sidebar.tasks">
-                    <i class="fas fa-tasks fa-fw"></i><span class="sidebar-item-text">Tasks</span>
-                </a>
-                <a href="@Url.Action("Index", "HabitTracker")" class="list-group-item list-group-item-action" data-translate-key="sidebar.habitTracker">
-                    <i class="fas fa-calendar-check fa-fw"></i><span class="sidebar-item-text">Habit Tracker</span>
-                </a>
-                <a href="@Url.Action("Edit", "WelcomeMessage")" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">
-                    <i class="fas fa-comment-dots fa-fw"></i><span class="sidebar-item-text">Default Welcome Message</span>
-                </a>
-                <a href="@Url.Action("Index", "Instructors")" class="list-group-item list-group-item-action" data-translate-key="coaches_menu">
-                    <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Instructors</span>
-                </a>
+                
+                @if (readableModules.Contains("Roles"))
+                {
+                    <a href="@Url.Action("Index", "Roles")" class="list-group-item list-group-item-action" data-translate-key="roles_menu">
+                        <i class="fas fa-user-shield fa-fw"></i><span class="sidebar-item-text">Roles</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("Users"))
+                {
+                    <a href="@Url.Action("Index", "Users")" class="list-group-item list-group-item-action" data-translate-key="users_menu">
+                        <i class="fas fa-users fa-fw"></i><span class="sidebar-item-text">Users</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("Customers"))
+                {
+                    <a href="@Url.Action("Index", "Customers")" class="list-group-item list-group-item-action" data-translate-key="customers_menu">
+                        <i class="fas fa-id-card-alt fa-fw"></i><span class="sidebar-item-text">Customers</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("LifeAreas"))
+                {
+                    <a href="@Url.Action("Index", "LifeAreas")" class="list-group-item list-group-item-action" data-translate-key="areas_of_life">
+                        <i class="fas fa-heartbeat fa-fw"></i><span class="sidebar-item-text">Areas of Life</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("XRayLife"))
+                {
+                    <a href="@Url.Action("Index", "XRayLife")" class="list-group-item list-group-item-action" data-translate-key="xray_of_life">
+                        <i class="fas fa-x-ray fa-fw"></i><span class="sidebar-item-text">X-Ray of life</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("LifeAssessment"))
+                {
+                    <a href="@Url.Action("Index", "LifeAssessment")" class="list-group-item list-group-item-action" data-translate-key="sidebar.lifeAssessmentQuestionnaires">
+                        <i class="fas fa-clipboard-list fa-fw"></i><span class="sidebar-item-text">Life Assessment Questionnaires</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("WheelOfLife"))
+                {
+                    <a href="@Url.Action("Index", "WheelOfLife")" class="list-group-item list-group-item-action" data-translate-key="sidebar.wheelOfLife">
+                        <i class="fas fa-chart-pie fa-fw"></i><span class="sidebar-item-text">Wheel of Life</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("WheelOfProgress"))
+                {
+                    <a href="@Url.Action("Index", "WheelOfProgress")" class="list-group-item list-group-item-action" data-translate-key="sidebar.wheelOfProgress">
+                        <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">Wheel of Progress</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("Tasks"))
+                {
+                    <a href="@Url.Action("Index", "Tasks")" class="list-group-item list-group-item-action" data-translate-key="sidebar.tasks">
+                        <i class="fas fa-tasks fa-fw"></i><span class="sidebar-item-text">Tasks</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("HabitTracker"))
+                {
+                    <a href="@Url.Action("Index", "HabitTracker")" class="list-group-item list-group-item-action" data-translate-key="sidebar.habitTracker">
+                        <i class="fas fa-calendar-check fa-fw"></i><span class="sidebar-item-text">Habit Tracker</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("WelcomeMessage"))
+                {
+                    <a href="@Url.Action("Edit", "WelcomeMessage")" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">
+                        <i class="fas fa-comment-dots fa-fw"></i><span class="sidebar-item-text">Default Welcome Message</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("Instructors"))
+                {
+                    <a href="@Url.Action("Index", "Instructors")" class="list-group-item list-group-item-action" data-translate-key="coaches_menu">
+                        <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Instructors</span>
+                    </a>
+                }
                 <a href="@Url.Action("Create", "Users")" class="list-group-item list-group-item-action d-none" data-translate-key="add_user">
                     <i class="fas fa-user-plus fa-fw"></i><span class="sidebar-item-text">Add USER</span>
                 </a>
@@ -82,38 +135,61 @@
                     <i class="fas fa-user-circle fa-fw"></i><span class="sidebar-item-text">Profile</span>
                 </a>
                 
-                <!-- Academy con submenú (usar collapse de Bootstrap) -->
-                <a href="#academySubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-translate-key="academy">
-                    <div>
-                        <i class="fas fa-graduation-cap fa-fw"></i><span class="sidebar-item-text">Academy</span>
-                    </div>
-                    <i class="fas fa-chevron-down fa-fw transition-icon"></i>
-                </a>
-                <ul class="collapse list-unstyled" id="academySubmenu">
-                    <li>
-                        <a href="@Url.Action("Index", "Topics")" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.topics">
-                            <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Topics</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="@Url.Action("Index", "VideoManagement")" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.videoManagement">
-                            <i class="fas fa-video fa-fw"></i><span class="sidebar-item-text">Video Management</span>
-                        </a>
-                    </li>
-                </ul>
+                @* Academy con submenú - mostrar solo si tiene permisos para Topics o VideoManagement *@
+                @if (readableModules.Contains("Topics") || readableModules.Contains("VideoManagement"))
+                {
+                    <a href="#academySubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-translate-key="academy">
+                        <div>
+                            <i class="fas fa-graduation-cap fa-fw"></i><span class="sidebar-item-text">Academy</span>
+                        </div>
+                        <i class="fas fa-chevron-down fa-fw transition-icon"></i>
+                    </a>
+                    <ul class="collapse list-unstyled" id="academySubmenu">
+                        @if (readableModules.Contains("Topics"))
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", "Topics")" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.topics">
+                                    <i class="fas fa-chalkboard-teacher fa-fw"></i><span class="sidebar-item-text">Topics</span>
+                                </a>
+                            </li>
+                        }
+                        @if (readableModules.Contains("VideoManagement"))
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", "VideoManagement")" class="list-group-item list-group-item-action ps-5" data-translate-key="sidebar.academia.videoManagement">
+                                    <i class="fas fa-video fa-fw"></i><span class="sidebar-item-text">Video Management</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
                 
-                <a href="@Url.Action("Index", "ToolboxAcademy")" class="list-group-item list-group-item-action" data-translate-key="page_titles.toolboxAcademy">
-                    <i class="fas fa-university fa-fw"></i><span class="sidebar-item-text">Academia Toolbox</span>
-                </a>
-                <a href="@Url.Action("Analytics", "Admin")" class="list-group-item list-group-item-action d-none" data-translate-key="website_setting">
-                    <i class="fas fa-chart-bar fa-fw"></i><span class="sidebar-item-text">Analytics</span>
-                </a>
-                <a href="@Url.Action("Index", "WebsiteSettings")" class="list-group-item list-group-item-action" data-translate-key="sidebar.websiteSettings">
-                    <i class="fas fa-cog fa-fw"></i><span class="sidebar-item-text">Website Settings</span>
-                </a>
-                <a href="@Url.Action("Index", "EmailContents")" class="list-group-item list-group-item-action" data-translate-key="email.emailContents">
-                    <i class="fas fa-envelope fa-fw"></i><span class="sidebar-item-text">Email Contents</span>
-                </a>
+                @if (readableModules.Contains("ToolboxAcademy"))
+                {
+                    <a href="@Url.Action("Index", "ToolboxAcademy")" class="list-group-item list-group-item-action" data-translate-key="page_titles.toolboxAcademy">
+                        <i class="fas fa-university fa-fw"></i><span class="sidebar-item-text">Academia Toolbox</span>
+                    </a>
+                }
+                @if (readableModules.Contains("Analytics"))
+                {
+                    <a href="@Url.Action("Analytics", "Admin")" class="list-group-item list-group-item-action" data-translate-key="website_setting">
+                        <i class="fas fa-chart-bar fa-fw"></i><span class="sidebar-item-text">Analytics</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("WebsiteSettings"))
+                {
+                    <a href="@Url.Action("Index", "WebsiteSettings")" class="list-group-item list-group-item-action" data-translate-key="sidebar.websiteSettings">
+                        <i class="fas fa-cog fa-fw"></i><span class="sidebar-item-text">Website Settings</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("EmailContents"))
+                {
+                    <a href="@Url.Action("Index", "EmailContents")" class="list-group-item list-group-item-action" data-translate-key="email.emailContents">
+                        <i class="fas fa-envelope fa-fw"></i><span class="sidebar-item-text">Email Contents</span>
+                    </a>
+                }
                 <a href="#" class="list-group-item list-group-item-action mt-auto d-none" data-translate-key="logout">
                     <i class="fas fa-sign-out-alt fa-fw"></i><span class="sidebar-item-text">Logout</span>
                 </a>
@@ -159,17 +235,45 @@
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="avatar-wrapper me-2">
-                                    <svg width="38" height="38" xmlns="http://www.w3.org/2000/svg" class="rounded-circle" style="background-color: #7367f0;">
-                                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff">CC</text>
-                                    </svg>
+                                    @{
+                                        var userName = User.Identity?.Name ?? "Usuario";
+                                        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                                        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                                        
+                                        // Por ahora usar un avatar por defecto o las iniciales
+                                        var initials = string.Join("", userName.Split(' ').Take(2).Select(n => n.FirstOrDefault().ToString().ToUpper()));
+                                        if (string.IsNullOrEmpty(initials)) initials = "U";
+                                    }
+                                    
+                                    <div id="userAvatar" class="user-avatar-container">
+                                        <!-- El avatar se cargará dinámicamente con JavaScript -->
+                                        <svg width="38" height="38" xmlns="http://www.w3.org/2000/svg" class="rounded-circle user-avatar-placeholder" style="background-color: #7367f0;">
+                                            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff">@initials</text>
+                                        </svg>
+                                    </div>
                                 </div>
-                                <span class="user-name">Carlos Checo</span>
+                                <span class="user-name">@userName</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="#" data-translate-key="profile">Profile</a></li>
-                                <li><a class="dropdown-item" href="#" data-translate-key="settings">Settings</a></li>
+                                <li>
+                                    <div class="dropdown-item-text">
+                                        <div class="fw-semibold">@userName</div>
+                                        <div class="text-muted small">@userEmail</div>
+                                    </div>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" data-translate-key="logout">Logout</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Details", "Users", new { id = userId })" data-translate-key="profile"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Edit", "Users", new { id = userId })" data-translate-key="settings"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-action="Logout" asp-controller="Auth" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>
+                                            <span data-translate-key="logout">Cerrar Sesión</span>
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     </div>

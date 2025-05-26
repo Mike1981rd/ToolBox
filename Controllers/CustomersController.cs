@@ -14,7 +14,7 @@ using ClosedXML.Excel;
 
 namespace ToolBox.Controllers
 {
-    public class CustomersController : Controller
+    public class CustomersController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomerService _customerService;
@@ -454,12 +454,6 @@ namespace ToolBox.Controllers
             return File(pdfBytes, "application/pdf", $"Clientes_{DateTime.Now:yyyyMMdd}.pdf");
         }
 
-        private int GetCurrentUserId()
-        {
-            // TODO: Obtener el usuario actual desde la sesión o claims
-            // Por ahora retornamos un ID hardcodeado para pruebas
-            return 1;
-        }
 
         private bool CustomerExists(int id)
         {

@@ -5,7 +5,7 @@ using ToolBox.Data;
 
 namespace ToolBox.Controllers
 {
-    public class TasksController : Controller
+    public class TasksController : BaseController
     {
         private readonly ITareaService _tareaService;
         private readonly ILogger<TasksController> _logger;
@@ -242,11 +242,5 @@ namespace ToolBox.Controllers
             return Json(statistics);
         }
 
-        private int GetCurrentUserId()
-        {
-            // TODO: Obtener el usuario actual desde la sesión o claims
-            // Por ahora retornamos un ID hardcodeado para pruebas
-            return 1;
-        }
     }
 }

@@ -7,7 +7,7 @@ namespace ToolBox.Controllers
     /// <summary>
     /// Controller for handling administrative functions and views
     /// </summary>
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private readonly ILogger<AdminController> _logger;
 

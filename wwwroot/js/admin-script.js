@@ -2242,8 +2242,66 @@ const translations = {
     }
 };
 
+// Function to load user avatar
+function loadUserAvatar() {
+    const avatarContainer = document.getElementById('userAvatar');
+    if (!avatarContainer) return;
+    
+    fetch('/Users/GetCurrentUserInfo')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.user) {
+                const user = data.user;
+                
+                // Update user name in the dropdown
+                const userNameElement = document.querySelector('.user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = user.fullName;
+                }
+                
+                // Update avatar
+                if (user.avatarUrl && user.avatarUrl !== '/img/default-avatar.png') {
+                    // User has a custom avatar
+                    avatarContainer.innerHTML = `
+                        <img src="${user.avatarUrl}" alt="${user.fullName}" 
+                             class="rounded-circle user-avatar" 
+                             style="width: 38px; height: 38px; object-fit: cover;"
+                             onerror="this.onerror=null; this.parentElement.innerHTML=createInitialsAvatar('${user.fullName}');">
+                    `;
+                } else {
+                    // Use initials avatar
+                    avatarContainer.innerHTML = createInitialsAvatar(user.fullName);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error loading user info:', error);
+        });
+}
+
+// Function to create initials avatar
+function createInitialsAvatar(fullName) {
+    const initials = fullName
+        .split(' ')
+        .map(name => name.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join('');
+    
+    return `
+        <svg width="38" height="38" xmlns="http://www.w3.org/2000/svg" 
+             class="rounded-circle user-avatar-placeholder" 
+             style="background-color: #7367f0;">
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+                  font-family="Arial" font-size="14" fill="#fff">${initials}</text>
+        </svg>
+    `;
+}
+
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Load user avatar on page load
+    loadUserAvatar();
+    
     // Elements
     const sidebarToggle = document.getElementById('sidebarToggle');
     const menuToggle = document.getElementById('menu-toggle');

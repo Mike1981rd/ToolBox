@@ -7,7 +7,7 @@ using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
-    public class XRayLifeController : Controller
+    public class XRayLifeController : BaseController
     {
         private readonly ILifeAreaService _lifeAreaService;
         private readonly IQuestionService _questionService;
@@ -338,13 +338,5 @@ namespace ToolBox.Controllers
         }
         
         // Helper method to get current user ID
-        // TODO: Replace with actual authentication when implemented
-        private int GetCurrentUserId()
-        {
-            // For now, return a hardcoded user ID
-            // In production, this should get the ID from the authenticated user
-            // Example: return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            return 1; // Hardcoded for testing
-        }
     }
 }
