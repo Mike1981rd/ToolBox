@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('PhoneNumber', document.getElementById('add-customer-phone').value);
                 formData.append('CompanyName', document.getElementById('add-customer-company').value || '');
                 formData.append('Country', document.getElementById('add-customer-country').value || '');
-                formData.append('IsActive', document.getElementById('add-customer-status').value === 'true');
+                formData.append('IsActive', document.getElementById('add-customer-status').value);
                 
                 // Agregar el archivo de avatar si existe
                 const avatarInput = document.getElementById('uploadCustomerAvatarInput');
@@ -99,7 +99,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => {
                     if (response.redirected) {
                         // Si hay redirección, probablemente el cliente se creó exitosamente
-                        window.location.href = response.url;
+                        // Cerrar el offcanvas y resetear el formulario
+                        const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('addCustomerOffcanvas'));
+                        if (offcanvas) {
+                            offcanvas.hide();
+                        }
+                        // Resetear el formulario
+                        addCustomerForm.reset();
+                        addCustomerForm.classList.remove('was-validated');
+                        // Resetear el avatar
+                        if (customerAvatarPreview) {
+                            customerAvatarPreview.src = defaultAvatarUrl;
+                        }
+                        // Recargar la página para mostrar el nuevo cliente
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 300);
                     } else {
                         return response.text();
                     }
@@ -119,42 +134,96 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 4. Status Filter functionality
+    // 4. Status Filter functionality with smooth transition
     if (statusFilter) {
         statusFilter.addEventListener('change', function() {
-            const selectedStatus = this.value;
-            const currentUrl = new URL(window.location);
+            showTableLoading(true);
+            const params = new URLSearchParams();
+            params.append('statusFilter', this.value);
             
-            // Update URL parameters
-            if (selectedStatus) {
-                currentUrl.searchParams.set('statusFilter', selectedStatus);
-            } else {
-                currentUrl.searchParams.delete('statusFilter');
+            // Mantener término de búsqueda si existe
+            const currentSearchTerm = searchInput ? searchInput.value.trim() : '';
+            if (currentSearchTerm) {
+                params.append('searchTerm', currentSearchTerm);
             }
             
-            // Navigate to new URL
-            window.location.href = currentUrl.toString();
+            // Transición suave en lugar de recarga agresiva
+            setTimeout(() => {
+                window.location.href = window.location.pathname + '?' + params.toString();
+            }, 200);
         });
     }
     
-    // 5. Search functionality
+    // 5. Search functionality with smooth transitions
     if (searchInput) {
         let searchTimeout;
+        
+        // Establecer el valor inicial desde los parámetros de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialSearchTerm = urlParams.get('searchTerm');
+        if (initialSearchTerm) {
+            searchInput.value = initialSearchTerm;
+        }
+        
+        // Función para filtro en tiempo real (sin recarga)
+        function filterTableClientSide(searchTerm) {
+            const tbody = document.querySelector('#customersTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matches = searchTerm === '' || text.includes(searchTerm.toLowerCase());
+                
+                if (matches) {
+                    row.style.display = '';
+                    row.style.opacity = '1';
+                } else {
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        if (row.style.opacity === '0') {
+                            row.style.display = 'none';
+                        }
+                    }, 200);
+                }
+            });
+        }
+        
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
+            const searchTerm = this.value.trim();
+            
+            // Filtro inmediato para respuesta instantánea
+            filterTableClientSide(searchTerm);
+            
+            // Búsqueda en servidor con debounce más largo para mantener sincronía
             searchTimeout = setTimeout(() => {
-                const searchTerm = this.value.trim();
-                const currentUrl = new URL(window.location);
+                const params = new URLSearchParams();
                 
-                if (searchTerm) {
-                    currentUrl.searchParams.set('searchTerm', searchTerm);
-                } else {
-                    currentUrl.searchParams.delete('searchTerm');
+                // Mantener el filtro de estado actual
+                if (statusFilter && statusFilter.value) {
+                    params.append('statusFilter', statusFilter.value);
                 }
                 
-                window.location.href = currentUrl.toString();
-            }, 500); // Debounce search for 500ms
+                // Agregar término de búsqueda si existe
+                if (searchTerm) {
+                    params.append('searchTerm', searchTerm);
+                }
+                
+                // Actualizar URL sin recarga agresiva
+                const newUrl = window.location.pathname + '?' + params.toString();
+                window.history.replaceState({}, '', newUrl);
+                
+            }, 1500); // Solo actualizar URL después de 1.5 segundos de inactividad
         });
+    }
+    
+    // Función para mostrar estado de carga suave
+    function showTableLoading(show) {
+        const tbody = document.querySelector('#customersTable tbody');
+        if (tbody) {
+            tbody.style.opacity = show ? '0.5' : '1';
+            tbody.style.pointerEvents = show ? 'none' : 'auto';
+        }
     }
     
     // 6. Toggle Status functionality
@@ -216,8 +285,7 @@ function toggleCustomerStatus(customerId, buttonElement) {
     const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || 
                   document.querySelector('meta[name="RequestVerificationToken"]')?.getAttribute('content');
     
-    const formData = new FormData();
-    formData.append('id', customerId);
+    const formData = new URLSearchParams();
     if (token) {
         formData.append('__RequestVerificationToken', token);
     }
@@ -227,8 +295,11 @@ function toggleCustomerStatus(customerId, buttonElement) {
     const originalHtml = buttonElement.innerHTML;
     buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
-    fetch('/Customers/ToggleStatus', {
+    fetch(`/Customers/ToggleStatus/${customerId}`, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: formData
     })
     .then(response => response.json())

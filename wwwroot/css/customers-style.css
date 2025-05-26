@@ -1,5 +1,14 @@
 /* Estilos específicos para el módulo de Clientes */
 
+/* Transiciones suaves para filtros */
+#customersTable tbody {
+    transition: opacity 0.3s ease-in-out;
+}
+
+#customersTable tbody tr {
+    transition: opacity 0.2s ease-in-out;
+}
+
 /* Tabla de clientes */
 .card-datatable {
     padding: 0;

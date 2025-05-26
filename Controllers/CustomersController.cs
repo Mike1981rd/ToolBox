@@ -30,8 +30,9 @@ namespace ToolBox.Controllers
         // GET: Customers
         public async Task<IActionResult> Index(string? statusFilter = null, string? searchTerm = null)
         {
-            // Por defecto mostrar clientes activos
+            // Por defecto mostrar clientes activos si no se especifica filtro
             statusFilter = statusFilter ?? "active";
+            
             var customers = await _customerService.GetAllCustomersAsync(statusFilter, searchTerm);
             var customerViewModels = customers.Select(c => new CustomerListItemViewModel
             {
@@ -50,22 +51,13 @@ namespace ToolBox.Controllers
             }).ToList();
 
             // Pasar los filtros actuales a la vista para mantener la selección
-            ViewBag.CurrentStatusFilter = statusFilter ?? "active";
+            ViewBag.CurrentStatusFilter = statusFilter;
             ViewBag.CurrentSearchTerm = searchTerm;
             
             return View(customerViewModels);
         }
 
-        // Mantener compatibilidad con la vista existente
-        public async Task<IActionResult> AllCustomers(string? statusFilter = null, string? searchTerm = null)
-        {
-            return await Index(statusFilter, searchTerm);
-        }
-        
-        // Acciones para Exportar
-        public async Task<IActionResult> ExportToExcel(string? statusFilter = null, string? searchTerm = null)
-        {
-            var customers = await _customerService.GetAllCustomersAsync(statusFilter, searchTerm);
+        /* CÓDIGO HUÉRFANO COMENTADO - ELIMINAR DESPUÉS
             var dataToExport = customers.Select(c => new {
                 CustomerNumber = c.CustomerNumber,
                 FullName = c.FullName,
@@ -130,7 +122,9 @@ namespace ToolBox.Controllers
                 }
             }
         }
+        FIN DE CÓDIGO HUÉRFANO */
 
+        /* MÉTODO DUPLICADO - COMENTADO
         public async Task<IActionResult> ExportToCsv(string? statusFilter = null, string? searchTerm = null)
         {
             // Por defecto mostrar clientes activos si no se especifica filtro
@@ -148,7 +142,7 @@ namespace ToolBox.Controllers
             byte[] fileBytes = Encoding.UTF8.GetBytes(builder.ToString());
             string fileName = $"Clientes_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
             return File(fileBytes, "text/csv", fileName);
-        }
+        } */
 
         // GET: Customers/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -353,6 +347,111 @@ namespace ToolBox.Controllers
                     message = newStatusMessage 
                 });
             }
+        }
+
+        // GET: Customers/ExportToExcel
+        [HttpGet]
+        public async Task<IActionResult> ExportToExcel(string? statusFilter = null)
+        {
+            var customers = await _customerService.GetAllCustomersAsync(statusFilter);
+            
+            using var workbook = new ClosedXML.Excel.XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Clientes");
+            
+            // Headers
+            worksheet.Cell(1, 1).Value = "ID";
+            worksheet.Cell(1, 2).Value = "Número Cliente";
+            worksheet.Cell(1, 3).Value = "Nombre Completo";
+            worksheet.Cell(1, 4).Value = "Email";
+            worksheet.Cell(1, 5).Value = "Teléfono";
+            worksheet.Cell(1, 6).Value = "Empresa";
+            worksheet.Cell(1, 7).Value = "País";
+            worksheet.Cell(1, 8).Value = "Estado";
+            worksheet.Cell(1, 9).Value = "Fecha Creación";
+            worksheet.Cell(1, 10).Value = "Última Actualización";
+            
+            // Style headers
+            var headerRange = worksheet.Range(1, 1, 1, 10);
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+            
+            // Data
+            int row = 2;
+            foreach (var customer in customers)
+            {
+                worksheet.Cell(row, 1).Value = customer.Id;
+                worksheet.Cell(row, 2).Value = customer.CustomerNumber;
+                worksheet.Cell(row, 3).Value = customer.FullName;
+                worksheet.Cell(row, 4).Value = customer.Email;
+                worksheet.Cell(row, 5).Value = customer.PhoneNumber;
+                worksheet.Cell(row, 6).Value = customer.CompanyName ?? "";
+                worksheet.Cell(row, 7).Value = customer.Country ?? "";
+                worksheet.Cell(row, 8).Value = customer.IsActive ? "Activo" : "Inactivo";
+                worksheet.Cell(row, 9).Value = customer.CreatedAt.ToString("dd/MM/yyyy");
+                worksheet.Cell(row, 10).Value = customer.UpdatedAt.ToString("dd/MM/yyyy");
+                row++;
+            }
+            
+            // Auto-fit columns
+            worksheet.Columns().AdjustToContents();
+            
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            var content = stream.ToArray();
+            
+            return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                       $"Clientes_{DateTime.Now:yyyyMMdd}.xlsx");
+        }
+
+        // GET: Customers/ExportToCsv
+        [HttpGet]
+        public async Task<IActionResult> ExportToCsv(string? statusFilter = null)
+        {
+            var customers = await _customerService.GetAllCustomersAsync(statusFilter);
+            
+            var csv = new StringBuilder();
+            csv.AppendLine("ID,Número Cliente,Nombre Completo,Email,Teléfono,Empresa,País,Estado,Fecha Creación,Última Actualización");
+            
+            foreach (var customer in customers)
+            {
+                csv.AppendLine($"{customer.Id}," +
+                              $"\"{customer.CustomerNumber}\"," +
+                              $"\"{customer.FullName}\"," +
+                              $"\"{customer.Email}\"," +
+                              $"\"{customer.PhoneNumber}\"," +
+                              $"\"{customer.CompanyName ?? ""}\"," +
+                              $"\"{customer.Country ?? ""}\"," +
+                              $"\"{(customer.IsActive ? "Activo" : "Inactivo")}\"," +
+                              $"\"{customer.CreatedAt:dd/MM/yyyy}\"," +
+                              $"\"{customer.UpdatedAt:dd/MM/yyyy}\"");
+            }
+            
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", $"Clientes_{DateTime.Now:yyyyMMdd}.csv");
+        }
+
+        // GET: Customers/ExportToPdf
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf(string? statusFilter = null)
+        {
+            var customers = await _customerService.GetAllCustomersAsync(statusFilter);
+            
+            var customerDtos = customers.Select(c => new Documents.CustomerPdfDto
+            {
+                CustomerNumber = c.CustomerNumber,
+                FullName = c.FullName,
+                Email = c.Email,
+                PhoneNumber = c.PhoneNumber,
+                CompanyName = c.CompanyName ?? "",
+                Country = c.Country ?? "",
+                Status = c.IsActive ? "Activo" : "Inactivo",
+                CreatedAt = c.CreatedAt.ToString("dd/MM/yyyy")
+            }).ToList();
+            
+            var document = new Documents.CustomerListPdfDocument(customerDtos);
+            var pdfBytes = document.GeneratePdf();
+            
+            return File(pdfBytes, "application/pdf", $"Clientes_{DateTime.Now:yyyyMMdd}.pdf");
         }
 
         private int GetCurrentUserId()

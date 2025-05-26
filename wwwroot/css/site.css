@@ -20,3 +20,52 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Smooth table row transitions */
+#topicsTable tbody tr {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#topicsTable tbody tr.fade-out {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+#topicsTable tbody tr.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth loading state */
+.table-loading {
+  position: relative;
+}
+
+.table-loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Remove aggressive transitions */
+.form-select, .form-control {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}

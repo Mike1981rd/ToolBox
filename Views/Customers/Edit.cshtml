@@ -15,21 +15,6 @@
 </nav>
 
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-4" data-translate-key="edit_customer_title">Editar Cliente</h1>
-            <p class="lead" data-translate-key="edit_customer_subtitle">Actualizar información del cliente: @Model.FirstName @Model.LastName</p>
-        </div>
-        <div class="col-auto d-flex align-items-center">
-            <a asp-action="Index" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-arrow-left me-1"></i> <span data-translate-key="btn_back_to_list">Volver a la Lista</span>
-            </a>
-            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info">
-                <i class="fas fa-eye me-1"></i> <span data-translate-key="btn_view_details">Ver Detalles</span>
-            </a>
-        </div>
-    </div>
-
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm">
@@ -117,15 +102,35 @@
                                 <select asp-for="Country" class="form-select">
                                     <option value="" data-translate-key="form_select_country">Seleccionar país</option>
                                     <option value="AR">Argentina</option>
+                                    <option value="BZ">Belice</option>
                                     <option value="BO">Bolivia</option>
                                     <option value="BR">Brasil</option>
                                     <option value="CL">Chile</option>
                                     <option value="CO">Colombia</option>
                                     <option value="CR">Costa Rica</option>
-                                    <option value="ES">España</option>
+                                    <option value="CU">Cuba</option>
+                                    <option value="DO">República Dominicana</option>
+                                    <option value="EC">Ecuador</option>
+                                    <option value="SV">El Salvador</option>
+                                    <option value="GF">Guayana Francesa</option>
+                                    <option value="GT">Guatemala</option>
+                                    <option value="GY">Guyana</option>
+                                    <option value="HT">Haití</option>
+                                    <option value="HN">Honduras</option>
+                                    <option value="JM">Jamaica</option>
                                     <option value="MX">México</option>
-                                    <option value="US">Estados Unidos</option>
+                                    <option value="NI">Nicaragua</option>
+                                    <option value="PA">Panamá</option>
+                                    <option value="PY">Paraguay</option>
+                                    <option value="PE">Perú</option>
+                                    <option value="PR">Puerto Rico</option>
+                                    <option value="SR">Surinam</option>
+                                    <option value="TT">Trinidad y Tobago</option>
+                                    <option value="UY">Uruguay</option>
                                     <option value="VE">Venezuela</option>
+                                    <option value="ES">España</option>
+                                    <option value="US">Estados Unidos</option>
+                                    <option value="CA">Canadá</option>
                                 </select>
                                 <span asp-validation-for="Country" class="text-danger"></span>
                             </div>

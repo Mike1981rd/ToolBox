@@ -140,7 +140,7 @@ namespace ToolBox.Services
             var query = _context.Customers.Include(c => c.CreatedByUser).AsQueryable();
 
             // Filtrar por estado si se proporciona
-            if (!string.IsNullOrEmpty(statusFilter))
+            if (!string.IsNullOrEmpty(statusFilter) && statusFilter.ToLower() != "all")
             {
                 if (statusFilter.ToLower() == "active")
                 {

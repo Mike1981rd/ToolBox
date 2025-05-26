@@ -42,16 +42,67 @@ function initializeTopicsModule() {
         });
     }
     
-    // Initialize search functionality
+    // Initialize search functionality with client-side filtering
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            // Client-side filtering for instant results
+            if (topicsData.length > 0) {
+                const tableRows = document.querySelectorAll('#topicsTableBody tr');
+                let visibleCount = 0;
+                
+                tableRows.forEach(row => {
+                    // Skip no data row
+                    if (row.cells.length === 1) return;
+                    
+                    // Get text from name and description
+                    const topicCell = row.cells[1]; // Topic column
+                    const name = topicCell.querySelector('.fw-semibold')?.textContent.toLowerCase() || '';
+                    const description = topicCell.querySelector('.text-muted')?.textContent.toLowerCase() || '';
+                    
+                    // Check if search term matches
+                    const matches = name.includes(searchTerm) || description.includes(searchTerm);
+                    
+                    // Show/hide row with smooth transition
+                    if (matches) {
+                        row.style.display = '';
+                        row.style.opacity = '1';
+                        visibleCount++;
+                    } else {
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.style.display = 'none';
+                        }, 200);
+                    }
+                });
+                
+                // Show no results message if needed
+                if (visibleCount === 0) {
+                    const tbody = document.querySelector('#topicsTableBody');
+                    const noResultsRow = tbody.querySelector('.no-results-row');
+                    
+                    if (!noResultsRow) {
+                        const newRow = tbody.insertRow();
+                        newRow.className = 'no-results-row';
+                        newRow.innerHTML = '<td colspan="4" class="text-center">No se encontraron temas que coincidan con la búsqueda</td>';
+                    }
+                } else {
+                    const noResultsRow = document.querySelector('.no-results-row');
+                    if (noResultsRow) {
+                        noResultsRow.remove();
+                    }
+                }
+            }
+            
+            // Also update server-side search after debounce for pagination
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
                 currentSearchTerm = this.value.trim();
-                currentPage = 1; // Reset to first page on new search
+                currentPage = 1;
                 loadTopics();
-            }, 300); // 300ms debounce delay
+            }, 500);
         });
     }
     
@@ -150,19 +201,22 @@ function renderTopicsTable() {
         topicsData = [];
     }
     
-    if (topicsData.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                    <i class="fas fa-search fa-2x mb-2 d-block"></i>
-                    <span data-translate-key="no_topics_found">No topics found</span>
-                </td>
-            </tr>
-        `;
-        return;
-    }
+    // Fade out existing content
+    tbody.style.transition = 'opacity 0.2s ease';
+    tbody.style.opacity = '0';
     
-    tbody.innerHTML = topicsData.map(topic => `
+    setTimeout(() => {
+        if (topicsData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="fas fa-search fa-2x mb-2 d-block"></i>
+                        <span data-translate-key="no_topics_found">No topics found</span>
+                    </td>
+                </tr>
+            `;
+        } else {
+            tbody.innerHTML = topicsData.map(topic => `
         <tr>
             <td class="dt-checkboxes-cell">
                 <input type="checkbox" class="form-check-input dt-checkboxes" value="${topic.id}">
@@ -196,10 +250,15 @@ function renderTopicsTable() {
                 </div>
             </td>
         </tr>
-    `).join('');
-    
-    // Attach event listeners to action buttons
-    attachActionListeners();
+            `).join('');
+        }
+        
+        // Fade in new content
+        tbody.style.opacity = '1';
+        
+        // Attach event listeners to action buttons
+        attachActionListeners();
+    }, 200);
 }
 
 function updatePagination() {
@@ -457,14 +516,12 @@ function updateSubmitButton(translationKey) {
 function showLoadingState() {
     const tbody = document.getElementById('topicsTableBody');
     if (tbody) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center py-4">
-                    <i class="fas fa-spinner fa-spin fa-2x mb-2 d-block"></i>
-                    <span data-translate-key="loading_topics">Loading topics...</span>
-                </td>
-            </tr>
-        `;
+        // Add subtle loading indicator without clearing the table
+        const existingRows = tbody.querySelectorAll('tr');
+        existingRows.forEach(row => {
+            row.style.opacity = '0.5';
+            row.style.transition = 'opacity 0.2s ease';
+        });
     }
 }
 
