@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Test Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<h1>Dashboard de Prueba</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Mensaje de Bienvenida</h5>
+                <p>Este es un mensaje de prueba</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Video</h5>
+                <p>Aquí iría el video</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>Total Clientes</h5>
+                <h2>123</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>Clientes Activos</h5>
+                <h2>98</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+<h3>Test de API</h3>
+<button class="btn btn-primary" onclick="testAPI()">Probar API</button>
+<div id="apiResult"></div>
+
+<script>
+function testAPI() {
+    fetch('/api/dashboard/welcome-message-config')
+        .then(response => {
+            document.getElementById('apiResult').innerHTML = 'Status: ' + response.status;
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('apiResult').innerHTML += '<br>Data: ' + JSON.stringify(data);
+        })
+        .catch(error => {
+            document.getElementById('apiResult').innerHTML = 'Error: ' + error;
+        });
+}
+</script>

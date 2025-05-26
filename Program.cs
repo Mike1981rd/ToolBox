@@ -91,4 +91,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
 
+// Map API controllers
+app.MapControllers();
+
 app.Run();

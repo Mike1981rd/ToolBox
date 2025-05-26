@@ -1096,7 +1096,15 @@ const translations = {
         "days.fri": "Fri",
         "days.sat": "Sat",
         "days.sun": "Sun",
-        "common.cancel": "Cancel"
+        "common.cancel": "Cancel",
+        // Dashboard Permissions
+        "dashboard_permissions": "Dashboard Permissions",
+        "dashboard_permissions_message": "Control which dashboard components this role can see.",
+        "dashboard_visibility": "Dashboard Visibility",
+        "can_view_welcome_message": "Can View Welcome Message",
+        "can_view_welcome_video": "Can View Welcome Video",
+        "can_view_total_clients_card": "Can View Total Clients Card",
+        "can_view_active_clients_card": "Can View Active Clients Card"
     },
     es: {
         dashboard: "Tablero",
@@ -2238,7 +2246,15 @@ const translations = {
         "days.fri": "Vie",
         "days.sat": "Sáb",
         "days.sun": "Dom",
-        "common.cancel": "Cancelar"
+        "common.cancel": "Cancelar",
+        // Dashboard Permissions
+        "dashboard_permissions": "Permisos del Dashboard",
+        "dashboard_permissions_message": "Controla qué componentes del dashboard puede ver este rol.",
+        "dashboard_visibility": "Visibilidad del Dashboard",
+        "can_view_welcome_message": "Puede Ver Mensaje de Bienvenida",
+        "can_view_welcome_video": "Puede Ver Video de Bienvenida",
+        "can_view_total_clients_card": "Puede Ver Tarjeta Total de Clientes",
+        "can_view_active_clients_card": "Puede Ver Tarjeta de Clientes Activos"
     }
 };
 

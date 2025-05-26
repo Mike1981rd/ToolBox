@@ -164,6 +164,10 @@ namespace ToolBox.Controllers
                 Description = role.Description,
                 AssignedDashboard = role.AssignedDashboard,
                 IsActive = role.IsActive,
+                PuedeVerMensajeBienvenidaDashboard = role.PuedeVerMensajeBienvenidaDashboard,
+                PuedeVerVideoBienvenidaDashboard = role.PuedeVerVideoBienvenidaDashboard,
+                PuedeVerCardTotalClientesDashboard = role.PuedeVerCardTotalClientesDashboard,
+                PuedeVerCardClientesActivosDashboard = role.PuedeVerCardClientesActivosDashboard,
                 SelectedPermissionIds = selectedPermissionIds,
                 AvailablePermissions = allPermissions.Select(p => new PermissionViewModel
                 {
@@ -219,6 +223,10 @@ namespace ToolBox.Controllers
                         Description = model.Description ?? string.Empty,
                         AssignedDashboard = model.AssignedDashboard,
                         IsActive = model.IsActive,
+                        PuedeVerMensajeBienvenidaDashboard = model.PuedeVerMensajeBienvenidaDashboard,
+                        PuedeVerVideoBienvenidaDashboard = model.PuedeVerVideoBienvenidaDashboard,
+                        PuedeVerCardTotalClientesDashboard = model.PuedeVerCardTotalClientesDashboard,
+                        PuedeVerCardClientesActivosDashboard = model.PuedeVerCardClientesActivosDashboard,
                         UpdatedAt = DateTime.UtcNow
                     };
 

@@ -26,6 +26,12 @@ namespace ToolBox.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+        // Dashboard Permission Properties
+        public bool PuedeVerMensajeBienvenidaDashboard { get; set; } = true;
+        public bool PuedeVerVideoBienvenidaDashboard { get; set; } = true;
+        public bool PuedeVerCardTotalClientesDashboard { get; set; } = true;
+        public bool PuedeVerCardClientesActivosDashboard { get; set; } = true;
+
         public virtual ICollection<User> Users { get; set; }
 
         public virtual ICollection<RolePermission> RolePermissions { get; set; }

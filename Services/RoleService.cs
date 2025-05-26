@@ -173,6 +173,10 @@ namespace ToolBox.Services
                 existingRole.Description = roleDetails.Description;
                 existingRole.AssignedDashboard = roleDetails.AssignedDashboard;
                 existingRole.IsActive = roleDetails.IsActive;
+                existingRole.PuedeVerMensajeBienvenidaDashboard = roleDetails.PuedeVerMensajeBienvenidaDashboard;
+                existingRole.PuedeVerVideoBienvenidaDashboard = roleDetails.PuedeVerVideoBienvenidaDashboard;
+                existingRole.PuedeVerCardTotalClientesDashboard = roleDetails.PuedeVerCardTotalClientesDashboard;
+                existingRole.PuedeVerCardClientesActivosDashboard = roleDetails.PuedeVerCardClientesActivosDashboard;
                 existingRole.UpdatedAt = DateTime.UtcNow;
                 
                 // Eliminar permisos existentes

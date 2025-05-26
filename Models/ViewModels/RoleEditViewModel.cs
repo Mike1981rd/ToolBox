@@ -20,6 +20,12 @@ namespace ToolBox.Models.ViewModels
 
         public bool IsActive { get; set; } // Permitir activar/desactivar el rol
 
+        // Dashboard Permission Properties
+        public bool PuedeVerMensajeBienvenidaDashboard { get; set; }
+        public bool PuedeVerVideoBienvenidaDashboard { get; set; }
+        public bool PuedeVerCardTotalClientesDashboard { get; set; }
+        public bool PuedeVerCardClientesActivosDashboard { get; set; }
+
         // Para mostrar todos los permisos disponibles y marcar los ya seleccionados
         public List<PermissionViewModel> AvailablePermissions { get; set; } // Reutilizamos PermissionViewModel
 
