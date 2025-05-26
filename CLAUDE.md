@@ -1,5 +1,35 @@
 # ToolBox Admin Dashboard Project
 
+## 🔧 Solución de Errores Comunes de Consola
+
+### Error: Failed to load resource: net::ERR_NAME_NOT_RESOLVED (via.placeholder.com)
+
+**Problema**: Las vistas utilizaban imágenes placeholder de `via.placeholder.com`, un servicio externo que puede fallar sin conexión a internet o cuando el servicio no está disponible.
+
+**Síntomas**: 
+- Error en consola: `Failed to load resource: net::ERR_NAME_NOT_RESOLVED via.placeholder.com/250x250/DFE3E7/8C98A4?text=User:1`
+- Las imágenes de avatar no se cargan correctamente
+
+**Solución Implementada**:
+Reemplazar todas las referencias a `via.placeholder.com` con la imagen local `/img/default-avatar.png`:
+
+```html
+<!-- ❌ ANTES (causa error) -->
+<img src="https://via.placeholder.com/250x250/DFE3E7/8C98A4?text=User">
+
+<!-- ✅ DESPUÉS (usa imagen local) -->
+<img src="/img/default-avatar.png">
+```
+
+**Archivos Modificados**:
+1. `/Views/Users/_AddUserOffcanvas.cshtml`
+2. `/Views/Customers/_AddCustomerOffcanvas.cshtml`
+3. `/Views/Instructors/_InstructorAccountTab.cshtml`
+4. `/Views/Users/Details.cshtml`
+5. `/wwwroot/js/instructors.js` (variable `defaultInstructorAvatarSrc`)
+
+**Nota**: El proyecto ya incluye `/wwwroot/img/default-avatar.png` como imagen por defecto.
+
 ## ⚠️ Notas Críticas sobre Fechas y PostgreSQL
 
 ### Problema con Fechas en PostgreSQL/Npgsql

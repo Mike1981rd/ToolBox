@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadInstructorAvatar = document.getElementById('uploadInstructorAvatar');
     const instructorAvatarPreview = document.getElementById('instructorAvatarPreview');
     const resetInstructorAvatar = document.getElementById('resetInstructorAvatar');
-    const defaultInstructorAvatarSrc = 'https://via.placeholder.com/100x100/DFE3E7/8C98A4?text=Avatar';
+    const defaultInstructorAvatarSrc = '/img/default-avatar.png';
 
     if (uploadInstructorAvatar && instructorAvatarPreview) {
         uploadInstructorAvatar.addEventListener('change', function(event) {
