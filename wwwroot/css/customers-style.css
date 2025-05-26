@@ -329,6 +329,44 @@
     opacity: 0.9;
 }
 
+/* Form Action Buttons Mobile Layout */
+@media (max-width: 767.98px) {
+    /* Form footer buttons in customer forms */
+    .d-flex.justify-content-end.gap-2,
+    .form-footer,
+    .modal-footer {
+        flex-direction: column-reverse !important;
+        gap: 0.75rem !important;
+    }
+    
+    .d-flex.justify-content-end.gap-2 .btn,
+    .form-footer .btn,
+    .modal-footer .btn {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Primary action button first */
+    .btn-primary {
+        order: -1;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(115, 103, 240, 0.25);
+    }
+    
+    /* Secondary button styling */
+    .btn-secondary {
+        background-color: transparent;
+        border: 2px solid var(--border-color);
+        color: var(--body-text);
+    }
+    
+    .btn-secondary:hover {
+        background-color: var(--border-color);
+    }
+}
+
 .customer-name .fw-semibold {
     color: var(--body-text);
     text-decoration: none;

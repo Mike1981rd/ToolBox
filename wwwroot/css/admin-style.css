@@ -187,6 +187,46 @@ body::-webkit-scrollbar {
     transition: transform 0.3s ease;
 }
 
+/* Better visual feedback for collapsible items */
+.sidebar .list-group-item[data-bs-toggle="collapse"] {
+    position: relative;
+}
+
+.sidebar .list-group-item[data-bs-toggle="collapse"]::after {
+    content: '';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* Mobile specific improvements for submenu toggle */
+@media (max-width: 991.98px) {
+    .sidebar .list-group-item[data-bs-toggle="collapse"] {
+        padding-right: 3rem;
+    }
+    
+    .sidebar .list-group-item[data-bs-toggle="collapse"] .fa-chevron-down {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 0.5rem;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar .list-group-item[data-bs-toggle="collapse"][aria-expanded="true"] .fa-chevron-down {
+        transform: translateY(-50%) rotate(180deg);
+    }
+}
+
 /* Desktop: When sidebar is toggled (collapsed) */
 @media (min-width: 992px) {
     .sidebar.toggled {
@@ -265,6 +305,65 @@ body::-webkit-scrollbar {
     z-index: 10;
 }
 
+/* Mobile navbar spacing improvements */
+@media (max-width: 767.98px) {
+    .top-navbar {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .top-navbar .container-fluid {
+        padding: 0;
+    }
+    
+    /* Better spacing for navbar elements */
+    .top-navbar .d-flex.ms-auto {
+        gap: 0.5rem;
+    }
+    
+    /* Adjust individual elements */
+    .top-navbar .dropdown {
+        margin: 0 0.25rem;
+    }
+    
+    /* Theme toggle button */
+    .top-navbar #theme-toggle {
+        margin: 0 0.25rem;
+    }
+    
+    /* Notification icon */
+    .top-navbar .position-relative {
+        margin: 0 0.25rem;
+    }
+    
+    /* Language dropdown */
+    #languageDropdown {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    #languageDropdown .fa-language {
+        font-size: 1.125rem;
+    }
+    
+    #languageDropdown span {
+        display: none; /* Hide text on mobile, show only icon */
+    }
+    
+    /* User dropdown adjustments */
+    #userDropdown {
+        padding: 0.375rem;
+    }
+    
+    #userDropdown .user-name {
+        display: none; /* Hide username on mobile */
+    }
+    
+    /* Ensure consistent icon sizes */
+    .top-navbar .btn i {
+        font-size: 1.125rem;
+    }
+}
+
 .top-navbar .btn {
     color: var(--navbar-text);
     padding: 0.25rem 0.5rem;
@@ -281,6 +380,27 @@ body::-webkit-scrollbar {
     transition: all 0.2s ease-in-out;
     position: relative;
     overflow: hidden;
+}
+
+/* Mobile hamburger button enhanced style */
+.top-navbar #sidebarToggle {
+    background-color: var(--primary-color);
+    border: none;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(115, 103, 240, 0.3);
+    transition: all 0.3s ease;
+}
+
+.top-navbar #sidebarToggle i {
+    font-size: 1.5rem !important;
+    font-weight: 900 !important;
+    color: white !important;
 }
 
 .top-navbar #sidebarToggle::before,
@@ -316,7 +436,17 @@ body::-webkit-scrollbar {
     transform: scale(1.1);
 }
 
-.top-navbar #sidebarToggle:hover,
+.top-navbar #sidebarToggle:hover {
+    background-color: #5e50ee;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(115, 103, 240, 0.4);
+}
+
+.top-navbar #sidebarToggle:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(115, 103, 240, 0.3);
+}
+
 .top-navbar #sidebarToggleDesktop:hover {
     background-color: rgba(115, 103, 240, 0.08);
     color: var(--primary-color);
@@ -333,6 +463,26 @@ body::-webkit-scrollbar {
     display: flex;
     align-items: center;
     font-size: 0.9rem;
+}
+
+/* Fix alignment of all navbar items */
+.top-navbar .d-flex.align-items-center {
+    align-items: center !important;
+}
+
+/* Notification bell specific fixes */
+.top-navbar .position-relative .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.5rem;
+    height: 38px; /* Match other elements height */
+}
+
+.top-navbar .position-relative .fa-bell {
+    font-size: 1.1rem;
+    line-height: 1;
+    vertical-align: middle;
 }
 
 .top-navbar .dropdown-toggle:hover,
@@ -366,6 +516,21 @@ body::-webkit-scrollbar {
 .top-navbar #userDropdown span {
     color: var(--navbar-text);
     font-size: 0.9rem;
+}
+
+/* Ensure consistent button sizing in navbar */
+.top-navbar .btn,
+.top-navbar .dropdown-toggle {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Theme toggle button alignment */
+.top-navbar #theme-toggle {
+    padding: 0.35rem 0.5rem;
+    height: 38px;
 }
 
 /* User Avatar Styles */
@@ -696,6 +861,24 @@ h1, h2, h3, h4, h5, h6 {
         display: block !important;
     }
     
+    /* Enhanced hamburger button style - already defined above */
+    
+    /* Increased spacing for mobile navigation items */
+    .sidebar .list-group-item {
+        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Extra spacing for submenu items */
+    .sidebar #academySubmenu .list-group-item {
+        padding: 0.875rem 3rem;
+    }
+    
+    /* Better touch targets for mobile */
+    .sidebar .list-group-item[data-bs-toggle="collapse"] {
+        padding-right: 2.5rem;
+    }
+    
     /* Overlay when sidebar is open */
     .sidebar-overlay {
         position: fixed;
@@ -726,8 +909,17 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     /* Mobile sidebar close button */
-    .sidebar #menu-toggle {
+    .sidebar #menu-close {
         display: block !important;
+        font-size: 1.25rem;
+        padding: 0.5rem;
+        color: var(--sidebar-text);
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+    }
+    
+    .sidebar #menu-close:hover {
+        opacity: 1;
     }
 }
 
@@ -748,9 +940,53 @@ h1, h2, h3, h4, h5, h6 {
         padding-right: 1rem;
     }
     
-    /* Smaller font size for mobile */
+    /* Maintain good spacing even on small devices */
     .sidebar .list-group-item {
-        font-size: 0.875rem;
+        font-size: 0.9rem;
+        padding: 0.875rem 1.25rem;
+    }
+    
+    /* Hamburger button stays prominent */
+    #sidebarToggle {
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    /* Dashboard specific adjustments */
+    h1, .h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3, .h3 {
+        font-size: 1.25rem;
+    }
+    
+    h4, .h4 {
+        font-size: 1.1rem;
+    }
+    
+    h5, .h5 {
+        font-size: 1rem;
+    }
+    
+    /* Card adjustments for mobile */
+    .card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Ensure proper text wrapping */
+    .card-title,
+    .card-text {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 }
 
@@ -1614,4 +1850,89 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* ===== GLOBAL MOBILE FORM BUTTON STYLES ===== */
+/* These styles apply to all CRUD forms in the admin dashboard */
+@media (max-width: 767.98px) {
+    /* Offcanvas Forms */
+    .offcanvas-body form > .d-flex:last-child,
+    .offcanvas-body form > .mt-4.d-flex,
+    .offcanvas-body form > div:last-child.d-flex {
+        flex-direction: column-reverse !important;
+        gap: 0.75rem !important;
+    }
+    
+    .offcanvas-body form .btn {
+        width: 100% !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Regular Forms (non-offcanvas) */
+    form > .mt-4:has(.btn),
+    form > div:last-child:has(.btn),
+    .card-body > form > div:last-child:has(.btn) {
+        display: flex;
+        flex-direction: column-reverse !important;
+        gap: 0.75rem !important;
+    }
+    
+    form > .mt-4:has(.btn) .btn,
+    form > div:last-child:has(.btn) .btn,
+    .card-body > form > div:last-child:has(.btn) .btn {
+        width: 100% !important;
+        padding: 0.875rem 1rem !important;
+        margin: 0 !important;
+    }
+    
+    /* Specific for forms with col-sm-9 offset pattern (like Instructors) */
+    .pt-4 .row .col-sm-9.offset-sm-3 {
+        display: flex;
+        flex-direction: column-reverse !important;
+        gap: 0.75rem !important;
+    }
+    
+    .pt-4 .row .col-sm-9.offset-sm-3 .btn {
+        width: 100% !important;
+        padding: 0.875rem 1rem !important;
+        margin: 0 !important;
+    }
+    
+    /* Primary button emphasis on mobile */
+    .btn-primary {
+        box-shadow: 0 2px 8px rgba(115, 103, 240, 0.3) !important;
+    }
+    
+    /* Cancel button secondary style */
+    .btn-outline-secondary {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+    }
+    
+    /* Navbar spacing improvements */
+    .top-navbar .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .top-navbar .d-flex.align-items-center {
+        gap: 0.75rem !important;
+    }
+    
+    /* Fix navbar elements alignment on mobile */
+    .top-navbar .me-3.position-relative {
+        display: flex;
+        align-items: center;
+    }
+    
+    .top-navbar .dropdown {
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Ensure consistent button heights */
+    .btn {
+        min-height: 48px !important;
+    }
 }

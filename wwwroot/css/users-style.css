@@ -156,8 +156,9 @@
     /* Action buttons container */
     .mobile-action-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
         width: 100%;
+        justify-content: center; /* Center buttons horizontally */
     }
     
     .mobile-action-buttons .btn-export {
@@ -166,11 +167,25 @@
     }
     
     .mobile-action-buttons .btn-add {
-        flex: 1;
-        min-width: 0;
+        flex: 0 0 auto;
+        min-width: 160px;
+        max-width: 220px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        background-color: var(--primary-color) !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(115, 103, 240, 0.3) !important;
+        padding: 0.875rem 1.5rem !important;
+    }
+    
+    .mobile-action-buttons .btn-add:hover,
+    .mobile-action-buttons .btn-add:focus {
+        background-color: #5a52d5 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(115, 103, 240, 0.4) !important;
     }
     
     /* Export button as icon on very small screens */
@@ -187,6 +202,17 @@
         
         .mobile-action-buttons .btn-export i {
             margin: 0;
+        }
+        
+        /* Make add button more prominent on small screens */
+        .mobile-action-buttons .btn-add {
+            padding: 1rem !important;
+            font-size: 1rem !important;
+            min-height: 48px !important;
+        }
+        
+        .mobile-action-buttons .btn-add i {
+            font-size: 1.1rem !important;
         }
     }
     
@@ -235,10 +261,45 @@
     /* Stack action buttons vertically on very small screens */
     .mobile-action-buttons {
         flex-direction: column;
+        align-items: center; /* Center buttons */
     }
     
     .mobile-action-buttons .btn {
         width: 100%;
+    }
+    
+    /* Ensure Add button is prominent when stacked */
+    .mobile-action-buttons .btn-add {
+        order: -1; /* Move Add button to top when stacked */
+        padding: 1rem 2rem !important;
+        font-size: 1.125rem !important;
+        background: linear-gradient(135deg, var(--primary-color), #5a52d5) !important;
+        position: relative;
+        overflow: visible !important;
+        width: auto !important; /* Auto width instead of full */
+        max-width: 260px !important; /* Maximum width */
+        min-width: 200px !important; /* Minimum width */
+        margin: 0 auto 0.75rem auto !important; /* Center with margin */
+    }
+    
+    .mobile-action-buttons .btn-add::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, rgba(115, 103, 240, 0.4), rgba(90, 82, 213, 0.4));
+        border-radius: inherit;
+        filter: blur(8px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+    
+    /* Export button also centered with consistent width */
+    .mobile-action-buttons .btn-export {
+        max-width: 260px !important;
+        margin: 0 auto !important;
     }
     
     /* Smaller text and badges */
@@ -324,6 +385,41 @@
 .apply-filters-btn:hover {
     background-color: var(--primary-color);
     opacity: 0.9;
+}
+
+/* Form Action Buttons Mobile Layout */
+@media (max-width: 767.98px) {
+    /* Offcanvas footer buttons */
+    .offcanvas-footer {
+        flex-direction: column-reverse !important;
+        gap: 0.75rem !important;
+        padding: 1rem !important;
+    }
+    
+    .offcanvas-footer .btn {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Primary action button first */
+    .offcanvas-footer .btn-primary {
+        order: -1;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(115, 103, 240, 0.25);
+    }
+    
+    /* Secondary button styling */
+    .offcanvas-footer .btn-secondary {
+        background-color: transparent;
+        border: 2px solid var(--border-color);
+        color: var(--body-text);
+    }
+    
+    .offcanvas-footer .btn-secondary:hover {
+        background-color: var(--border-color);
+    }
 }
 .pagination .page-link {
     min-width: 32px;

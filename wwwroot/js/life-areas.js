@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Filter elements
     const searchInput = document.getElementById('searchLifeArea');
+    const mobileSearchInput = document.getElementById('mobileSearchLifeArea');
     const statusFilter = document.getElementById('selectStatus');
+    const mobileStatusFilter = document.getElementById('mobileSelectStatus');
+    const applyFiltersBtn = document.querySelector('.apply-filters-btn');
     
     // Icon elements
     const colorPicker = document.getElementById('lifeAreaColor');
@@ -334,6 +337,79 @@ document.addEventListener('DOMContentLoaded', function () {
             updateIconPreview(selectedIcon, colorPicker.value);
         }
     });
+    
+    // Search functionality
+    function setupSearch() {
+        const performSearch = function(searchTerm) {
+            const rows = document.querySelectorAll('#lifeAreasTable tbody tr:not(.no-results-row)');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const title = row.querySelector('.text-body')?.textContent.toLowerCase() || '';
+                const description = row.querySelector('.text-muted')?.textContent.toLowerCase() || '';
+                const searchLower = searchTerm.toLowerCase();
+                
+                if (title.includes(searchLower) || description.includes(searchLower)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            updateTableInfo(visibleCount);
+            handleNoResults(visibleCount);
+        };
+        
+        // Desktop search
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                performSearch(this.value);
+            });
+        }
+        
+        // Mobile search
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', function() {
+                performSearch(this.value);
+                // Sync with desktop search
+                if (searchInput) searchInput.value = this.value;
+            });
+        }
+    }
+    
+    // Filter functionality
+    function setupFilters() {
+        // Desktop filter
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function() {
+                const params = new URLSearchParams();
+                params.append('statusFilter', this.value);
+                window.location.href = window.location.pathname + '?' + params.toString();
+            });
+        }
+        
+        // Mobile filter
+        if (mobileStatusFilter) {
+            mobileStatusFilter.addEventListener('change', function() {
+                // Sync with desktop filter
+                if (statusFilter) statusFilter.value = this.value;
+            });
+        }
+        
+        // Apply filters button (mobile)
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function() {
+                const params = new URLSearchParams();
+                params.append('statusFilter', mobileStatusFilter.value);
+                window.location.href = window.location.pathname + '?' + params.toString();
+            });
+        }
+    }
+    
+    // Initialize search and filters
+    setupSearch();
+    setupFilters();
     
     // Other Functions
     async function loadLifeAreaForEdit(id) {

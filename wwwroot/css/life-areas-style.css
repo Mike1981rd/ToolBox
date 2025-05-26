@@ -1,0 +1,300 @@
+/* Life Areas Module Styles */
+
+/* Reutilizamos los estilos del módulo de usuarios para consistencia */
+
+/* Mobile Filters Container */
+.mobile-filters-btn {
+    display: none;
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-filters-btn:hover {
+    background-color: var(--primary-color);
+    opacity: 0.9;
+    color: white;
+}
+
+.mobile-filters-btn i {
+    margin-right: 0.5rem;
+}
+
+/* Mobile controls container */
+.mobile-controls-wrapper {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Desktop filters (hide on mobile) */
+.desktop-filters {
+    display: block;
+}
+
+/* Search field container */
+.mobile-search-container {
+    width: 100%;
+    position: relative;
+}
+
+.mobile-search-container input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-left: 2.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.mobile-search-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25);
+}
+
+.mobile-search-container::before {
+    content: '\f002'; /* Font Awesome search icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--body-text);
+    opacity: 0.5;
+}
+
+/* Action buttons container */
+.mobile-action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    justify-content: center; /* Center buttons horizontally */
+}
+
+.mobile-action-buttons .btn-add {
+    flex: 1 1 100%;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(115, 103, 240, 0.3) !important;
+    padding: 0.875rem 1.5rem !important;
+}
+
+/* Text visibility control for button */
+.btn-text-mobile {
+    display: none;
+}
+
+.btn-text-desktop {
+    display: inline;
+}
+
+.mobile-action-buttons .btn-add:hover,
+.mobile-action-buttons .btn-add:focus {
+    background-color: #5a52d5 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(115, 103, 240, 0.4) !important;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 991.98px) {
+    /* Hide desktop filters */
+    .desktop-filters {
+        display: none !important;
+    }
+    
+    /* Show mobile filters button */
+    .mobile-filters-btn {
+        display: block;
+    }
+    
+    /* Show mobile controls wrapper */
+    .mobile-controls-wrapper {
+        display: flex;
+    }
+    
+    /* Reorganize datatable controls */
+    .dataTables_wrapper .row.p-3 {
+        display: none !important; /* Hide desktop controls */
+    }
+    
+    /* Hide items per page selector on mobile */
+    .dataTables_length {
+        display: none;
+    }
+    
+    /* Show mobile text version */
+    .btn-text-mobile {
+        display: inline;
+    }
+    
+    .btn-text-desktop {
+        display: none;
+    }
+    
+    /* Make add button more prominent on small screens */
+    @media (max-width: 400px) {
+        .mobile-action-buttons .btn-add {
+            padding: 1rem 0.75rem !important;
+            font-size: 0.95rem !important;
+            min-height: 48px !important;
+        }
+        
+        .mobile-action-buttons .btn-add i {
+            font-size: 1rem !important;
+        }
+        
+        .mobile-action-buttons .btn-add span {
+            display: inline-block;
+            max-width: none;
+        }
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* Stack action buttons vertically on very small screens */
+    .mobile-action-buttons {
+        flex-direction: column;
+        align-items: center; /* Center buttons */
+    }
+    
+    .mobile-action-buttons .btn {
+        width: 100%;
+    }
+    
+    /* Ensure Add button is prominent when stacked */
+    .mobile-action-buttons .btn-add {
+        order: -1; /* Move Add button to top when stacked */
+        padding: 1rem 2rem !important;
+        font-size: 1.125rem !important;
+        background: linear-gradient(135deg, var(--primary-color), #5a52d5) !important;
+        position: relative;
+        overflow: visible !important;
+        width: 100% !important; /* Full width to prevent text cutoff */
+        margin: 0 0 0.75rem 0 !important;
+    }
+    
+    .mobile-action-buttons .btn-add::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, rgba(115, 103, 240, 0.4), rgba(90, 82, 213, 0.4));
+        border-radius: inherit;
+        filter: blur(8px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+}
+
+/* Offcanvas for filters (mobile) */
+.offcanvas.offcanvas-start {
+    width: 300px;
+    max-width: 85vw;
+}
+
+.offcanvas-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.offcanvas-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+.offcanvas-header .btn-close:hover {
+    opacity: 1;
+}
+
+.offcanvas-body .form-label {
+    font-weight: 600;
+    color: var(--body-text);
+    margin-bottom: 0.5rem;
+}
+
+.offcanvas-body .form-select {
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.offcanvas-body .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25);
+}
+
+/* Apply filters button in offcanvas */
+.apply-filters-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.apply-filters-btn:hover {
+    background-color: var(--primary-color);
+    opacity: 0.9;
+    color: white;
+}
+
+/* Life Areas specific styles */
+.avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.avatar i {
+    font-size: 1.5rem;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 991.98px) {
+    .table-responsive {
+        margin-bottom: 1rem;
+    }
+    
+    .dataTable th,
+    .dataTable td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Avatar adjustments */
+    .avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .avatar i {
+        font-size: 1.2rem;
+    }
+}

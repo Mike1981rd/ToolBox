@@ -10,8 +10,14 @@
     </ol>
 </nav>
 
+<!-- Mobile Filters Button -->
+<button class="btn mobile-filters-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas">
+    <i class="fas fa-filter"></i>
+    <span data-translate-key="mobile_filters_button">Filtros</span>
+</button>
+
 <!-- Sección de Filtros -->
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-4 desktop-filters">
     <div class="card-header border-bottom">
         <h5 class="card-title mb-0">Filtros</h5>
     </div>
@@ -38,6 +44,23 @@
 
 <!-- Tabla de Áreas de Vida -->
 <div class="card shadow-sm">
+    <!-- Mobile Controls (Search + Action Buttons) -->
+    <div class="mobile-controls-wrapper">
+        <!-- Search Field -->
+        <div class="mobile-search-container">
+            <input type="search" class="form-control" placeholder="Buscar Área de Vida" data-translate-placeholder-key="search_life_area_placeholder" id="mobileSearchLifeArea">
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mobile-action-buttons">
+            <button class="btn btn-primary btn-add" type="button" data-bs-toggle="offcanvas" data-bs-target="#addEditLifeAreaOffcanvas" aria-controls="addEditLifeAreaOffcanvas">
+                <i class="fas fa-plus me-1"></i>
+                <span class="btn-text-desktop" data-translate-key="add_new_life_area_button">Añadir Nueva Área de Vida</span>
+                <span class="btn-text-mobile" data-translate-key="add_button_short">Añadir</span>
+            </button>
+        </div>
+    </div>
+    
     <div class="card-datatable table-responsive pt-0">
         <div class="dataTables_wrapper dt-bootstrap5 no-footer">
             <div class="row p-3 align-items-center">
@@ -164,6 +187,37 @@
 
 <!-- Offcanvas para Añadir/Editar Área de Vida -->
 @await Html.PartialAsync("_AddEditLifeAreaOffcanvas")
+
+<!-- Offcanvas para Filtros (Mobile) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filtersOffcanvasLabel" data-translate-key="filters_title">Filtros</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="mb-4">
+            <label class="form-label" for="mobileSelectStatus" data-translate-key="filter_status_label">Estado</label>
+            <select id="mobileSelectStatus" class="form-select mobile-filter-select">
+                @if (ViewBag.CurrentStatusFilter == "active")
+                {
+                    <option value="active" selected data-translate-key="filter_active">Activas</option>
+                    <option value="inactive" data-translate-key="filter_inactive">Inactivas</option>
+                }
+                else
+                {
+                    <option value="active" data-translate-key="filter_active">Activas</option>
+                    <option value="inactive" selected data-translate-key="filter_inactive">Inactivas</option>
+                }
+            </select>
+        </div>
+        
+        <button type="button" class="btn apply-filters-btn" data-translate-key="apply_filters_button">Aplicar Filtros</button>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/life-areas-style.css" asp-append-version="true" />
+}
 
 @section Scripts {
     <script src="~/js/life-areas.js"></script>

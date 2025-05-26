@@ -449,11 +449,24 @@
             
             // Close sidebar when clicking on a link (mobile)
             sidebarLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    if (window.innerWidth < 992) {
+                link.addEventListener('click', function(e) {
+                    // Don't close sidebar if clicking on a submenu toggle
+                    if (link.getAttribute('data-bs-toggle') === 'collapse') {
+                        e.stopPropagation();
+                        return;
+                    }
+                    
+                    // Only close sidebar for actual navigation links on mobile
+                    if (window.innerWidth < 992 && !link.classList.contains('dropdown-toggle')) {
                         closeSidebar();
                     }
                 });
+            });
+            
+            // Prevent sidebar close when clicking inside submenu
+            const academySubmenu = document.getElementById('academySubmenu');
+            academySubmenu?.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
             
             // Handle window resize
