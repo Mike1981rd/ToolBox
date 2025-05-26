@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('input[type="search"]');
     
     // Mobile filter elements
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
     const mobileStatusFilter = document.getElementById('mobileSelectStatus');
     const applyMobileFiltersBtn = document.getElementById('applyMobileFilters');
     const filtersOffcanvas = document.getElementById('filtersOffcanvas');
@@ -316,6 +317,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof translatePage === 'function') {
         translatePage();
     }
+    
+    // 10. Mobile Filters Functionality
+    // Sincronizar filtros móviles con desktop
+    function syncMobileFilters() {
+        if (statusFilter && mobileStatusFilter) {
+            mobileStatusFilter.value = statusFilter.value;
+        }
+    }
+    
+    // Sincronizar al abrir el offcanvas
+    if (filtersOffcanvas) {
+        filtersOffcanvas.addEventListener('show.bs.offcanvas', syncMobileFilters);
+    }
+    
+    // Aplicar filtros desde móvil
+    if (applyMobileFiltersBtn) {
+        applyMobileFiltersBtn.addEventListener('click', function() {
+            // Sincronizar valores con desktop
+            if (mobileStatusFilter && statusFilter) {
+                statusFilter.value = mobileStatusFilter.value;
+            }
+            
+            // Cerrar offcanvas
+            const offcanvasInstance = bootstrap.Offcanvas.getInstance(filtersOffcanvas);
+            if (offcanvasInstance) {
+                offcanvasInstance.hide();
+            }
+            
+            // Aplicar filtros (trigger change event)
+            if (statusFilter) {
+                statusFilter.dispatchEvent(new Event('change'));
+            }
+        });
+    }
 });
 
 /**
@@ -483,38 +518,3 @@ function handleError(element, message) {
     }
     return false;
 }
-
-    // 7. Mobile Filters Functionality
-    // Sincronizar filtros móviles con desktop
-    function syncMobileFilters() {
-        if (statusFilter && mobileStatusFilter) {
-            mobileStatusFilter.value = statusFilter.value;
-        }
-    }
-    
-    // Sincronizar al abrir el offcanvas
-    if (filtersOffcanvas) {
-        filtersOffcanvas.addEventListener('show.bs.offcanvas', syncMobileFilters);
-    }
-    
-    // Aplicar filtros desde móvil
-    if (applyMobileFiltersBtn) {
-        applyMobileFiltersBtn.addEventListener('click', function() {
-            // Sincronizar valores con desktop
-            if (mobileStatusFilter && statusFilter) {
-                statusFilter.value = mobileStatusFilter.value;
-            }
-            
-            // Cerrar offcanvas
-            const offcanvasInstance = bootstrap.Offcanvas.getInstance(filtersOffcanvas);
-            if (offcanvasInstance) {
-                offcanvasInstance.hide();
-            }
-            
-            // Aplicar filtros (trigger change event)
-            if (statusFilter) {
-                statusFilter.dispatchEvent(new Event('change'));
-            }
-        });
-    }
-});
