@@ -275,6 +275,7 @@ namespace ToolBox.Controllers
                     TaxId = model.TaxId,
                     BillingMethod = model.BillingMethod,
                     Language = model.Language,
+                    DefaultLanguage = model.DefaultLanguage,
                     IsTwoFactorEnabled = model.IsTwoFactorEnabled,
                     IsActive = model.IsActive,
                     AvatarUrl = avatarUrl // Asignar la URL del avatar si se subió
@@ -328,6 +329,7 @@ namespace ToolBox.Controllers
                 BillingMethod = user.BillingMethod,
                 IsActive = user.IsActive,
                 Language = user.Language,
+                DefaultLanguage = user.DefaultLanguage,
                 IsTwoFactorEnabled = user.IsTwoFactorEnabled,
                 ExistingAvatarUrl = user.AvatarUrl,
                 AvailableRoles = new SelectList(await _roleService.GetAllRolesAsync(), "Id", "Name", user.RoleId)

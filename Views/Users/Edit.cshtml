@@ -157,14 +157,27 @@
                                 <span asp-validation-for="BillingMethod" class="text-danger"></span>
                             </div>
 
-                            <!-- Language -->
-                            <div class="col-md-6">
+                            <!-- Language (Hidden - using DefaultLanguage instead) -->
+                            <div class="col-md-6 d-none">
                                 <label asp-for="Language" class="form-label" data-translate-key="form_language">Idioma</label>
                                 <select asp-for="Language" class="form-select">
                                     <option value="en" data-translate-key="language_english">Inglés</option>
                                     <option value="es" data-translate-key="language_spanish">Español</option>
                                 </select>
                                 <span asp-validation-for="Language" class="text-danger"></span>
+                            </div>
+
+                            <!-- Default Language -->
+                            <div class="col-md-12">
+                                <label asp-for="DefaultLanguage" class="form-label" data-translate-key="form_default_language">Idioma Predeterminado</label>
+                                <select asp-for="DefaultLanguage" class="form-select">
+                                    <option value="es" data-translate-key="language_spanish">Español</option>
+                                    <option value="en" data-translate-key="language_english">Inglés</option>
+                                </select>
+                                <span asp-validation-for="DefaultLanguage" class="text-danger"></span>
+                                <div class="form-text">
+                                    <small data-translate-key="form_default_language_help">Idioma preferido del usuario para la interfaz.</small>
+                                </div>
                             </div>
 
                             <!-- Status & 2FA -->

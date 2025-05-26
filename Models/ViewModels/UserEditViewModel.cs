@@ -56,6 +56,9 @@ namespace ToolBox.Models.ViewModels
         [StringLength(10, ErrorMessage = "El idioma no puede exceder los 10 caracteres.")]
         public string? Language { get; set; }
 
+        [StringLength(5, ErrorMessage = "El idioma predeterminado no puede exceder los 5 caracteres.")]
+        public string DefaultLanguage { get; set; } = "es";
+
         public bool IsTwoFactorEnabled { get; set; }
 
         // Para mostrar el avatar actual

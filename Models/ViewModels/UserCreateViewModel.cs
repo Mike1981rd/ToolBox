@@ -37,6 +37,7 @@ namespace ToolBox.Models.ViewModels
         public string? BillingMethod { get; set; }
         public bool IsActive { get; set; } = true; // Default activo
         public string? Language { get; set; }
+        public string DefaultLanguage { get; set; } = "es";
         public bool IsTwoFactorEnabled { get; set; }
 
         // Para poblar el dropdown de Roles

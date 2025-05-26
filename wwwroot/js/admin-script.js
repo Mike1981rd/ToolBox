@@ -1144,7 +1144,13 @@ const translations = {
         "filter_all": "All",
         "filter_active": "Active",
         "filter_inactive": "Inactive",
-        "add_new_topic_button": "Add New Topic"
+        "add_new_topic_button": "Add New Topic",
+        // Website Settings module translations
+        "labels.defaultLanguage": "Default Language",
+        "help.defaultLanguage": "This will be your preferred language for the interface. You can change it temporarily using the language selector.",
+        // User form translations
+        "form_default_language": "Default Language",
+        "form_default_language_help": "This will be the user's preferred language for the interface."
     },
     es: {
         dashboard: "Tablero",
@@ -2334,7 +2340,13 @@ const translations = {
         "filter_all": "Todos",
         "filter_active": "Activos",
         "filter_inactive": "Inactivos",
-        "add_new_topic_button": "Agregar Nuevo Tema"
+        "add_new_topic_button": "Agregar Nuevo Tema",
+        // Website Settings module translations
+        "labels.defaultLanguage": "Idioma Predeterminado",
+        "help.defaultLanguage": "Este será tu idioma preferido para la interfaz. Puedes cambiarlo temporalmente usando el selector de idioma.",
+        // User form translations
+        "form_default_language": "Idioma Predeterminado",
+        "form_default_language_help": "Este será el idioma preferido del usuario para la interfaz."
     }
 };
 
@@ -2791,13 +2803,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Initializes the language based on localStorage or defaults to English
+     * Initializes the language based on user preference or defaults to Spanish
      */
-    function initLanguage() {
-        const savedLanguage = localStorage.getItem('language') || 'en';
+    async function initLanguage() {
+        try {
+            // First try to get user's default language from server
+            const response = await fetch('/WebsiteSettings/GetDefaultLanguage');
+            const result = await response.json();
+            
+            let languageToUse;
+            if (result.success && result.language) {
+                languageToUse = result.language;
+            } else {
+                // Fallback to localStorage or default
+                languageToUse = localStorage.getItem('language') || 'es';
+            }
+            
+            // Apply translations based on the determined language
+            setLanguage(languageToUse);
+            
+            // Update the language selector in header
+            updateLanguageSelector(languageToUse);
+            
+        } catch (error) {
+            console.error('Error loading user language preference:', error);
+            // Fallback to localStorage or default
+            const fallbackLanguage = localStorage.getItem('language') || 'es';
+            setLanguage(fallbackLanguage);
+            updateLanguageSelector(fallbackLanguage);
+        }
+    }
+
+    /**
+     * Updates the language selector in the header
+     */
+    function updateLanguageSelector(language) {
+        const selectedLanguageSpan = document.getElementById('selectedLanguage');
+        if (selectedLanguageSpan) {
+            const languageText = language === 'en' ? 'English' : 'Español';
+            selectedLanguageSpan.textContent = languageText;
+        }
         
-        // Apply translations based on the saved language
-        setLanguage(savedLanguage);
+        // Mark the active language option
+        const languageLinks = document.querySelectorAll('.lang-select');
+        languageLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-lang') === language) {
+                link.classList.add('active');
+            }
+        });
     }
     
     /**

@@ -8,6 +8,7 @@ const WebsiteSettings = {
     init: function() {
         this.setupEventListeners();
         this.initializeFormValidation();
+        this.loadDefaultLanguage();
     },
 
     // Setup all event listeners
@@ -39,6 +40,17 @@ const WebsiteSettings = {
 
         // Social media URL validation on blur
         this.setupSocialMediaValidation();
+
+        // Default language change
+        const defaultLanguageSelect = document.getElementById('defaultLanguage');
+        if (defaultLanguageSelect) {
+            defaultLanguageSelect.addEventListener('change', (e) => {
+                console.log('Language changed to:', e.target.value);
+                this.saveDefaultLanguage(e.target.value);
+            });
+        } else {
+            console.log('defaultLanguage select element not found');
+        }
     },
 
     // Handle logo file change
@@ -320,6 +332,114 @@ const WebsiteSettings = {
         });
 
         return isValid;
+    },
+
+    // Load user's default language preference
+    loadDefaultLanguage: async function() {
+        try {
+            const response = await fetch('/WebsiteSettings/GetDefaultLanguage');
+            const result = await response.json();
+            
+            if (result.success) {
+                const defaultLanguageSelect = document.getElementById('defaultLanguage');
+                if (defaultLanguageSelect) {
+                    defaultLanguageSelect.value = result.language;
+                    
+                    // Update the global language selector to match
+                    this.updateGlobalLanguageSelector(result.language);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading default language:', error);
+        }
+    },
+
+    // Save user's default language preference
+    saveDefaultLanguage: async function(language) {
+        try {
+            console.log('saveDefaultLanguage called with:', language);
+            
+            // Get CSRF token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            console.log('CSRF token found:', !!token);
+            
+            const response = await fetch('/WebsiteSettings/SaveDefaultLanguage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ language: language })
+            });
+            
+            console.log('Response status:', response.status);
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Update the global language selector
+                this.updateGlobalLanguageSelector(language);
+                
+                // Apply the language change immediately
+                if (typeof setLanguage === 'function') {
+                    setLanguage(language);
+                }
+                
+                // Show success message
+                this.showToast('success', result.message || 'Default language saved successfully');
+            } else {
+                this.showToast('error', result.message || 'Error saving default language');
+            }
+        } catch (error) {
+            console.error('Error saving default language:', error);
+            this.showToast('error', 'Error saving default language');
+        }
+    },
+
+    // Update the global language selector in the header
+    updateGlobalLanguageSelector: function(language) {
+        const globalLanguageSelector = document.getElementById('languageDropdown');
+        const selectedLanguageSpan = document.getElementById('selectedLanguage');
+        
+        if (selectedLanguageSpan) {
+            const languageText = language === 'en' ? 'English' : 'Español';
+            selectedLanguageSpan.textContent = languageText;
+        }
+    },
+
+    // Show toast notification
+    showToast: function(type, message) {
+        // Create a simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        // Find or create toast container
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '1050';
+            document.body.appendChild(toastContainer);
+        }
+        
+        toastContainer.appendChild(toast);
+        
+        // Initialize and show toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
     }
 };
 

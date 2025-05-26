@@ -142,6 +142,59 @@ namespace ToolBox.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveDefaultLanguage([FromBody] SaveDefaultLanguageRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("SaveDefaultLanguage called with Language: {Language}", request?.Language);
+                
+                if (request == null || string.IsNullOrEmpty(request.Language))
+                {
+                    _logger.LogWarning("Invalid request: Language is null or empty");
+                    return Json(new { success = false, message = "Invalid language parameter" });
+                }
+                
+                var userId = GetCurrentUserId();
+                _logger.LogInformation("Current user ID: {UserId}", userId);
+                
+                var success = await _configService.UpdateUserDefaultLanguageAsync(userId, request.Language);
+                
+                if (success)
+                {
+                    _logger.LogInformation("Successfully saved default language {Language} for user {UserId}", request.Language, userId);
+                    return Json(new { success = true, message = "Idioma predeterminado guardado correctamente" });
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to save default language {Language} for user {UserId}", request.Language, userId);
+                    return Json(new { success = false, message = "Error al guardar el idioma predeterminado" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception in SaveDefaultLanguage for user {UserId}", GetCurrentUserId());
+                return Json(new { success = false, message = "Error al guardar el idioma predeterminado" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDefaultLanguage()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var language = await _configService.GetUserDefaultLanguageAsync(userId);
+                return Json(new { success = true, language = language ?? "es" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting default language for user {UserId}", GetCurrentUserId());
+                return Json(new { success = true, language = "es" }); // Default fallback
+            }
+        }
+
         #region Private Methods
 
         private WebsiteSettingsViewModel MapToViewModel(WebsiteConfiguration config)

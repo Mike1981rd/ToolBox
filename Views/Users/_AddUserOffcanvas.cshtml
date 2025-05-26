@@ -160,13 +160,25 @@
                 </div>
             </div>
 
-            <!-- Language -->
-            <div class="mb-3">
+            <!-- Language (Hidden - using DefaultLanguage instead) -->
+            <div class="mb-3 d-none">
                 <label for="language" class="form-label" data-translate-key="form_language">Language</label>
                 <select class="form-select" id="language" name="language">
                     <option value="en" data-translate-key="language_english">English</option>
                     <option value="es" data-translate-key="language_spanish">Spanish</option>
                 </select>
+            </div>
+
+            <!-- Default Language -->
+            <div class="mb-3">
+                <label for="defaultLanguage" class="form-label" data-translate-key="form_default_language">Default Language</label>
+                <select class="form-select" id="defaultLanguage" name="defaultLanguage">
+                    <option value="es" data-translate-key="language_spanish">Español</option>
+                    <option value="en" data-translate-key="language_english">English</option>
+                </select>
+                <div class="form-text">
+                    <small data-translate-key="form_default_language_help">This will be the user's preferred language for the interface.</small>
+                </div>
             </div>
 
             <div class="divider my-4">

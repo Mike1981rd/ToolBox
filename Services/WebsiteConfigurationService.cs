@@ -111,5 +111,62 @@ namespace ToolBox.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> UpdateUserDefaultLanguageAsync(int userId, string language)
+        {
+            try
+            {
+                _logger.LogInformation("Attempting to update default language for user {UserId} to {Language}", userId, language);
+                
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return false;
+                }
+
+                _logger.LogInformation("Found user {UserId}, current DefaultLanguage: {CurrentLanguage}", userId, user.DefaultLanguage);
+                
+                user.DefaultLanguage = language;
+                user.UpdatedAt = DateTime.UtcNow;
+                
+                var changes = await _context.SaveChangesAsync();
+                _logger.LogInformation("SaveChanges returned {Changes} changes for user {UserId}", changes, userId);
+                
+                if (changes > 0)
+                {
+                    _logger.LogInformation("Successfully updated default language for user {UserId} to {Language}", userId, language);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogWarning("No changes were saved when updating language for user {UserId}", userId);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating default language for user {UserId} to {Language}", userId, language);
+                return false;
+            }
+        }
+
+        public async Task<string?> GetUserDefaultLanguageAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Where(u => u.Id == userId)
+                    .Select(u => u.DefaultLanguage)
+                    .FirstOrDefaultAsync();
+                
+                return user ?? "es"; // Default fallback
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting default language for user {UserId}", userId);
+                return "es"; // Default fallback
+            }
+        }
     }
 }

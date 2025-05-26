@@ -260,6 +260,7 @@ namespace ToolBox.Services
                 userToUpdate.TaxId = model.TaxId;
                 userToUpdate.BillingMethod = model.BillingMethod;
                 userToUpdate.Language = model.Language;
+                userToUpdate.DefaultLanguage = model.DefaultLanguage;
                 userToUpdate.IsTwoFactorEnabled = model.IsTwoFactorEnabled;
                 userToUpdate.IsActive = model.IsActive;
 
