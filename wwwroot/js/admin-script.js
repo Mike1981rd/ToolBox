@@ -71,6 +71,9 @@ const translations = {
         form_2fa: "Enable Two-Factor Authentication",
         form_button_cancel: "Cancel",
         form_button_submit: "Add User",
+        mobile_filters_button: "Filters",
+        mobile_filters_title: "Filter Options",
+        apply_filters_button: "Apply Filters",
         payment_auto_debit: "Auto Debit",
         payment_manual_paypal: "Manual - Paypal",
         payment_manual_cc: "Manual - Credit Card",
@@ -1150,7 +1153,10 @@ const translations = {
         "help.defaultLanguage": "This will be your preferred language for the interface. You can change it temporarily using the language selector.",
         // User form translations
         "form_default_language": "Default Language",
-        "form_default_language_help": "This will be the user's preferred language for the interface."
+        "form_default_language_help": "This will be the user's preferred language for the interface.",
+        "mobile_filters_button": "Filters",
+        "mobile_filters_title": "Filter Options",
+        "apply_filters_button": "Apply Filters"
     },
     es: {
         dashboard: "Tablero",
@@ -1225,6 +1231,9 @@ const translations = {
         form_2fa: "Habilitar Autenticación de Dos Factores",
         form_button_cancel: "Cancelar",
         form_button_submit: "Añadir Usuario",
+        mobile_filters_button: "Filtros",
+        mobile_filters_title: "Opciones de Filtro",
+        apply_filters_button: "Aplicar Filtros",
         payment_auto_debit: "Débito Automático",
         payment_manual_paypal: "Manual - Paypal",
         payment_manual_cc: "Manual - Tarjeta de Crédito",

@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusFilter = document.getElementById('selectStatus');
     const searchInput = document.querySelector('input[type="search"]');
     
+    // Mobile filter elements
+    const mobileStatusFilter = document.getElementById('mobileSelectStatus');
+    const applyMobileFiltersBtn = document.getElementById('applyMobileFilters');
+    const filtersOffcanvas = document.getElementById('filtersOffcanvas');
+    
     // Avatar por defecto local
     const defaultAvatarUrl = '/img/default-avatar.png';
     
@@ -155,14 +160,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 5. Search functionality with smooth transitions
-    if (searchInput) {
+    if (searchInput || mobileSearchInput) {
         let searchTimeout;
         
         // Establecer el valor inicial desde los parámetros de URL
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearchTerm = urlParams.get('searchTerm');
         if (initialSearchTerm) {
-            searchInput.value = initialSearchTerm;
+            if (searchInput) searchInput.value = initialSearchTerm;
+            if (mobileSearchInput) mobileSearchInput.value = initialSearchTerm;
+        }
+        
+        // Sincronizar búsqueda móvil con desktop
+        if (mobileSearchInput && searchInput) {
+            // Sincronizar al escribir en móvil
+            mobileSearchInput.addEventListener('input', function() {
+                searchInput.value = this.value;
+                searchInput.dispatchEvent(new Event('input'));
+            });
+            
+            // Sincronizar al escribir en desktop
+            searchInput.addEventListener('input', function() {
+                mobileSearchInput.value = this.value;
+            });
         }
         
         // Función para filtro en tiempo real (sin recarga)
@@ -188,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        searchInput.addEventListener('input', function() {
+        const handleSearch = function() {
             clearTimeout(searchTimeout);
             const searchTerm = this.value.trim();
             
@@ -213,8 +233,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newUrl = window.location.pathname + '?' + params.toString();
                 window.history.replaceState({}, '', newUrl);
                 
+                // Actualizar enlaces de exportación móviles
+                updateMobileExportLinks();
+                
             }, 1500); // Solo actualizar URL después de 1.5 segundos de inactividad
+        };
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', handleSearch);
+        }
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', handleSearch);
+        }
+    }
+    
+    // 6. Update mobile export links
+    function updateMobileExportLinks() {
+        const params = new URLSearchParams();
+        
+        // Obtener valores de los filtros
+        const statusValue = statusFilter ? statusFilter.value : '';
+        const searchValue = mobileSearchInput ? mobileSearchInput.value : '';
+        
+        // Agregar parámetros si tienen valor
+        if (statusValue) params.append('statusFilter', statusValue);
+        if (searchValue) params.append('searchTerm', searchValue);
+        
+        const queryString = params.toString();
+        const suffix = queryString ? '?' + queryString : '';
+        
+        // Actualizar enlaces de exportación móviles
+        document.querySelectorAll('.mobile-export-link').forEach(link => {
+            const baseUrl = link.href.split('?')[0];
+            link.href = baseUrl + suffix;
         });
+    }
+    
+    // Actualizar al cambiar filtros o búsqueda
+    if (statusFilter) {
+        statusFilter.addEventListener('change', updateMobileExportLinks);
     }
     
     // Función para mostrar estado de carga suave
@@ -426,3 +483,38 @@ function handleError(element, message) {
     }
     return false;
 }
+
+    // 7. Mobile Filters Functionality
+    // Sincronizar filtros móviles con desktop
+    function syncMobileFilters() {
+        if (statusFilter && mobileStatusFilter) {
+            mobileStatusFilter.value = statusFilter.value;
+        }
+    }
+    
+    // Sincronizar al abrir el offcanvas
+    if (filtersOffcanvas) {
+        filtersOffcanvas.addEventListener('show.bs.offcanvas', syncMobileFilters);
+    }
+    
+    // Aplicar filtros desde móvil
+    if (applyMobileFiltersBtn) {
+        applyMobileFiltersBtn.addEventListener('click', function() {
+            // Sincronizar valores con desktop
+            if (mobileStatusFilter && statusFilter) {
+                statusFilter.value = mobileStatusFilter.value;
+            }
+            
+            // Cerrar offcanvas
+            const offcanvasInstance = bootstrap.Offcanvas.getInstance(filtersOffcanvas);
+            if (offcanvasInstance) {
+                offcanvasInstance.hide();
+            }
+            
+            // Aplicar filtros (trigger change event)
+            if (statusFilter) {
+                statusFilter.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+});

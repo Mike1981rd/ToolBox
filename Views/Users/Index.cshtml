@@ -56,48 +56,83 @@
     </div>
 </div> *@
 
+<!-- Mobile Filters Button -->
+<button class="btn mobile-filters-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas">
+    <i class="fas fa-filter"></i>
+    <span data-translate-key="mobile_filters_button">Filters</span>
+</button>
+
 <!-- Sección Principal (Contenedor tipo Card para Filtros y Tabla) -->
 <div class="card shadow-sm">
-    <div class="card-header border-bottom">
-        <h5 class="card-title mb-0" data-translate-key="filters_title">Filters</h5>
+    <!-- Mobile Controls (Search + Action Buttons) -->
+    <div class="mobile-controls-wrapper">
+        <!-- Search Field -->
+        <div class="mobile-search-container">
+            <input type="search" class="form-control" placeholder="Search User" data-translate-placeholder-key="search_user_placeholder" id="mobileSearchInput">
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mobile-action-buttons">
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-share-square me-1"></i>
+                    <span data-translate-key="export_button">Export</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item mobile-export-link" href="@Url.Action("ExportToExcel", "Users")" data-export-type="excel" data-translate-key="export_to_excel"><i class="fas fa-file-excel me-1"></i> Excel</a></li>
+                    <li><a class="dropdown-item mobile-export-link" href="@Url.Action("ExportToPdf", "Users")" data-export-type="pdf" data-translate-key="export_to_pdf"><i class="fas fa-file-pdf me-1"></i> PDF</a></li>
+                    <li><a class="dropdown-item mobile-export-link" href="@Url.Action("ExportToCsv", "Users")" data-export-type="csv" data-translate-key="export_to_csv"><i class="fas fa-file-csv me-1"></i> CSV</a></li>
+                </ul>
+            </div>
+            <button class="btn btn-primary btn-add" type="button" data-bs-toggle="offcanvas" data-bs-target="#addUserOffcanvas" aria-controls="addUserOffcanvas">
+                <i class="fas fa-plus me-1"></i>
+                <span data-translate-key="add_new_record_button">Add New Record</span>
+            </button>
+        </div>
     </div>
-    <div class="card-body">
-        <!-- Filtros (row con selects) -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <label class="form-label" for="selectRole" data-translate-key="filter_select_role">Select Role</label>
-                <select id="selectRole" class="form-select filter-select">
-                    <option value="" data-translate-key="all_option">All</option>
-                    @if (ViewBag.AvailableRoles != null)
-                    {
-                        @foreach (var role in ViewBag.AvailableRoles as IEnumerable<ToolBox.Models.Role>)
+    <!-- Desktop Filters -->
+    <div class="desktop-filters">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0" data-translate-key="filters_title">Filters</h5>
+        </div>
+        <div class="card-body">
+            <!-- Filtros (row con selects) -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label" for="selectRole" data-translate-key="filter_select_role">Select Role</label>
+                    <select id="selectRole" class="form-select filter-select">
+                        <option value="" data-translate-key="all_option">All</option>
+                        @if (ViewBag.AvailableRoles != null)
                         {
-                            @if (ViewBag.CurrentRoleFilter == role.Id.ToString())
+                            @foreach (var role in ViewBag.AvailableRoles as IEnumerable<ToolBox.Models.Role>)
                             {
-                                <option value="@role.Id" selected>@role.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@role.Id">@role.Name</option>
+                                @if (ViewBag.CurrentRoleFilter == role.Id.ToString())
+                                {
+                                    <option value="@role.Id" selected>@role.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@role.Id">@role.Name</option>
+                                }
                             }
                         }
-                    }
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label" for="selectStatus" data-translate-key="filter_select_status">Select Status</label>
-                <select id="selectStatus" class="form-select filter-select">
-                    @if (ViewBag.CurrentStatusFilter == "active")
-                    {
-                        <option value="active" selected data-translate-key="status_active">Active</option>
-                        <option value="inactive" data-translate-key="status_inactive">Inactive</option>
-                    }
-                    else
-                    {
-                        <option value="active" data-translate-key="status_active">Active</option>
-                        <option value="inactive" selected data-translate-key="status_inactive">Inactive</option>
-                    }
-                </select>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="selectStatus" data-translate-key="filter_select_status">Select Status</label>
+                    <select id="selectStatus" class="form-select filter-select">
+                        @if (ViewBag.CurrentStatusFilter == "active")
+                        {
+                            <option value="active" selected data-translate-key="status_active">Active</option>
+                            <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                        }
+                        else
+                        {
+                            <option value="active" data-translate-key="status_active">Active</option>
+                            <option value="inactive" selected data-translate-key="status_inactive">Inactive</option>
+                        }
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -333,6 +368,60 @@
 <!-- Incluir Offcanvas para añadir nuevos usuarios -->
 @await Html.PartialAsync("_AddUserOffcanvas")
 
+<!-- Offcanvas para Filtros Móviles -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">
+            <i class="fas fa-filter me-2"></i>
+            <span data-translate-key="mobile_filters_title">Filters</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="mb-4">
+            <label class="form-label" for="mobileSelectRole" data-translate-key="filter_select_role">Select Role</label>
+            <select id="mobileSelectRole" class="form-select mobile-filter-select">
+                <option value="" data-translate-key="all_option">All</option>
+                @if (ViewBag.AvailableRoles != null)
+                {
+                    @foreach (var role in ViewBag.AvailableRoles as IEnumerable<ToolBox.Models.Role>)
+                    {
+                        @if (ViewBag.CurrentRoleFilter == role.Id.ToString())
+                        {
+                            <option value="@role.Id" selected>@role.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@role.Id">@role.Name</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="form-label" for="mobileSelectStatus" data-translate-key="filter_select_status">Select Status</label>
+            <select id="mobileSelectStatus" class="form-select mobile-filter-select">
+                @if (ViewBag.CurrentStatusFilter == "active")
+                {
+                    <option value="active" selected data-translate-key="status_active">Active</option>
+                    <option value="inactive" data-translate-key="status_inactive">Inactive</option>
+                }
+                else
+                {
+                    <option value="active" data-translate-key="status_active">Active</option>
+                    <option value="inactive" selected data-translate-key="status_inactive">Inactive</option>
+                }
+            </select>
+        </div>
+        
+        <button class="btn apply-filters-btn" id="applyMobileFilters">
+            <i class="fas fa-check me-2"></i>
+            <span data-translate-key="apply_filters_button">Apply Filters</span>
+        </button>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/users-script.js"></script>
     <script>
@@ -341,6 +430,7 @@
             const roleFilter = document.getElementById('selectRole');
             const statusFilter = document.getElementById('selectStatus');
             const searchInput = document.querySelector('input[aria-controls="DataTables_Table_0"]');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
             
             function applyFilters() {
                 const params = new URLSearchParams();
@@ -616,6 +706,99 @@
             
             // Inicializar enlaces de exportación con filtros actuales
             updateExportLinks();
+            
+            // Sincronizar filtros móviles con desktop
+            function syncMobileFilters() {
+                const roleDesktop = document.getElementById('selectRole');
+                const roleMobile = document.getElementById('mobileSelectRole');
+                const statusDesktop = document.getElementById('selectStatus');
+                const statusMobile = document.getElementById('mobileSelectStatus');
+                
+                if (roleDesktop && roleMobile) {
+                    roleMobile.value = roleDesktop.value;
+                }
+                if (statusDesktop && statusMobile) {
+                    statusMobile.value = statusDesktop.value;
+                }
+            }
+            
+            // Sincronizar búsqueda móvil con desktop
+            if (mobileSearchInput && searchInput) {
+                // Sincronizar valor inicial
+                mobileSearchInput.value = searchInput.value;
+                
+                // Sincronizar al escribir en móvil
+                mobileSearchInput.addEventListener('input', function() {
+                    searchInput.value = this.value;
+                    searchInput.dispatchEvent(new Event('input'));
+                });
+                
+                // Sincronizar al escribir en desktop
+                searchInput.addEventListener('input', function() {
+                    mobileSearchInput.value = this.value;
+                });
+            }
+            
+            // Actualizar enlaces de exportación móviles
+            function updateMobileExportLinks() {
+                const params = new URLSearchParams();
+                
+                // Obtener valores de los filtros
+                const roleValue = roleFilter ? roleFilter.value : '';
+                const statusValue = statusFilter ? statusFilter.value : '';
+                const searchValue = mobileSearchInput ? mobileSearchInput.value : '';
+                
+                // Agregar parámetros si tienen valor
+                if (roleValue) params.append('roleFilter', roleValue);
+                if (statusValue) params.append('statusFilter', statusValue);
+                if (searchValue) params.append('searchTerm', searchValue);
+                
+                const queryString = params.toString();
+                const suffix = queryString ? '?' + queryString : '';
+                
+                // Actualizar enlaces de exportación móviles
+                document.querySelectorAll('.mobile-export-link').forEach(link => {
+                    const baseUrl = link.href.split('?')[0];
+                    link.href = baseUrl + suffix;
+                });
+            }
+            
+            // Actualizar al cambiar filtros o búsqueda
+            if (mobileSearchInput) {
+                mobileSearchInput.addEventListener('input', updateMobileExportLinks);
+            }
+            
+            // Sincronizar al abrir el offcanvas
+            const filtersOffcanvas = document.getElementById('filtersOffcanvas');
+            if (filtersOffcanvas) {
+                filtersOffcanvas.addEventListener('show.bs.offcanvas', syncMobileFilters);
+            }
+            
+            // Aplicar filtros desde móvil
+            const applyMobileFiltersBtn = document.getElementById('applyMobileFilters');
+            if (applyMobileFiltersBtn) {
+                applyMobileFiltersBtn.addEventListener('click', function() {
+                    const roleMobile = document.getElementById('mobileSelectRole');
+                    const statusMobile = document.getElementById('mobileSelectStatus');
+                    
+                    // Sincronizar valores con desktop
+                    if (roleMobile && roleFilter) {
+                        roleFilter.value = roleMobile.value;
+                    }
+                    if (statusMobile && statusFilter) {
+                        statusFilter.value = statusMobile.value;
+                    }
+                    
+                    // Cerrar offcanvas
+                    const offcanvasInstance = bootstrap.Offcanvas.getInstance(filtersOffcanvas);
+                    if (offcanvasInstance) {
+                        offcanvasInstance.hide();
+                    }
+                    
+                    // Aplicar filtros
+                    applyFilters();
+                });
+            }
             
             // Manejar mensajes de éxito/error de TempData
             @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))

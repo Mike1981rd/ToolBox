@@ -79,7 +79,7 @@
                 <div class="logo-container">
                     <img src="~/img/toolbox-logo.svg" alt="ToolBox Logo" class="logo" id="sidebarLogo">
                 </div>
-                <button class="btn btn-link d-md-none position-absolute top-0 end-0" id="menu-toggle" aria-expanded="true" aria-label="Close sidebar">
+                <button class="btn btn-link d-lg-none position-absolute top-0 end-0" id="menu-close" aria-expanded="true" aria-label="Close sidebar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -248,7 +248,10 @@
             <!-- Top Navigation -->
             <nav class="navbar navbar-expand navbar-light top-navbar">
                 <div class="container-fluid px-4">
-                    <button class="btn" id="sidebarToggle" aria-expanded="true" aria-label="Toggle sidebar">
+                    <button class="btn d-lg-none" id="sidebarToggle" aria-expanded="false" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn d-none d-lg-block" id="sidebarToggleDesktop" aria-expanded="true" aria-label="Toggle sidebar">
                         <i class="fas fa-bars"></i>
                     </button>
                     
@@ -354,6 +357,9 @@
             </footer>
         </div>
     </div>
+    
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- jQuery (debe cargarse antes que otros scripts) -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -365,7 +371,7 @@
     <script src="~/js/admin-script.js" asp-append-version="true"></script>
     <!-- No necesitamos image-url-fixer.js ya que todas las URLs ahora son SVG en base64 -->
     
-    <!-- Active Link Script -->
+    <!-- Active Link and Mobile Sidebar Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Mark current page as active in sidebar
@@ -379,6 +385,90 @@
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
+                }
+            });
+            
+            // Mobile Sidebar Toggle Functionality
+            const sidebar = document.getElementById('sidebar-wrapper');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const toggleBtnDesktop = document.getElementById('sidebarToggleDesktop');
+            const closeBtn = document.getElementById('menu-close');
+            const pageContent = document.getElementById('page-content-wrapper');
+            
+            // Function to open sidebar (mobile)
+            function openSidebar() {
+                sidebar.classList.add('show');
+                overlay.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+            
+            // Function to close sidebar (mobile)
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+            
+            // Function to toggle sidebar (desktop)
+            function toggleSidebarDesktop() {
+                sidebar.classList.toggle('toggled');
+                pageContent.classList.toggle('toggled');
+                const isCollapsed = sidebar.classList.contains('toggled');
+                toggleBtnDesktop.setAttribute('aria-expanded', !isCollapsed);
+            }
+            
+            // Mobile toggle button
+            toggleBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (sidebar.classList.contains('show')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+            
+            // Desktop toggle button
+            toggleBtnDesktop?.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebarDesktop();
+            });
+            
+            // Close button in sidebar
+            closeBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSidebar();
+            });
+            
+            // Click overlay to close sidebar
+            overlay?.addEventListener('click', function() {
+                closeSidebar();
+            });
+            
+            // Close sidebar when clicking on a link (mobile)
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    // Desktop view - reset mobile sidebar state
+                    closeSidebar();
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Handle escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+                    closeSidebar();
                 }
             });
         });
