@@ -3,7 +3,7 @@ using ToolBox.Models;
 
 namespace ToolBox.Controllers
 {
-    public class EmailContentsController : Controller
+    public class EmailContentsController : BaseController
     {
         private readonly ILogger<EmailContentsController> _logger;
 

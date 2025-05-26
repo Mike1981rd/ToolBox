@@ -11,7 +11,7 @@ using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
-    public class RolesController : Controller
+    public class RolesController : BaseController
     {
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;

@@ -4,7 +4,7 @@ using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
-    public class TopicsController : Controller
+    public class TopicsController : BaseController
     {
         private readonly ITopicService _topicService;
         private readonly ILogger<TopicsController> _logger;

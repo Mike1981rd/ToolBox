@@ -5,7 +5,7 @@ using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
-    public class WebsiteSettingsController : Controller
+    public class WebsiteSettingsController : BaseController
     {
         private readonly IWebsiteConfigurationService _configService;
         private readonly IWebHostEnvironment _environment;

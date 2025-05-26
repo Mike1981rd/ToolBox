@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
-public class InstructorsController : Controller
+namespace ToolBox.Controllers
+{
+    public class InstructorsController : BaseController
 {
     public IActionResult Index() // Nueva acción para el listado
     {
@@ -39,4 +41,5 @@ public class InstructorsController : Controller
 
     // La acción Edit(int id) podría ser similar a Profile(int id) pero con IsEditMode = true
     // public IActionResult Edit(int id) { ... ViewBag.IsEditMode = true; return View("Profile", viewModel); ... }
+    }
 }

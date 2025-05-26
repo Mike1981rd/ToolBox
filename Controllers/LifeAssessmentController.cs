@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ToolBox.Controllers
 {
-    public class LifeAssessmentController : Controller
+    public class LifeAssessmentController : BaseController
     {
         private readonly ILogger<LifeAssessmentController> _logger;
         private readonly ILifeAreaService _lifeAreaService;

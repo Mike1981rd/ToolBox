@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ToolBox.Controllers
 {
-    public class VideoManagementController : Controller
+    public class VideoManagementController : BaseController
     {
         private readonly IVideoService _videoService;
         private readonly ITopicService _topicService;

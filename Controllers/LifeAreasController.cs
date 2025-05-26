@@ -9,7 +9,7 @@ using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
-    public class LifeAreasController : Controller
+    public class LifeAreasController : BaseController
     {
         private readonly ILifeAreaService _lifeAreaService;
 

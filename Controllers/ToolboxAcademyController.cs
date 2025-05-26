@@ -7,7 +7,7 @@ using ToolBox.Services;
 
 namespace ToolBox.Controllers
 {
-    public class ToolboxAcademyController : Controller
+    public class ToolboxAcademyController : BaseController
     {
         private readonly ILogger<ToolboxAcademyController> _logger;
         private readonly IVideoService _videoService;

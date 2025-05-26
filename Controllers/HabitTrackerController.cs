@@ -4,7 +4,7 @@ using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
-    public class HabitTrackerController : Controller
+    public class HabitTrackerController : BaseController
     {
         private readonly IHabitoService _habitoService;
         private readonly ILogger<HabitTrackerController> _logger;

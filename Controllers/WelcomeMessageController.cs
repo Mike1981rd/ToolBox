@@ -4,7 +4,7 @@ using ToolBox.Interfaces;
 
 namespace ToolBox.Controllers
 {
-    public class WelcomeMessageController : Controller
+    public class WelcomeMessageController : BaseController
     {
         private readonly IWelcomeMessageService _welcomeMessageService;
         private readonly ILogger<WelcomeMessageController> _logger;
