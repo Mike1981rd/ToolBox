@@ -1,0 +1,571 @@
+@model ToolBox.Models.ViewModels.SessionsIndexViewModel
+@{
+    ViewData["Title"] = "Sesiones";
+    Layout = "_AdminLayout";
+}
+
+@Html.AntiForgeryToken()
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_sessions_list">Sesiones</li>
+    </ol>
+</nav>
+
+<!-- Mobile Filters Button -->
+<button class="btn mobile-filters-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas">
+    <i class="fas fa-filter"></i>
+    <span data-translate-key="mobile_filters_button">Filtros</span>
+</button>
+
+<!-- Lista de Sesiones -->
+<div class="card">
+    <!-- Mobile Controls (Search + Action Buttons) -->
+    <div class="mobile-controls-wrapper">
+        <!-- Search Field -->
+        <div class="mobile-search-container">
+            <input type="search" class="form-control" placeholder="Buscar Sesión" 
+                   data-translate-placeholder-key="search_session_placeholder" 
+                   id="mobileSearchInput" 
+                   value="@Model.CurrentSearchQuery">
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mobile-action-buttons">
+            @if (ViewBag.UserPermissions != null && ViewBag.UserPermissions.ContainsKey("Sessions") && ViewBag.UserPermissions["Sessions"].Contains("Create"))
+            {
+                <a href="@Url.Action("Create", "Sessions")" class="btn btn-primary btn-add">
+                    <i class="fas fa-plus me-1"></i>
+                    <span data-translate-key="add_new_session_button">Añadir Nueva Sesión</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Desktop Filters -->
+    <div class="card-header d-none d-md-flex justify-content-between align-items-center">
+        <h5 class="mb-0" data-translate-key="sessions_title">Sesiones</h5>
+        <div class="d-flex gap-2 align-items-center">
+            <!-- Search -->
+            <form method="get" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="search" name="searchQuery" class="form-control" 
+                           placeholder="Buscar sesión..." 
+                           data-translate-placeholder-key="search_session_placeholder">
+                </div>
+                
+                <!-- Status Filter -->
+                <select name="statusFilter" id="statusFilter" class="form-select" style="width: auto;">
+                    @if (Model.CurrentStatusFilter == "all")
+                    {
+                        <option value="all" selected data-translate-key="filter_all">Todos</option>
+                    }
+                    else
+                    {
+                        <option value="all" data-translate-key="filter_all">Todos</option>
+                    }
+                    
+                    @if (Model.CurrentStatusFilter == "active")
+                    {
+                        <option value="active" selected data-translate-key="filter_active">Activos</option>
+                    }
+                    else
+                    {
+                        <option value="active" data-translate-key="filter_active">Activos</option>
+                    }
+                    
+                    @if (Model.CurrentStatusFilter == "inactive")
+                    {
+                        <option value="inactive" selected data-translate-key="filter_inactive">Inactivos</option>
+                    }
+                    else
+                    {
+                        <option value="inactive" data-translate-key="filter_inactive">Inactivos</option>
+                    }
+                </select>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            
+            <!-- Add Button -->
+            @if (ViewBag.UserPermissions != null && ViewBag.UserPermissions.ContainsKey("Sessions") && ViewBag.UserPermissions["Sessions"].Contains("Create"))
+            {
+                <a href="@Url.Action("Create", "Sessions")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 
+                    <span data-translate-key="add_new_session_button">Añadir Nueva Sesión</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="sessionsTable">
+                <thead>
+                    <tr>
+                        <th data-translate-key="table_client">Cliente</th>
+                        <th data-translate-key="table_session_date">Fecha Sesión</th>
+                        <th data-translate-key="table_next_session_date">Próxima Sesión</th>
+                        <th data-translate-key="table_ways_to_develop">Formas de Desarrollar</th>
+                        <th data-translate-key="table_assignments">Tareas</th>
+                        <th data-translate-key="table_challenges">Desafíos</th>
+                        <th data-translate-key="table_key_points">Puntos Clave</th>
+                        <th data-translate-key="table_status">Estado</th>
+                        <th data-translate-key="table_actions">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Sessions.Any())
+                    {
+                        @foreach (var session in Model.Sessions)
+                        {
+                            <tr data-session-id="@session.Id">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar me-2">
+                                            <img src="@(session.Client.AvatarUrl ?? "/img/default-avatar.png")" 
+                                                 alt="@session.Client.FullName" 
+                                                 class="rounded-circle" 
+                                                 width="40" height="40">
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">@session.Client.FullName</div>
+                                            <small class="text-muted">@session.Client.Email</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (session.NextSessionDateTime.HasValue)
+                                    {
+                                        @session.NextSessionDateTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                          title="@session.WaysToDevelop">
+                                        @(string.IsNullOrEmpty(session.WaysToDevelop) ? "-" : 
+                                          (session.WaysToDevelop.Length > 50 ? 
+                                           session.WaysToDevelop.Substring(0, 50) + "..." : 
+                                           session.WaysToDevelop))
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                          title="@session.Assignments">
+                                        @(string.IsNullOrEmpty(session.Assignments) ? "-" : 
+                                          (session.Assignments.Length > 50 ? 
+                                           session.Assignments.Substring(0, 50) + "..." : 
+                                           session.Assignments))
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                          title="@session.Challenges">
+                                        @(string.IsNullOrEmpty(session.Challenges) ? "-" : 
+                                          (session.Challenges.Length > 50 ? 
+                                           session.Challenges.Substring(0, 50) + "..." : 
+                                           session.Challenges))
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                          title="@Html.Raw(session.KeyPoints)">
+                                        @{
+                                            var keyPointsText = System.Text.RegularExpressions.Regex.Replace(session.KeyPoints, "<.*?>", "");
+                                            var truncatedKeyPoints = keyPointsText.Length > 50 ? 
+                                                keyPointsText.Substring(0, 50) + "..." : 
+                                                keyPointsText;
+                                        }
+                                        @truncatedKeyPoints
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (session.Status)
+                                    {
+                                        <span class="badge bg-success" data-translate-key="status_active">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary" data-translate-key="status_inactive">Inactivo</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-inline-block text-nowrap">
+                                        @if (ViewBag.UserPermissions != null && ViewBag.UserPermissions.ContainsKey("Sessions") && ViewBag.UserPermissions["Sessions"].Contains("Write"))
+                                        {
+                                            <a href="@Url.Action("Edit", "Sessions", new { id = session.Id })" class="btn btn-sm btn-icon" title="Editar Sesión">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            @if (session.Status)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-icon text-warning toggle-status-btn" 
+                                                        title="Desactivar Sesión"
+                                                        data-session-id="@session.Id"
+                                                        data-session-title="@session.Client?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
+                                                        data-current-status="active"
+                                                        data-action="deactivate">
+                                                    <i class="fas fa-pause-circle"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-sm btn-icon text-success toggle-status-btn" 
+                                                        title="Activar Sesión"
+                                                        data-session-id="@session.Id"
+                                                        data-session-title="@session.Client?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
+                                                        data-current-status="inactive"
+                                                        data-action="activate">
+                                                    <i class="fas fa-play-circle"></i>
+                                                </button>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
+                                    <span data-translate-key="no_sessions_found">No se encontraron sesiones</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filters Offcanvas -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="filtersOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" data-translate-key="filters_title">Filtros</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" id="mobileFiltersForm">
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="status_filter_label">Estado</label>
+                <select name="statusFilter" id="mobileStatusFilter" class="form-select">
+                    @if (Model.CurrentStatusFilter == "all")
+                    {
+                        <option value="all" selected data-translate-key="filter_all">Todos</option>
+                    }
+                    else
+                    {
+                        <option value="all" data-translate-key="filter_all">Todos</option>
+                    }
+                    
+                    @if (Model.CurrentStatusFilter == "active")
+                    {
+                        <option value="active" selected data-translate-key="filter_active">Activos</option>
+                    }
+                    else
+                    {
+                        <option value="active" data-translate-key="filter_active">Activos</option>
+                    }
+                    
+                    @if (Model.CurrentStatusFilter == "inactive")
+                    {
+                        <option value="inactive" selected data-translate-key="filter_inactive">Inactivos</option>
+                    }
+                    else
+                    {
+                        <option value="inactive" data-translate-key="filter_inactive">Inactivos</option>
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="searchQuery" id="hiddenMobileSearch" value="@Model.CurrentSearchQuery">
+            <button type="submit" class="btn btn-primary w-100" data-translate-key="apply_filters_button">
+                <i class="fas fa-check me-1"></i> Aplicar Filtros
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" data-translate-key="notification_title">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sessions-script.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar cambios en los filtros
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.querySelector('input[name="searchQuery"]');
+            
+            function applyFilters() {
+                const params = new URLSearchParams();
+                
+                // Obtener valores de los filtros
+                const statusValue = statusFilter ? statusFilter.value : '';
+                
+                // Solo enviar statusFilter al servidor, la búsqueda es del lado cliente
+                if (statusValue && statusValue !== 'all') params.append('statusFilter', statusValue);
+                
+                // Redirigir con los nuevos parámetros
+                window.location.href = '@Url.Action("Index", "Sessions")' + (params.toString() ? '?' + params.toString() : '');
+            }
+            
+            // Agregar event listeners para filtro de estado
+            if (statusFilter) {
+                statusFilter.addEventListener('change', applyFilters);
+            }
+            
+            // Implementar búsqueda dinámica del lado del cliente
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    const tableRows = document.querySelectorAll('#sessionsTable tbody tr');
+                    
+                    tableRows.forEach(row => {
+                        // Omitir fila de "no hay sesiones"
+                        if (row.cells.length === 1) return;
+                        
+                        // Obtener el texto de las celdas relevantes para búsqueda
+                        const clientCell = row.cells[0]; // Primera columna contiene cliente
+                        const clientName = clientCell.querySelector('.fw-medium')?.textContent.toLowerCase() || '';
+                        const clientEmail = clientCell.querySelector('.text-muted')?.textContent.toLowerCase() || '';
+                        
+                        // También buscar en puntos clave y otros campos de texto
+                        const keyPointsCell = row.cells[6]; // Columna de puntos clave
+                        const keyPoints = keyPointsCell?.textContent.toLowerCase() || '';
+                        
+                        const assignmentsCell = row.cells[4]; // Columna de asignaciones
+                        const assignments = assignmentsCell?.textContent.toLowerCase() || '';
+                        
+                        const challengesCell = row.cells[5]; // Columna de desafíos
+                        const challenges = challengesCell?.textContent.toLowerCase() || '';
+                        
+                        // Verificar si el término de búsqueda coincide
+                        const matches = clientName.includes(searchTerm) || 
+                                      clientEmail.includes(searchTerm) ||
+                                      keyPoints.includes(searchTerm) ||
+                                      assignments.includes(searchTerm) ||
+                                      challenges.includes(searchTerm);
+                        
+                        // Mostrar u ocultar la fila según la coincidencia
+                        row.style.display = matches ? '' : 'none';
+                    });
+                    
+                    // Verificar si todas las filas están ocultas
+                    const visibleRows = Array.from(tableRows).filter(row => 
+                        row.style.display !== 'none' && row.cells.length > 1
+                    );
+                    
+                    if (visibleRows.length === 0) {
+                        // Si no hay filas visibles, mostrar mensaje
+                        const tbody = document.querySelector('#sessionsTable tbody');
+                        const noResultsRow = tbody.querySelector('.no-results-row');
+                        
+                        if (!noResultsRow) {
+                            const newRow = tbody.insertRow();
+                            newRow.className = 'no-results-row';
+                            newRow.innerHTML = '<td colspan="9" class="text-center py-4"><div class="text-muted"><i class="fas fa-search fa-2x mb-3 d-block"></i><span>No se encontraron sesiones que coincidan con la búsqueda</span></div></td>';
+                        }
+                    } else {
+                        // Si hay resultados, remover mensaje de "no resultados" si existe
+                        const noResultsRow = document.querySelector('.no-results-row');
+                        if (noResultsRow) {
+                            noResultsRow.remove();
+                        }
+                    }
+                });
+                
+                // También manejar Enter para prevenir el comportamiento por defecto
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+        
+        // Toggle status functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.toggle-status-btn')) {
+                e.preventDefault();
+                const button = e.target.closest('.toggle-status-btn');
+                const sessionId = button.dataset.sessionId;
+                const sessionTitle = button.dataset.sessionTitle;
+                const currentStatus = button.dataset.currentStatus;
+                const action = button.dataset.action;
+                
+                const message = action === 'deactivate' 
+                    ? `¿Estás seguro de que deseas desactivar la sesión "${sessionTitle}"?`
+                    : `¿Estás seguro de que deseas activar la sesión "${sessionTitle}"?`;
+                
+                if (confirm(message)) {
+                    toggleSessionStatus(sessionId, button);
+                }
+            }
+        });
+
+        function toggleSessionStatus(sessionId, button) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            fetch('/Sessions/ToggleStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'id': sessionId,
+                    '__RequestVerificationToken': token
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const row = button.closest('tr');
+                    const currentFilter = '@Model.CurrentStatusFilter';
+                    
+                    // Update status badge
+                    const statusBadge = row.querySelector('td:nth-child(8) .badge');
+                    if (result.newIsActiveState) {
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = 'Activo';
+                    } else {
+                        statusBadge.className = 'badge bg-secondary';
+                        statusBadge.textContent = 'Inactivo';
+                    }
+                    
+                    // Update button
+                    if (result.newIsActiveState) {
+                        button.className = 'btn btn-sm btn-icon text-warning toggle-status-btn';
+                        button.title = 'Desactivar Sesión';
+                        button.dataset.currentStatus = 'active';
+                        button.dataset.action = 'deactivate';
+                        button.innerHTML = '<i class="fas fa-pause-circle"></i>';
+                    } else {
+                        button.className = 'btn btn-sm btn-icon text-success toggle-status-btn';
+                        button.title = 'Activar Sesión';
+                        button.dataset.currentStatus = 'inactive';
+                        button.dataset.action = 'activate';
+                        button.innerHTML = '<i class="fas fa-play-circle"></i>';
+                    }
+                    
+                    // Remove row with animation if it doesn't match current filter
+                    if ((currentFilter === 'active' && !result.newIsActiveState) || 
+                        (currentFilter === 'inactive' && result.newIsActiveState)) {
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(-10px)';
+                        row.style.transition = 'all 0.3s ease';
+                        setTimeout(() => row.remove(), 300);
+                    }
+                    
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message || 'Error al cambiar el estado', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error al procesar la solicitud', 'error');
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toastElement = document.getElementById('notificationToast');
+            if (toastElement) {
+                const toastBody = toastElement.querySelector('.toast-body');
+                toastBody.textContent = message;
+                
+                // Remove previous color classes
+                toastElement.classList.remove('bg-success', 'bg-danger', 'bg-info', 'text-white');
+                
+                // Add color based on type
+                if (type === 'success') {
+                    toastElement.classList.add('bg-success', 'text-white');
+                } else if (type === 'error') {
+                    toastElement.classList.add('bg-danger', 'text-white');
+                }
+                
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+        }
+    </script>
+    
+    <style>
+        /* Hide scrollbars */
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
+        .table-responsive::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .table-responsive {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        #sessionsTable {
+            width: 100%;
+            table-layout: auto;
+        }
+        
+        /* Ensure no horizontal scroll on body */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Action buttons styling consistent with users module */
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-icon:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #495057;
+        }
+        
+        .btn-icon.text-warning:hover {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        
+        .btn-icon.text-success:hover {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+    </style>
+}

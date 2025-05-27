@@ -34,6 +34,8 @@ namespace ToolBox.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SesionCalendario> SesionesCalendario { get; set; }
         public DbSet<SesionCliente> SesionesClientes { get; set; }
+        public DbSet<Session> Sessions { get; set; }
+        public DbSet<SessionFile> SessionFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -350,6 +352,52 @@ namespace ToolBox.Data
                 .WithMany()
                 .HasForeignKey(sc => sc.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Session configuration
+            modelBuilder.Entity<Session>()
+                .HasKey(s => s.Id);
+
+            modelBuilder.Entity<Session>()
+                .HasOne(s => s.Client)
+                .WithMany()
+                .HasForeignKey(s => s.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Session>()
+                .HasIndex(s => new { s.ClientId, s.SessionDateTime });
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.KeyPoints)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.WaysToDevelop)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.Assignments)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.Challenges)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.Feedback)
+                .HasColumnType("TEXT");
+
+            // SessionFile configuration
+            modelBuilder.Entity<SessionFile>()
+                .HasKey(sf => sf.Id);
+
+            modelBuilder.Entity<SessionFile>()
+                .HasOne(sf => sf.Session)
+                .WithMany(s => s.SessionFiles)
+                .HasForeignKey(sf => sf.SessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SessionFile>()
+                .HasIndex(sf => sf.SessionId);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -378,7 +426,8 @@ namespace ToolBox.Data
                 "EmailContents",
                 "WebsiteSettings",
                 "WelcomeMessage",
-                "Calendario"
+                "Calendario",
+                "Sessions"
             };
 
             var actions = new[]

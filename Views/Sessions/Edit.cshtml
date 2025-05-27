@@ -1,0 +1,588 @@
+@model ToolBox.Models.ViewModels.SessionEditViewModel
+@{
+    ViewData["Title"] = "Editar Sesión";
+    Layout = "_AdminLayout";
+    var clients = ViewBag.Clients as dynamic;
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Sessions" asp-action="Index" data-translate-key="breadcrumb_sessions_list">Sesiones</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_edit_session">Editar Sesión</li>
+    </ol>
+</nav>
+
+<form asp-action="Update" asp-controller="Sessions" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" id="sessionForm">
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+    
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-12 col-lg-8">
+            <!-- Información Principal -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" data-translate-key="main_information_title">Información Principal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Cliente -->
+                        <div class="col-12">
+                            <label asp-for="ClientId" class="form-label" data-translate-key="field_client">Cliente <span class="text-danger">*</span></label>
+                            <select asp-for="ClientId" class="form-select" required>
+                                <option value="" data-translate-key="select_client_placeholder">Seleccione un cliente</option>
+                                @if (clients != null)
+                                {
+                                    @foreach (var client in clients)
+                                    {
+                                        @if (client.Id == Model.ClientId)
+                                        {
+                                            <option value="@client.Id" selected>@client.FullName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@client.Id">@client.FullName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ClientId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Fecha y Hora de Sesión -->
+                        <div class="col-md-6">
+                            <label asp-for="SessionDateTime" class="form-label" data-translate-key="field_session_datetime">Fecha y hora de la sesión <span class="text-danger">*</span></label>
+                            <input asp-for="SessionDateTime" type="datetime-local" class="form-control" required>
+                            <span asp-validation-for="SessionDateTime" class="text-danger"></span>
+                        </div>
+
+                        <!-- Próxima Fecha y Hora de Sesión -->
+                        <div class="col-md-6">
+                            <label asp-for="NextSessionDateTime" class="form-label" data-translate-key="field_next_session_datetime">Fecha y hora de la próxima sesión</label>
+                            <input asp-for="NextSessionDateTime" type="datetime-local" class="form-control">
+                            <span asp-validation-for="NextSessionDateTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido de la Sesión -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" data-translate-key="session_content_title">Contenido de la Sesión</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Puntos Clave -->
+                        <div class="col-12">
+                            <label asp-for="KeyPoints" class="form-label" data-translate-key="field_key_points">Puntos clave <span class="text-danger">*</span></label>
+                            <textarea asp-for="KeyPoints" class="form-control" id="keyPointsEditor" rows="6" required>@Model.KeyPoints</textarea>
+                            <span asp-validation-for="KeyPoints" class="text-danger"></span>
+                        </div>
+
+                        <!-- Formas de Desarrollar -->
+                        <div class="col-12">
+                            <label asp-for="WaysToDevelop" class="form-label" data-translate-key="field_ways_to_develop">Formas de desarrollar</label>
+                            <textarea asp-for="WaysToDevelop" class="form-control" rows="4">@Model.WaysToDevelop</textarea>
+                            <span asp-validation-for="WaysToDevelop" class="text-danger"></span>
+                        </div>
+
+                        <!-- Asignaciones -->
+                        <div class="col-12">
+                            <label asp-for="Assignments" class="form-label" data-translate-key="field_assignments">Asignaciones</label>
+                            <textarea asp-for="Assignments" class="form-control" rows="4">@Model.Assignments</textarea>
+                            <span asp-validation-for="Assignments" class="text-danger"></span>
+                        </div>
+
+                        <!-- Desafíos -->
+                        <div class="col-12">
+                            <label asp-for="Challenges" class="form-label" data-translate-key="field_challenges">Desafíos</label>
+                            <textarea asp-for="Challenges" class="form-control" rows="4">@Model.Challenges</textarea>
+                            <span asp-validation-for="Challenges" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retroalimentación y Otros -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" data-translate-key="feedback_others_title">Retroalimentación y Otros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Retroalimentación -->
+                        <div class="col-12">
+                            <label asp-for="Feedback" class="form-label" data-translate-key="field_feedback">Retroalimentación</label>
+                            <textarea asp-for="Feedback" class="form-control" rows="4">@Model.Feedback</textarea>
+                            <span asp-validation-for="Feedback" class="text-danger"></span>
+                        </div>
+
+                        <!-- Twitter -->
+                        <div class="col-12">
+                            <label asp-for="Twitter" class="form-label" data-translate-key="field_twitter">Twitter</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                <input asp-for="Twitter" type="text" class="form-control" maxlength="255" value="@Model.Twitter">
+                            </div>
+                            <span asp-validation-for="Twitter" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-12 col-lg-4">
+            <!-- Archivos Adjuntos Existentes -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" data-translate-key="existing_attachments_title">Archivos Adjuntos Existentes</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.SessionFiles != null && Model.SessionFiles.Any())
+                    {
+                        <div class="existing-files-list">
+                            @foreach (var file in Model.SessionFiles)
+                            {
+                                var extension = System.IO.Path.GetExtension(file.OriginalName).ToLowerInvariant();
+                                var isImage = new[] { ".jpg", ".jpeg", ".png" }.Contains(extension);
+                                var isPdf = extension == ".pdf";
+                                var isDoc = new[] { ".doc", ".docx" }.Contains(extension);
+                                var isVideo = new[] { ".mp4", ".mov" }.Contains(extension);
+                                
+                                <div class="existing-file-item" data-file-id="@file.Id">
+                                    <div class="file-preview">
+                                        @if (isImage)
+                                        {
+                                            <img src="@file.FilePath" alt="@file.OriginalName" class="file-thumbnail">
+                                        }
+                                        else if (isPdf)
+                                        {
+                                            <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                        }
+                                        else if (isDoc)
+                                        {
+                                            <i class="fas fa-file-word fa-2x text-primary"></i>
+                                        }
+                                        else if (isVideo)
+                                        {
+                                            <i class="fas fa-file-video fa-2x text-info"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-file fa-2x text-secondary"></i>
+                                        }
+                                    </div>
+                                    <div class="file-info">
+                                        <a href="@file.FilePath" target="_blank" class="file-name">@file.OriginalName</a>
+                                        <div class="file-size">@FormatFileSize(file.Size ?? 0)</div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete-file" data-file-id="@file.Id">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center" data-translate-key="no_existing_attachments">No hay archivos adjuntos</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Nuevos Archivos Adjuntos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" data-translate-key="new_attachments_title">Agregar Nuevos Archivos</h5>
+                </div>
+                <div class="card-body">
+                    <!-- File Upload Area -->
+                    <div class="file-upload-wrapper">
+                        <label for="attachments" class="file-upload-label">
+                            <div class="file-upload-design">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                <p class="mb-2" data-translate-key="drop_files_here">Arrastra archivos aquí o haz clic para seleccionar</p>
+                                <span class="file-upload-hint" data-translate-key="file_upload_hint">
+                                    JPG, PNG, PDF, DOC, DOCX, MP4, MOV (Max: 10MB)
+                                </span>
+                            </div>
+                            <input type="file" 
+                                   name="attachments" 
+                                   id="attachments" 
+                                   multiple 
+                                   accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.mp4,.mov"
+                                   class="file-upload-input">
+                        </label>
+                    </div>
+
+                    <!-- File Preview List -->
+                    <div id="filePreviewContainer" class="mt-3" style="display: none;">
+                        <h6 class="mb-3" data-translate-key="selected_files">Archivos seleccionados:</h6>
+                        <div id="filePreviewList" class="file-preview-list"></div>
+                    </div>
+
+                    <!-- Validation Errors -->
+                    <span class="text-danger" id="attachmentErrors"></span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        <span class="text-danger">*</span> <span data-translate-key="required_fields_note">Campos obligatorios</span>
+                    </p>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            <span data-translate-key="update_button">Actualizar</span>
+                        </button>
+                        <a href="@Url.Action("Index", "Sessions")" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            <span data-translate-key="cancel_button">Cancelar</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" data-translate-key="notification_title">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-3">
+        <h6 class="alert-heading" data-translate-key="validation_errors_title">Errores de validación:</h6>
+        <div asp-validation-summary="All" class="mb-0"></div>
+    </div>
+}
+
+@functions {
+    string FormatFileSize(int bytes)
+    {
+        if (bytes == 0) return "0 Bytes";
+        var k = 1024;
+        var sizes = new[] { "Bytes", "KB", "MB", "GB" };
+        var i = (int)Math.Floor(Math.Log(bytes) / Math.Log(k));
+        return $"{Math.Round(bytes / Math.Pow(k, i), 2)} {sizes[i]}";
+    }
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <!-- TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/1ch6ln9g0ak7n4uqhevfwfodp03d49kcdiwwygiue9gc291x/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <!-- Include the same file upload script from Create view -->
+    <script src="~/js/sessions-file-upload.js"></script>
+    
+    <script>
+        // Initialize TinyMCE for key points
+        tinymce.init({
+            selector: '#keyPointsEditor',
+            height: 300,
+            menubar: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }'
+        });
+
+        // Handle file deletion
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-delete-file')) {
+                e.preventDefault();
+                const button = e.target.closest('.btn-delete-file');
+                const fileId = button.dataset.fileId;
+                
+                if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+                    deleteFile(fileId, button);
+                }
+            }
+        });
+
+        function deleteFile(fileId, button) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            fetch('/Sessions/DeleteFile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'fileId': fileId,
+                    '__RequestVerificationToken': token
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Remove the file item from UI
+                    const fileItem = button.closest('.existing-file-item');
+                    fileItem.style.opacity = '0';
+                    fileItem.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        fileItem.remove();
+                        // Check if no files left
+                        const filesList = document.querySelector('.existing-files-list');
+                        if (filesList && filesList.children.length === 0) {
+                            filesList.innerHTML = '<p class="text-muted text-center" data-translate-key="no_existing_attachments">No hay archivos adjuntos</p>';
+                        }
+                    }, 300);
+                    
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message || 'Error al eliminar el archivo', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error al procesar la solicitud', 'error');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastElement = document.getElementById('notificationToast');
+            if (toastElement) {
+                const toastBody = toastElement.querySelector('.toast-body');
+                toastBody.textContent = message;
+                
+                // Remove previous color classes
+                toastElement.classList.remove('bg-success', 'bg-danger', 'bg-info', 'text-white');
+                
+                // Add color based on type
+                if (type === 'success') {
+                    toastElement.classList.add('bg-success', 'text-white');
+                } else if (type === 'error') {
+                    toastElement.classList.add('bg-danger', 'text-white');
+                }
+                
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+        }
+
+        // Form validation
+        document.getElementById('sessionForm').addEventListener('submit', function(e) {
+            // Ensure TinyMCE content is synced
+            tinymce.triggerSave();
+            
+            // Validate next session date
+            const sessionDate = document.getElementById('SessionDateTime').value;
+            const nextSessionDate = document.getElementById('NextSessionDateTime').value;
+            
+            if (nextSessionDate && nextSessionDate < sessionDate) {
+                e.preventDefault();
+                alert('La fecha de la próxima sesión debe ser posterior a la fecha de la sesión actual.');
+                return false;
+            }
+        });
+    </script>
+    
+    <style>
+        /* Required field asterisk */
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        
+        /* Existing Files Styles */
+        .existing-files-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .existing-file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            transition: opacity 0.3s ease;
+        }
+        
+        .existing-file-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .file-preview {
+            width: 48px;
+            height: 48px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 0.25rem;
+        }
+        
+        .file-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .file-name {
+            display: block;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-decoration: none;
+            color: #0d6efd;
+        }
+        
+        .file-name:hover {
+            text-decoration: underline;
+        }
+        
+        .file-size {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .btn-delete-file {
+            margin-left: auto;
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* File Upload Styles (same as Create view) */
+        .file-upload-wrapper {
+            position: relative;
+        }
+        
+        .file-upload-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: block;
+            cursor: pointer;
+        }
+        
+        .file-upload-design {
+            padding: 2rem;
+            border: 2px dashed #dee2e6;
+            border-radius: 0.375rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .file-upload-design:hover {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+        
+        .file-upload-highlight {
+            border-color: #0d6efd !important;
+            background-color: #e7f1ff !important;
+        }
+        
+        .file-upload-hint {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        /* File Preview Styles */
+        .file-preview-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .file-preview-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            position: relative;
+        }
+        
+        .file-preview-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .file-preview-image {
+            width: 48px;
+            height: 48px;
+            margin-right: 1rem;
+            overflow: hidden;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+        }
+        
+        .file-preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .file-preview-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .file-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-size {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .file-remove-btn {
+            margin-left: auto;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+}

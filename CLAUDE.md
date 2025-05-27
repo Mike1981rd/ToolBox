@@ -286,6 +286,155 @@ private int GetCurrentUserId()
 - [ ] Eliminar usuario temporal ID=1
 - [ ] Testear flujo completo de autenticación
 
+## 🚫 PROCESO CRÍTICO PARA NUEVOS MÓDULOS: MIGRACIONES Y PERMISOS
+
+### ⚠️ IMPORTANTE: NUNCA CREAR ARCHIVOS DE MIGRACIÓN MANUALMENTE
+**Problema Recurrente**: Crear archivos de migración manualmente causa que Visual Studio no los reconozca y genera conflictos con IDs de permisos.
+
+### ✅ PROCESO CORRECTO PARA NUEVOS MÓDULOS
+
+#### Paso 1: Preparar SOLO los Modelos y DbContext
+```csharp
+// 1. Crear el modelo en /Models/
+public class NuevoModulo
+{
+    public int Id { get; set; }
+    // ... propiedades
+}
+
+// 2. Actualizar ApplicationDbContext.cs
+public DbSet<NuevoModulo> NuevoModulos { get; set; }
+
+// 3. NO AGREGAR permisos en SeedPermissions todavía
+```
+
+#### Paso 2: El Usuario Ejecuta la Migración
+```bash
+# El USUARIO ejecuta esto en Visual Studio Package Manager Console:
+Add-Migration CreateNuevoModuloTable
+```
+
+#### Paso 3: Verificar Permisos Existentes ANTES de Agregar Nuevos
+```sql
+-- El usuario debe ejecutar para ver el último ID usado:
+SELECT MAX("Id") FROM "Permissions";
+```
+
+#### Paso 4: Agregar Permisos en ApplicationDbContext
+```csharp
+// En ApplicationDbContext.cs - método SeedPermissions
+// USAR IDs que NO existan (verificar con la consulta anterior)
+new Permission { Id = 61, ModuleName = "NuevoModulo", ActionName = "Read", ... },
+new Permission { Id = 62, ModuleName = "NuevoModulo", ActionName = "Write", ... },
+new Permission { Id = 63, ModuleName = "NuevoModulo", ActionName = "Create", ... }
+```
+
+#### Paso 5: Segunda Migración para Permisos
+```bash
+# El USUARIO ejecuta:
+Add-Migration AddNuevoModuloPermissions
+Update-Database
+```
+
+### 📝 CHECKLIST OBLIGATORIO PARA NUEVOS MÓDULOS
+
+1. **ANTES de crear el módulo:**
+   - [ ] NO crear archivos de migración manualmente
+   - [ ] NO agregar permisos en la primera migración
+   - [ ] Verificar último ID de permisos en la BD
+
+2. **Crear estructura básica:**
+   - [ ] Modelo en /Models/
+   - [ ] DbSet en ApplicationDbContext
+   - [ ] NO tocar SeedPermissions todavía
+
+3. **Primera migración (solo tablas):**
+   - [ ] Usuario ejecuta: `Add-Migration CreateXXXTable`
+   - [ ] Usuario ejecuta: `Update-Database`
+
+4. **Agregar permisos después:**
+   - [ ] Verificar último ID: `SELECT MAX("Id") FROM "Permissions"`
+   - [ ] Agregar en SeedPermissions con IDs nuevos
+   - [ ] Agregar módulo a la lista de modules en SeedPermissions
+
+5. **Segunda migración (permisos):**
+   - [ ] Usuario ejecuta: `Add-Migration AddXXXPermissions`
+   - [ ] Usuario ejecuta: `Update-Database`
+
+6. **Verificar permisos:**
+   - [ ] Agregar módulo en _AdminLayout.cshtml
+   - [ ] Asignar permisos al rol en UI de Roles
+
+### ⚠️ PATRÓN CRÍTICO: BÚSQUEDA Y FILTROS
+
+**IMPORTANTE**: La búsqueda siempre es del lado cliente, NUNCA del servidor.
+
+#### Filtros de Estado (Servidor)
+```csharp
+// Controller - Solo filtro de estado
+public async Task<IActionResult> Index(string? statusFilter = null)
+{
+    statusFilter = statusFilter ?? "active"; // Default active
+    // Aplicar filtro de estado en query
+    if (statusFilter == "active") query = query.Where(x => x.Status == true);
+}
+```
+
+#### Búsqueda (Cliente)
+```javascript
+// JavaScript - Búsqueda del lado cliente
+searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    const tableRows = document.querySelectorAll('#tableId tbody tr');
+    
+    tableRows.forEach(row => {
+        // Obtener texto de celdas relevantes
+        const matches = /* lógica de búsqueda */;
+        row.style.display = matches ? '' : 'none';
+    });
+});
+```
+
+#### Envío de Datos AJAX
+```javascript
+// SIEMPRE usar form-data, NUNCA JSON para compatibilidad con [ValidateAntiForgeryToken]
+fetch('/Controller/Action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ 'id': value, '__RequestVerificationToken': token })
+});
+```
+
+### 🔴 ERRORES COMUNES QUE EVITAR
+
+1. **NO hacer esto:**
+   ```csharp
+   // ❌ NUNCA crear migración manualmente
+   public partial class CreateSessionTables : Migration { }
+   ```
+
+2. **NO agregar permisos en primera migración:**
+   ```csharp
+   // ❌ INCORRECTO - causará conflicto de IDs
+   migrationBuilder.InsertData(
+       table: "Permissions",
+       values: new object[] { 55, "Read", ... }
+   ```
+
+3. **NO asumir IDs de permisos:**
+   ```csharp
+   // ❌ INCORRECTO - verificar primero qué IDs están usados
+   new Permission { Id = 55, ... } // Este ID puede ya existir
+   ```
+
+### 💡 SOLUCIÓN SI YA HAY CONFLICTOS
+
+Si ya se crearon migraciones con conflictos:
+1. Eliminar archivos de migración problemáticos
+2. Usuario ejecuta: `Add-Migration NombreNuevo`
+3. Comentar InsertData/DeleteData de permisos si hay conflictos
+4. Usuario ejecuta: `Update-Database`
+
 ## 💡 Soluciones Rápidas a Problemas Comunes
 
 ```csharp

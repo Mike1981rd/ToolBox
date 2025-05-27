@@ -170,6 +170,13 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("Sessions"))
+                {
+                    <a href="@Url.Action("Index", "Sessions")" class="list-group-item list-group-item-action" data-translate-key="sidebar.sessions">
+                        <i class="fas fa-handshake fa-fw"></i><span class="sidebar-item-text">Sessions</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("WelcomeMessage"))
                 {
                     <a href="@Url.Action("Edit", "WelcomeMessage")" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">
