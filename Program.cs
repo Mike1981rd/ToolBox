@@ -48,6 +48,7 @@ builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<IWebsiteConfigurationService, WebsiteConfigurationService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<ISesionCalendarioService, SesionCalendarioService>();
 
 var app = builder.Build();
 

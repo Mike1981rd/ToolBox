@@ -163,6 +163,13 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("Calendar"))
+                {
+                    <a href="@Url.Action("Index", "Calendario")" class="list-group-item list-group-item-action" data-translate-key="sidebar.calendar">
+                        <i class="fas fa-calendar-alt fa-fw"></i><span class="sidebar-item-text">Calendar</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("WelcomeMessage"))
                 {
                     <a href="@Url.Action("Edit", "WelcomeMessage")" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">

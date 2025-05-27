@@ -1,0 +1,352 @@
+@{
+    ViewData["Title"] = "Calendar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Vuexy Calendar Styles -->
+    <link rel="stylesheet" href="~/css/calendario-vuexy.css">
+}
+
+<div class="container-fluid">
+    <!-- Vuexy Page Header -->
+    <div class="vuexy-page-header">
+        <div class="vuexy-d-flex vuexy-align-items-center vuexy-justify-content-between">
+            <div>
+                <h1>Calendar</h1>
+                <ul class="vuexy-breadcrumb">
+                    <li><a href="/Admin/Dashboard">Apps</a></li>
+                    <li>Calendar</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-md-3">
+            <div class="vuexy-sidebar">
+                <!-- Add Event Button -->
+                <button class="vuexy-add-event-btn w-100 vuexy-mb-3" id="btnAddEvent">
+                    <i class="fas fa-plus"></i>
+                    Add Event
+                </button>
+
+                <!-- Mini Calendar -->
+                <div class="vuexy-mini-calendar vuexy-mb-3">
+                    <div id="miniCalendar"></div>
+                </div>
+
+                <!-- Filters -->
+                <h5>Filter</h5>
+                <div class="vuexy-calendar-filters">
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="all" id="filterAll">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span>View All</span>
+                        </div>
+                    </div>
+
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="personal" id="filterPersonal">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span class="vuexy-filter-color" style="background: var(--vuexy-primary)"></span>
+                            <span>Personal</span>
+                        </div>
+                    </div>
+
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="business" id="filterBusiness">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span class="vuexy-filter-color" style="background: var(--vuexy-success)"></span>
+                            <span>Business</span>
+                        </div>
+                    </div>
+
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="family" id="filterFamily">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span class="vuexy-filter-color" style="background: var(--vuexy-warning)"></span>
+                            <span>Family</span>
+                        </div>
+                    </div>
+
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="holiday" id="filterHoliday">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span class="vuexy-filter-color" style="background: var(--vuexy-danger)"></span>
+                            <span>Holiday</span>
+                        </div>
+                    </div>
+
+                    <div class="vuexy-filter-item">
+                        <label class="vuexy-filter-checkbox">
+                            <input type="checkbox" checked value="etc" id="filterEtc">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="vuexy-filter-label">
+                            <span class="vuexy-filter-color" style="background: var(--vuexy-info)"></span>
+                            <span>ETC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Calendar -->
+        <div class="col-md-9">
+            <div class="vuexy-calendar-card">
+                <!-- Calendar Header -->
+                <div class="vuexy-calendar-header">
+                    <div class="vuexy-calendar-nav">
+                        <button class="vuexy-nav-btn" id="btnPrev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="vuexy-nav-btn" id="btnNext">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <h2 class="vuexy-calendar-title" id="calendarTitle">November 2023</h2>
+                    </div>
+
+                    <div class="vuexy-view-switcher">
+                        <button class="vuexy-view-btn active" data-view="dayGridMonth">Month</button>
+                        <button class="vuexy-view-btn" data-view="timeGridWeek">Week</button>
+                        <button class="vuexy-view-btn" data-view="timeGridDay">Day</button>
+                        <button class="vuexy-view-btn" data-view="listMonth">List</button>
+                    </div>
+                </div>
+
+                <!-- Calendar Body -->
+                <div class="vuexy-calendar-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Event Offcanvas -->
+<div class="offcanvas offcanvas-end vuexy-offcanvas" tabindex="-1" id="eventOffcanvas">
+    <div class="vuexy-offcanvas-header">
+        <h5 class="vuexy-offcanvas-title" id="offcanvasTitle">Add Event</h5>
+        <button type="button" class="vuexy-offcanvas-close" data-bs-dismiss="offcanvas">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="vuexy-offcanvas-body">
+        <form id="eventForm">
+            <!-- Title -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">
+                    Title <span class="required">*</span>
+                </label>
+                <input type="text" class="vuexy-form-control" id="eventTitle" required>
+            </div>
+
+            <!-- Label -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Label</label>
+                <div class="vuexy-event-label-group">
+                    <label class="vuexy-event-label selected" style="background: var(--vuexy-primary)">
+                        <input type="radio" name="eventLabel" value="primary" checked>
+                    </label>
+                    <label class="vuexy-event-label" style="background: var(--vuexy-success)">
+                        <input type="radio" name="eventLabel" value="success">
+                    </label>
+                    <label class="vuexy-event-label" style="background: var(--vuexy-warning)">
+                        <input type="radio" name="eventLabel" value="warning">
+                    </label>
+                    <label class="vuexy-event-label" style="background: var(--vuexy-danger)">
+                        <input type="radio" name="eventLabel" value="danger">
+                    </label>
+                    <label class="vuexy-event-label" style="background: var(--vuexy-info)">
+                        <input type="radio" name="eventLabel" value="info">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Start Date -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Start Date</label>
+                <input type="text" class="vuexy-form-control" id="eventStartDate">
+            </div>
+
+            <!-- End Date -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">End Date</label>
+                <input type="text" class="vuexy-form-control" id="eventEndDate">
+            </div>
+
+            <!-- All Day -->
+            <div class="vuexy-form-group">
+                <div class="vuexy-form-switch">
+                    <label class="vuexy-switch">
+                        <input type="checkbox" id="eventAllDay">
+                        <span class="vuexy-switch-slider"></span>
+                    </label>
+                    <label class="vuexy-form-label vuexy-mb-0">All Day</label>
+                </div>
+            </div>
+
+            <!-- Event URL -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Event URL</label>
+                <input type="url" class="vuexy-form-control" id="eventUrl" placeholder="https://www.google.com">
+            </div>
+
+            <!-- Guests -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Add Guests</label>
+                <select class="vuexy-form-control vuexy-form-select" id="eventGuests" multiple>
+                    <option>Donna Frank</option>
+                    <option>Jane Foster</option>
+                    <option>John Doe</option>
+                    <option>Sarah Taylor</option>
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Location</label>
+                <input type="text" class="vuexy-form-control" id="eventLocation" placeholder="Meeting Room">
+            </div>
+
+            <!-- Description -->
+            <div class="vuexy-form-group">
+                <label class="vuexy-form-label">Description</label>
+                <textarea class="vuexy-form-control" id="eventDescription" rows="3"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <div class="vuexy-offcanvas-footer">
+        <button type="button" class="vuexy-btn vuexy-btn-primary" id="btnSaveEvent">
+            Add Event
+        </button>
+        <button type="button" class="vuexy-btn vuexy-btn-secondary" data-bs-dismiss="offcanvas">
+            Cancel
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize FullCalendar
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: false, // We use custom header
+            height: 'auto',
+            editable: true,
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: 3,
+            
+            // Event styling
+            eventClassNames: function(arg) {
+                return ['fc-event-' + arg.event.extendedProps.label];
+            },
+            
+            select: function(info) {
+                // Open add event offcanvas
+                var offcanvas = new bootstrap.Offcanvas(document.getElementById('eventOffcanvas'));
+                offcanvas.show();
+            },
+            
+            eventClick: function(info) {
+                // Open edit event offcanvas
+                var offcanvas = new bootstrap.Offcanvas(document.getElementById('eventOffcanvas'));
+                document.getElementById('offcanvasTitle').textContent = 'Update Event';
+                document.getElementById('btnSaveEvent').textContent = 'Update';
+                offcanvas.show();
+            }
+        });
+        
+        calendar.render();
+
+        // Initialize mini calendar
+        var miniCalendarEl = document.getElementById('miniCalendar');
+        var miniCalendar = new FullCalendar.Calendar(miniCalendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev',
+                center: 'title',
+                right: 'next'
+            },
+            height: 'auto',
+            dayMaxEvents: false
+        });
+        
+        miniCalendar.render();
+
+        // Custom navigation
+        document.getElementById('btnPrev').addEventListener('click', function() {
+            calendar.prev();
+            updateTitle();
+        });
+
+        document.getElementById('btnNext').addEventListener('click', function() {
+            calendar.next();
+            updateTitle();
+        });
+
+        // View switcher
+        document.querySelectorAll('.vuexy-view-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelector('.vuexy-view-btn.active').classList.remove('active');
+                this.classList.add('active');
+                calendar.changeView(this.dataset.view);
+            });
+        });
+
+        // Update title
+        function updateTitle() {
+            var date = calendar.getDate();
+            var title = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            document.getElementById('calendarTitle').textContent = title;
+        }
+
+        updateTitle();
+
+        // Add event button
+        document.getElementById('btnAddEvent').addEventListener('click', function() {
+            var offcanvas = new bootstrap.Offcanvas(document.getElementById('eventOffcanvas'));
+            document.getElementById('offcanvasTitle').textContent = 'Add Event';
+            document.getElementById('btnSaveEvent').textContent = 'Add Event';
+            offcanvas.show();
+        });
+
+        // Event label selection
+        document.querySelectorAll('.vuexy-event-label').forEach(function(label) {
+            label.addEventListener('click', function() {
+                document.querySelector('.vuexy-event-label.selected').classList.remove('selected');
+                this.classList.add('selected');
+            });
+        });
+    });
+    </script>
+}

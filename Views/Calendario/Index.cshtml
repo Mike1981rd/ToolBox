@@ -1,0 +1,285 @@
+@{
+    ViewData["Title"] = "Calendar";
+    Layout = "_AdminLayout";
+}
+
+@section Styles {
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <!-- Select2 for multi-select -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Flatpickr for date/time picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Vuexy Calendar Styles -->
+    <link rel="stylesheet" href="~/css/calendario-vuexy.css">
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_calendar">Calendar</li>
+    </ol>
+</nav>
+
+<!-- Main Content Card (Following Users module structure) -->
+<div class="card shadow-sm">
+    <!-- Calendar Sidebar and Controls (Desktop) -->
+    <div class="desktop-filters">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0" data-translate-key="calendar.title">Calendar</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Left Sidebar with Filters -->
+                <div class="col-lg-3 col-md-4 col-12">
+                    <!-- Add Event Button -->
+                    <button class="btn btn-primary w-100 mb-3" id="btnAddSession">
+                        <i class="fas fa-plus me-2"></i>
+                        <span data-translate-key="calendar.addSession">Add Event</span>
+                    </button>
+
+                    <!-- Mini Calendar - Hidden -->
+                    <!-- <div class="card mb-3">
+                        <div class="card-body p-2">
+                            <div id="calendarMini"></div>
+                        </div>
+                    </div> -->
+
+                    <!-- Event Filters -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0" data-translate-key="calendar.filters">Event Filters</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" checked value="all" id="filterAll">
+                                <label class="form-check-label" for="filterAll">
+                                    <span data-translate-key="calendar.viewAll">View All</span>
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" checked value="Programada" id="filterProgramada">
+                                <label class="form-check-label d-flex align-items-center" for="filterProgramada">
+                                    <span class="badge me-2" style="background: #7367f0; width: 12px; height: 12px;"></span>
+                                    Programada
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" checked value="Confirmada" id="filterConfirmada">
+                                <label class="form-check-label d-flex align-items-center" for="filterConfirmada">
+                                    <span class="badge me-2" style="background: #28c76f; width: 12px; height: 12px;"></span>
+                                    Confirmada
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" checked value="EnProgreso" id="filterEnProgreso">
+                                <label class="form-check-label d-flex align-items-center" for="filterEnProgreso">
+                                    <span class="badge me-2" style="background: #ff9f43; width: 12px; height: 12px;"></span>
+                                    En Progreso
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" checked value="Completada" id="filterCompletada">
+                                <label class="form-check-label d-flex align-items-center" for="filterCompletada">
+                                    <span class="badge me-2" style="background: #00cfe8; width: 12px; height: 12px;"></span>
+                                    Completada
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Cancelada" id="filterCancelada">
+                                <label class="form-check-label d-flex align-items-center" for="filterCancelada">
+                                    <span class="badge me-2" style="background: #ea5455; width: 12px; height: 12px;"></span>
+                                    Cancelada
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Calendar Area -->
+                <div class="col-lg-9 col-md-8 col-12">
+                    <div class="card">
+                        <!-- Calendar Header with View Switcher -->
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary me-2" id="btnPrev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary me-3" id="btnNext">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <h5 class="mb-0" id="calendarTitle">May 2025</h5>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-outline-secondary" id="btnRefresh" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary active" data-view="dayGridMonth" data-translate-key="calendar.month">Month</button>
+                                <button class="btn btn-sm btn-outline-primary" data-view="timeGridWeek" data-translate-key="calendar.week">Week</button>
+                                <button class="btn btn-sm btn-outline-primary" data-view="timeGridDay" data-translate-key="calendar.day">Day</button>
+                                <button class="btn btn-sm btn-outline-primary" data-view="listMonth" data-translate-key="calendar.list">List</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Body -->
+                        <div class="card-body p-0">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSRF Token -->
+@Html.AntiForgeryToken()
+
+<!-- Add/Edit Session Offcanvas -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sessionOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasTitle">
+            <span data-translate-key="calendar.addSession">Add Session</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    
+    <div class="offcanvas-body">
+        <form id="sessionForm">
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span data-translate-key="calendar.sessionTitle">Title</span> <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="titulo" name="titulo" required>
+            </div>
+
+            <!-- Status Label -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span data-translate-key="calendar.status">Label</span> <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" id="estadoSesion" name="estadoSesion" required>
+                    <option value="Programada">🟣 Programada</option>
+                    <option value="Confirmada">🟢 Confirmada</option>
+                    <option value="EnProgreso">🟠 En Progreso</option>
+                    <option value="Completada">🔵 Completada</option>
+                    <option value="Cancelada">🔴 Cancelada</option>
+                </select>
+            </div>
+
+            <!-- Date Time Range -->
+            <div class="row">
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span data-translate-key="calendar.startDateTime">Start Date & Time</span> <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="fechaHoraInicio" name="fechaHoraInicio" required>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span data-translate-key="calendar.endDateTime">End Date & Time</span> <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="fechaHoraFin" name="fechaHoraFin" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Day Switch -->
+            <div class="mb-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="allDay">
+                    <label class="form-check-label" for="allDay" data-translate-key="calendar.allDay">All Day</label>
+                </div>
+            </div>
+
+            <!-- Coach -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.coach">Coach</label>
+                <select class="form-select" id="coachId" name="coachId">
+                    <option value="">Select Coach</option>
+                </select>
+            </div>
+
+            <!-- Clients -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.participants">Participants</label>
+                <select class="form-select" id="clientIds" name="clientIds" multiple>
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.location">Location</label>
+                <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Meeting Room / Online">
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.description">Description</label>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+
+            <!-- Session Type -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.sessionType">Session Type</label>
+                <select class="form-select" id="tipoSesion" name="tipoSesion">
+                    <option value="Individual">Individual</option>
+                    <option value="Grupal">Grupal</option>
+                    <option value="Taller">Taller</option>
+                    <option value="Conferencia">Conferencia</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="offcanvas-body border-top mt-auto">
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger me-auto d-none" id="btnDeleteSession">
+                <i class="fas fa-trash me-1"></i>
+                <span data-translate-key="buttons.delete">Delete</span>
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">
+                <span data-translate-key="buttons.cancel">Cancel</span>
+            </button>
+            <button type="button" class="btn btn-primary" id="btnSaveSession">
+                <span data-translate-key="buttons.save">Add Event</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="calendarToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body d-flex align-items-center">
+            <i class="fas fa-check-circle text-success me-2" id="toastIcon"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <!-- Calendar Script -->
+    <script src="~/js/calendario-vuexy.js"></script>
+}

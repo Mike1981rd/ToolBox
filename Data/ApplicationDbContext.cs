@@ -32,6 +32,8 @@ namespace ToolBox.Data
         public DbSet<Video> Videos { get; set; }
         public DbSet<WebsiteConfiguration> WebsiteConfiguration { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<SesionCalendario> SesionesCalendario { get; set; }
+        public DbSet<SesionCliente> SesionesClientes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -319,6 +321,35 @@ namespace ToolBox.Data
             // Índice por fecha de creación
             modelBuilder.Entity<Customer>()
                 .HasIndex(c => c.CreatedAt);
+                
+            // SesionCalendario configuration
+            modelBuilder.Entity<SesionCalendario>()
+                .HasOne(sc => sc.Coach)
+                .WithMany()
+                .HasForeignKey(sc => sc.CoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<SesionCalendario>()
+                .HasIndex(sc => sc.FechaHoraInicio);
+                
+            modelBuilder.Entity<SesionCalendario>()
+                .HasIndex(sc => new { sc.CoachId, sc.FechaHoraInicio });
+                
+            // SesionCliente configuration (Many-to-Many relationship)
+            modelBuilder.Entity<SesionCliente>()
+                .HasKey(sc => new { sc.SesionCalendarioId, sc.ClienteId });
+                
+            modelBuilder.Entity<SesionCliente>()
+                .HasOne(sc => sc.SesionCalendario)
+                .WithMany(s => s.SesionClientes)
+                .HasForeignKey(sc => sc.SesionCalendarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<SesionCliente>()
+                .HasOne(sc => sc.Cliente)
+                .WithMany()
+                .HasForeignKey(sc => sc.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -346,7 +377,8 @@ namespace ToolBox.Data
                 "HabitTracker",
                 "EmailContents",
                 "WebsiteSettings",
-                "WelcomeMessage"
+                "WelcomeMessage",
+                "Calendario"
             };
 
             var actions = new[]
@@ -387,6 +419,7 @@ namespace ToolBox.Data
                 "WheelOfLife" or "WheelOfProgress" or "XRayLife" or "LifeAssessment" or "LifeAreas" => "Herramientas de Vida",
                 "Tasks" or "HabitTracker" => "Productividad",
                 "EmailContents" or "WebsiteSettings" or "WelcomeMessage" => "Configuración",
+                "Calendario" => "Gestión de Sesiones",
                 _ => "Otros"
             };
         }
@@ -413,6 +446,7 @@ namespace ToolBox.Data
                 "EmailContents" => "Contenido de Emails",
                 "WebsiteSettings" => "Configuración del Sitio",
                 "WelcomeMessage" => "Mensaje de Bienvenida",
+                "Calendario" => "Calendario de Sesiones",
                 _ => module
             };
         }

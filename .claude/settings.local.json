@@ -14,7 +14,8 @@
       "Bash(dotnet --version)",
       "Bash(mv:*)",
       "Bash(/usr/bin/dotnet ef migrations add:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(awk:*)"
     ],
     "deny": []
   }

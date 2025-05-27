@@ -1,0 +1,426 @@
+/* Calendar Module Styles - Vuexy Inspired */
+
+/* Page Header */
+.page-header {
+    margin-top: -1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #ebe9f1;
+    background: #fff;
+}
+
+.page-header h1 {
+    color: #5e5873;
+    font-weight: 500;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.857rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #b9b9c3;
+}
+
+/* Calendar Container */
+.calendar-sidebar {
+    border: none;
+    box-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1);
+    border-radius: 0.428rem;
+}
+
+/* Filter Checkboxes */
+.filter-checkboxes .form-check {
+    margin-bottom: 0.7rem;
+}
+
+.filter-checkboxes .form-check-input {
+    cursor: pointer;
+    border: 2px solid #d8d6de;
+}
+
+.filter-checkboxes .form-check-input:checked {
+    background-color: #7367f0;
+    border-color: #7367f0;
+}
+
+.filter-checkboxes .badge {
+    font-weight: 400;
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Main Calendar Card */
+.card {
+    border: none;
+    box-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1);
+    border-radius: 0.428rem;
+    margin-bottom: 2rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* FullCalendar Customization */
+#calendar {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.fc {
+    font-size: 0.9rem;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #ebe9f1;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+    border-color: #ebe9f1;
+}
+
+/* Calendar Header */
+.fc-header-toolbar {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem !important;
+}
+
+.fc-toolbar-title {
+    font-size: 1.5rem !important;
+    font-weight: 500;
+    color: #5e5873;
+}
+
+.fc-button-primary {
+    background-color: #7367f0 !important;
+    border-color: #7367f0 !important;
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    border-radius: 0.357rem;
+    transition: all 0.2s;
+}
+
+.fc-button-primary:hover {
+    background-color: #5e50ee !important;
+    border-color: #5e50ee !important;
+    box-shadow: 0 3px 8px 0 rgba(115, 103, 240, 0.4);
+}
+
+.fc-button-primary:disabled {
+    background-color: #7367f0 !important;
+    border-color: #7367f0 !important;
+    opacity: 0.5;
+}
+
+.fc-button-primary:not(:disabled):active,
+.fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #4839eb !important;
+    border-color: #4839eb !important;
+}
+
+/* Day Headers */
+.fc-col-header-cell {
+    padding: 1rem 0;
+    background: #f8f8f8;
+    font-weight: 500;
+    color: #5e5873;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Day Cells */
+.fc-daygrid-day {
+    padding: 0.5rem;
+}
+
+.fc-daygrid-day-number {
+    padding: 0.5rem;
+    color: #5e5873;
+    font-weight: 500;
+}
+
+.fc-daygrid-day.fc-day-today {
+    background-color: rgba(115, 103, 240, 0.08);
+}
+
+.fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    color: #7367f0;
+    font-weight: 600;
+}
+
+/* Events */
+.fc-event {
+    border: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.2);
+}
+
+.fc-daygrid-event {
+    margin: 0.1rem 0;
+}
+
+.fc-event-title {
+    font-weight: 500;
+}
+
+/* Event Status Colors */
+.fc-event-programada {
+    background-color: #7367f0;
+    color: #fff;
+}
+
+.fc-event-confirmada {
+    background-color: #28c76f;
+    color: #fff;
+}
+
+.fc-event-enprogreso {
+    background-color: #ff9f43;
+    color: #fff;
+}
+
+.fc-event-completada {
+    background-color: #00cfe8;
+    color: #fff;
+}
+
+.fc-event-cancelada {
+    background-color: #ea5455;
+    color: #fff;
+}
+
+/* Offcanvas Styles */
+.offcanvas-end {
+    width: 400px !important;
+}
+
+@media (max-width: 576px) {
+    .offcanvas-end {
+        width: 100% !important;
+    }
+}
+
+.offcanvas-header {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ebe9f1;
+    padding: 1.5rem;
+}
+
+.offcanvas-title {
+    color: #5e5873;
+    font-weight: 500;
+    font-size: 1.25rem;
+}
+
+.offcanvas-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 80px);
+}
+
+.offcanvas-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #ebe9f1;
+    background: #f8f8f8;
+    margin-top: auto;
+}
+
+/* Nav Tabs */
+.nav-tabs {
+    border-bottom: 2px solid #ebe9f1;
+}
+
+.nav-tabs .nav-link {
+    color: #6e6b7b;
+    font-weight: 500;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+}
+
+.nav-tabs .nav-link:hover {
+    border: none;
+    color: #7367f0;
+}
+
+.nav-tabs .nav-link.active {
+    color: #7367f0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #7367f0;
+}
+
+/* Form Controls */
+.form-label {
+    font-weight: 500;
+    color: #5e5873;
+    margin-bottom: 0.5rem;
+    font-size: 0.857rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #d8d6de;
+    border-radius: 0.357rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #7367f0;
+    box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.1);
+}
+
+/* Select2 Customization */
+.select2-container--bootstrap-5 .select2-selection {
+    border: 1px solid #d8d6de;
+    border-radius: 0.357rem;
+    min-height: 38px;
+}
+
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #7367f0;
+    box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.1);
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+    background-color: #7367f0;
+    border-color: #7367f0;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+}
+
+/* Buttons */
+.btn {
+    font-weight: 500;
+    padding: 0.786rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 0.357rem;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #7367f0;
+    border-color: #7367f0;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #5e50ee;
+    border-color: #5e50ee;
+    box-shadow: 0 3px 8px 0 rgba(115, 103, 240, 0.4);
+}
+
+.btn-secondary {
+    background-color: #82868b;
+    border-color: #82868b;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #6e7378;
+    border-color: #6e7378;
+}
+
+.btn-outline-danger {
+    color: #ea5455;
+    border-color: #ea5455;
+}
+
+.btn-outline-danger:hover {
+    background-color: #ea5455;
+    border-color: #ea5455;
+    color: #fff;
+}
+
+/* Alert */
+.alert-info {
+    background-color: rgba(0, 207, 232, 0.12);
+    border-color: rgba(0, 207, 232, 0.2);
+    color: #00cfe8;
+}
+
+/* Mini Calendar */
+#calendarMini {
+    border: 1px solid #ebe9f1;
+    border-radius: 0.357rem;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+}
+
+#calendarMini .fc-toolbar {
+    margin-bottom: 0.5rem;
+}
+
+#calendarMini .fc-toolbar-title {
+    font-size: 0.9rem !important;
+}
+
+#calendarMini .fc-button {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+}
+
+#calendarMini .fc-col-header-cell {
+    padding: 0.3rem 0;
+    font-size: 0.7rem;
+}
+
+#calendarMini .fc-daygrid-day {
+    padding: 0.2rem;
+}
+
+#calendarMini .fc-daygrid-day-number {
+    padding: 0.2rem;
+    font-size: 0.75rem;
+}
+
+/* Loading State */
+.calendar-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .calendar-sidebar {
+        margin-bottom: 1.5rem;
+    }
+    
+    .fc-header-toolbar {
+        flex-direction: column;
+        align-items: start !important;
+    }
+    
+    .fc-toolbar-chunk {
+        margin: 0.25rem 0;
+    }
+}
