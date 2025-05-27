@@ -13,7 +13,8 @@
       "Bash(dotnet run)",
       "Bash(dotnet --version)",
       "Bash(mv:*)",
-      "Bash(/usr/bin/dotnet ef migrations add:*)"
+      "Bash(/usr/bin/dotnet ef migrations add:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

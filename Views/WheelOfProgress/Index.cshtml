@@ -21,37 +21,92 @@
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #f0f0f0;
-            padding: 2rem;
+            padding: 2.5rem;
             margin-bottom: 2rem;
             position: relative;
-            height: fit-content;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 400px;
-            width: 100%;
-            padding: 0.5rem;
+            max-width: 800px;
+            height: 500px;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
         #progressWheelChart {
             max-width: 100%;
+            max-height: 100%;
             margin: 0 auto;
         }
         
-        /* ApexCharts custom styling */
+        /* ApexCharts custom styling for radial bars */
         .apexcharts-canvas {
             margin: 0 auto;
         }
         
+        .apexcharts-radialbar-track {
+            stroke: #f5f5f5 !important;
+        }
+        
+        .apexcharts-radialbar-area {
+            stroke-width: 8px !important;
+        }
+        
         .apexcharts-datalabel-value {
-            font-size: 20px !important;
+            font-size: 24px !important;
             font-weight: 700 !important;
+            fill: #2d3748 !important;
         }
         
         .apexcharts-datalabel-label {
-            font-size: 12px !important;
-            opacity: 0.8;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            fill: #718096 !important;
+        }
+        
+        .apexcharts-radialbar-hollow {
+            fill: transparent !important;
+        }
+        
+        .apexcharts-text.apexcharts-datalabel-label {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .apexcharts-text.apexcharts-datalabel-value {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        /* Legend styling */
+        .apexcharts-legend {
+            padding: 15px 10px 10px !important;
+            justify-content: center !important;
+        }
+        
+        .apexcharts-legend-series {
+            margin: 0 8px !important;
+        }
+        
+        .apexcharts-legend-text {
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            color: #4a5568 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .apexcharts-legend-marker {
+            width: 14px !important;
+            height: 14px !important;
+            border-radius: 50% !important;
+            margin-right: 8px !important;
         }
 
         .progress-table-container {
@@ -127,21 +182,21 @@
         }
 
         .progress-input {
-            width: 90px;
+            width: 100px;
             text-align: center;
             font-weight: 600;
         }
 
         .deadline-input {
-            min-width: 160px;
-        }
-        
-        .goal-input {
             min-width: 200px;
         }
         
+        .goal-input {
+            min-width: 300px;
+        }
+        
         .action-input {
-            min-width: 180px;
+            min-width: 280px;
         }
 
         .save-section {
@@ -178,26 +233,71 @@
 
         .stats-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
             background: white;
             border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 1.75rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             border: 1px solid #f0f0f0;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+            text-align: left;
         }
 
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: #667eea;
+            color: #2d3748;
             display: block;
-            margin-bottom: 0.5rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
         }
 
         .stat-label {
@@ -238,17 +338,12 @@
 
         @@media (max-width: 768px) {
             .chart-wrapper {
-                height: 300px;
+                height: 350px;
                 padding: 0.5rem;
             }
 
-            .global-progress-overlay {
-                width: 80px;
-                height: 80px;
-            }
-
-            .global-progress-number {
-                font-size: 1.5rem;
+            .chart-title {
+                font-size: 1.25rem;
             }
 
             .progress-table-container {
@@ -256,17 +351,44 @@
             }
 
             .progress-table {
-                min-width: 800px;
+                min-width: 900px;
             }
 
             .stats-cards {
                 grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.25rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .goal-input {
+                min-width: 200px;
+            }
+            
+            .action-input {
+                min-width: 180px;
             }
         }
 
         @@media (max-width: 576px) {
             .stats-cards {
                 grid-template-columns: 1fr;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            .stat-card {
+                padding: 1.25rem;
             }
         }
     </style>
@@ -292,47 +414,63 @@
     </nav>
 
     <!-- Statistics Cards -->
-    <div class="stats-cards">
+    <div class="stats-cards mb-4">
         <div class="stat-card">
-            <span id="globalProgressStat" class="stat-number">0%</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.globalProgress">Progreso Global</span>
+            <div class="stat-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-content">
+                <span id="globalProgressStat" class="stat-number">0%</span>
+                <span class="stat-label" data-translate-key="wheelOfProgress.globalProgress">Progreso Global</span>
+            </div>
         </div>
         <div class="stat-card">
-            <span id="totalMetasStat" class="stat-number">0</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.totalCategories">Total Metas</span>
+            <div class="stat-icon">
+                <i class="fas fa-bullseye"></i>
+            </div>
+            <div class="stat-content">
+                <span id="totalMetasStat" class="stat-number">0</span>
+                <span class="stat-label" data-translate-key="wheelOfProgress.totalCategories">Total Metas</span>
+            </div>
         </div>
         <div class="stat-card">
-            <span id="metasCompletadasStat" class="stat-number">0</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.categoriesWithGoals">Completadas</span>
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span id="metasCompletadasStat" class="stat-number">0</span>
+                <span class="stat-label" data-translate-key="wheelOfProgress.categoriesWithGoals">Completadas</span>
+            </div>
         </div>
         <div class="stat-card">
-            <span id="ultimaActualizacionStat" class="stat-number">-</span>
-            <span class="stat-label" data-translate-key="wheelOfProgress.lastUpdated">Última Actualización</span>
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <span id="ultimaActualizacionStat" class="stat-number">-</span>
+                <span class="stat-label" data-translate-key="wheelOfProgress.lastUpdated">Última Actualización</span>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Chart Column - Más pequeño -->
-        <div class="col-md-4">
-            <div class="chart-container">
-                <h3 class="text-center mb-3" data-translate-key="wheelOfProgress.chartTitle">
-                    <i class="fas fa-chart-pie me-2"></i>
-                    Tu Rueda del Progreso
-                </h3>
-                <div class="chart-wrapper">
-                    <div id="progressWheelChart"></div>
-                    <div id="chartLoading" class="loading-spinner d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading chart...</span>
-                        </div>
-                    </div>
+    <!-- Chart Section - Full Width -->
+    <div class="chart-container mb-4">
+        <h3 class="chart-title" data-translate-key="wheelOfProgress.chartTitle">
+            <i class="fas fa-chart-pie me-2"></i>
+            Tu Rueda del Progreso
+        </h3>
+        <div class="chart-wrapper">
+            <div id="progressWheelChart"></div>
+            <div id="chartLoading" class="loading-spinner d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading chart...</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Progress Table Column - Más ancho -->
-        <div class="col-md-8">
-            <div class="progress-table-container">
+    <!-- Progress Table Section - Full Width -->
+    <div class="progress-table-container">
                 <div class="progress-table-header">
                     <h3 class="h5 mb-0" data-translate-key="wheelOfProgress.progressTableTitle">
                         <i class="fas fa-tasks me-2"></i>
@@ -380,568 +518,19 @@
                     <div id="saveMessage"></div>
                 </div>
             </div>
-        </div>
-    </div>
     
     <!-- CSRF Token for AJAX requests -->
     @Html.AntiForgeryToken()
 </div>
 
 @section Scripts {
-    <!-- ApexCharts for modern charts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+    <!-- ApexCharts for modern radial charts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <!-- Flatpickr for date picking -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
-    <script>
-        // Wheel of Progress JavaScript
-        const WheelOfProgress = {
-            config: {
-                chart: null,
-                baseUrl: '/WheelOfProgress',
-                currentData: [],
-                isLoading: false,
-                datepickers: []
-            },
-
-            // Initialize the module
-            init: function() {
-                console.log('Initializing Wheel of Progress module...');
-                this.loadWheelData();
-                this.bindEvents();
-            },
-            
-            // Load data from backend
-            loadWheelData: async function() {
-                this.showLoading(true);
-                
-                try {
-                    const response = await $.get(`${this.config.baseUrl}/GetWheelData`);
-                    
-                    if (response.success && response.data) {
-                        console.log('Wheel data loaded:', response.data);
-                        this.config.currentData = response.data;
-                        this.renderProgressTable(response.data.areas);
-                        this.updateStatistics(response.data.stats);
-                        this.initializeChart();
-                        this.initializeDatepickers();
-                    } else {
-                        this.showError('Error al cargar los datos');
-                    }
-                } catch (error) {
-                    console.error('Error loading wheel data:', error);
-                    this.showError('Error de conexión al cargar los datos');
-                } finally {
-                    this.showLoading(false);
-                }
-            },
-            
-            // Render progress table
-            renderProgressTable: function(areas) {
-                const tbody = $('#progressTableBody');
-                tbody.empty();
-                
-                areas.forEach(area => {
-                    const categorias = area.categorias || [];
-                    categorias.forEach((categoria, index) => {
-                        const isFirstCategory = index === 0;
-                        const rowspan = categorias.length;
-                        
-                        const fechaLimite = categoria.fechaLimite ? 
-                            new Date(categoria.fechaLimite).toISOString().split('T')[0] : '';
-                        
-                        let row = `<tr data-area-id="${area.id}" data-category-id="${categoria.id}">`;
-                        
-                        if (isFirstCategory) {
-                            // Use white text for dark backgrounds (like Vida Empresarial #2c3e50)
-                            const textColor = area.iconColor === '#2c3e50' ? 'white' : 'white';
-                            row += `
-                                <td class="area-cell" rowspan="${rowspan}" style="background-color: ${area.iconColor}; color: ${textColor};">
-                                    <div>
-                                        <i class="${area.iconClass}"></i><br>
-                                        <small>${area.nombre}</small>
-                                    </div>
-                                </td>
-                            `;
-                        }
-                        
-                        row += `
-                            <td class="category-cell">
-                                <span>${categoria.nombre}</span>
-                            </td>
-                            <td>
-                                <input type="text" 
-                                       class="form-control input-progress goal-input" 
-                                       data-category-id="${categoria.id}"
-                                       value="${categoria.meta || ''}"
-                                       placeholder="Define tu meta..."
-                                       maxlength="1000">
-                            </td>
-                            <td>
-                                <input type="number" 
-                                       class="form-control input-progress progress-input" 
-                                       data-category-id="${categoria.id}"
-                                       value="${categoria.porcentajeProgreso || 0}"
-                                       min="0" 
-                                       max="100"
-                                       placeholder="0">
-                            </td>
-                            <td>
-                                <input type="text" 
-                                       class="form-control input-progress action-input" 
-                                       data-category-id="${categoria.id}"
-                                       value="${categoria.siguienteAccion || ''}"
-                                       placeholder="Próxima acción..."
-                                       maxlength="1000">
-                            </td>
-                            <td>
-                                <input type="text" 
-                                       class="form-control input-progress deadline-input flatpickr-input" 
-                                       data-category-id="${categoria.id}"
-                                       value="${fechaLimite}"
-                                       placeholder="Seleccionar fecha..."
-                                       readonly>
-                            </td>
-                        </tr>`;
-                        
-                        tbody.append(row);
-                    });
-                });
-            },
-            
-            // Update statistics display
-            updateStatistics: function(stats) {
-                $('#globalProgressStat').text(Math.round(stats.progresoGlobal) + '%');
-                $('#totalMetasStat').text(stats.totalMetas);
-                $('#metasCompletadasStat').text(stats.metasCompletadas);
-                $('#globalProgressNumber').text(Math.round(stats.progresoGlobal) + '%');
-                
-                if (stats.ultimaActualizacion) {
-                    const fecha = new Date(stats.ultimaActualizacion);
-                    $('#ultimaActualizacionStat').text(fecha.toLocaleDateString());
-                } else {
-                    $('#ultimaActualizacionStat').text('-');
-                }
-            },
-
-            // Initialize ApexCharts radial bar chart
-            initializeChart: function() {
-                // Get current language for translations
-                const currentLang = localStorage.getItem('selectedLanguage') || 'es';
-                const isSpanish = currentLang === 'es';
-                
-                // Prepare chart data
-                const areas = this.config.currentData.areas || [];
-                
-                // Calculate average progress for each area
-                const chartData = areas.map(area => {
-                    const categorias = area.categorias || [];
-                    if (categorias.length === 0) return 0;
-                    
-                    const totalProgress = categorias.reduce((sum, cat) => sum + (cat.porcentajeProgreso || 0), 0);
-                    return Math.round(totalProgress / categorias.length);
-                });
-                
-                const labels = areas.map(area => area.nombre);
-                const colors = areas.map(area => area.iconColor);
-                
-                // Calculate global progress
-                const globalProgress = chartData.length > 0 ? 
-                    Math.round(chartData.reduce((a, b) => a + b, 0) / chartData.length) : 0;
-                
-                const options = {
-                    series: chartData,
-                    chart: {
-                        height: 380,
-                        type: 'radialBar',
-                        animations: {
-                            enabled: true,
-                            easing: 'easeinout',
-                            speed: 800,
-                            animateGradually: {
-                                enabled: true,
-                                delay: 150
-                            },
-                            dynamicAnimation: {
-                                enabled: true,
-                                speed: 350
-                            }
-                        }
-                    },
-                    plotOptions: {
-                        radialBar: {
-                            offsetY: 0,
-                            startAngle: 0,
-                            endAngle: 360,
-                            hollow: {
-                                margin: 5,
-                                size: '50%',
-                                background: 'transparent',
-                                image: undefined,
-                                imageOffsetX: 0,
-                                imageOffsetY: 0,
-                                position: 'front',
-                                dropShadow: {
-                                    enabled: true,
-                                    top: 3,
-                                    left: 0,
-                                    blur: 4,
-                                    opacity: 0.1
-                                }
-                            },
-                            track: {
-                                background: '#f3f4f6',
-                                strokeWidth: '100%',
-                                margin: 5,
-                                dropShadow: {
-                                    enabled: true,
-                                    top: -3,
-                                    left: 0,
-                                    blur: 4,
-                                    opacity: 0.08
-                                }
-                            },
-                            dataLabels: {
-                                show: true,
-                                name: {
-                                    offsetY: -5,
-                                    show: true,
-                                    color: '#4b5563',
-                                    fontSize: '14px',
-                                    fontWeight: '600'
-                                },
-                                value: {
-                                    formatter: function(val) {
-                                        return parseInt(val) + '%';
-                                    },
-                                    offsetY: 5,
-                                    color: '#1f2937',
-                                    fontSize: '18px',
-                                    fontWeight: '700',
-                                    show: true
-                                },
-                                total: {
-                                    show: true,
-                                    showAlways: true,
-                                    label: isSpanish ? 'Progreso Global' : 'Global Progress',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    color: '#4b5563',
-                                    formatter: function () {
-                                        return globalProgress + '%';
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shade: 'dark',
-                            type: 'vertical',
-                            shadeIntensity: 0.3,
-                            gradientToColors: colors,
-                            inverseColors: false,
-                            opacityFrom: 1,
-                            opacityTo: 0.8,
-                            stops: [0, 100]
-                        }
-                    },
-                    colors: colors,
-                    labels: labels,
-                    legend: {
-                        show: true,
-                        floating: false,
-                        fontSize: '11px',
-                        position: 'bottom',
-                        offsetX: 0,
-                        offsetY: 10,
-                        labels: {
-                            colors: '#4b5563',
-                            useSeriesColors: false
-                        },
-                        markers: {
-                            width: 12,
-                            height: 12,
-                            strokeWidth: 0,
-                            strokeColor: '#fff',
-                            fillColors: colors,
-                            radius: 12,
-                            customHTML: undefined,
-                            onClick: undefined,
-                            offsetX: 0,
-                            offsetY: 0
-                        },
-                        itemMargin: {
-                            horizontal: 12,
-                            vertical: 5
-                        },
-                        onItemClick: {
-                            toggleDataSeries: true
-                        },
-                        onItemHover: {
-                            highlightDataSeries: true
-                        }
-                    },
-                    responsive: [{
-                        breakpoint: 480,
-                        options: {
-                            chart: {
-                                height: 280
-                            },
-                            legend: {
-                                fontSize: '10px',
-                                itemMargin: {
-                                    horizontal: 5,
-                                    vertical: 1
-                                }
-                            }
-                        }
-                    }]
-                };
-                
-                // Destroy existing chart if any
-                if (this.config.chart) {
-                    this.config.chart.destroy();
-                }
-                
-                // Create new chart
-                this.config.chart = new ApexCharts(document.querySelector("#progressWheelChart"), options);
-                this.config.chart.render();
-            },
-
-            // Initialize Flatpickr date pickers
-            initializeDatepickers: function() {
-                const dateInputs = document.querySelectorAll('.deadline-input');
-                
-                dateInputs.forEach(input => {
-                    const flatpickrInstance = flatpickr(input, {
-                        dateFormat: "Y-m-d",
-                        allowInput: true,
-                        locale: localStorage.getItem('selectedLanguage') === 'es' ? 'es' : 'en',
-                        minDate: "today",
-                        onChange: (selectedDates, dateStr) => {
-                            this.updateGlobalProgress();
-                        }
-                    });
-                    
-                    this.config.datepickers.push(flatpickrInstance);
-                });
-            },
-
-            // Bind all event handlers
-            bindEvents: function() {
-                // Progress percentage input change events
-                $(document).on('input change', '.progress-input', (e) => {
-                    const value = parseInt($(e.target).val()) || 0;
-                    if (value < 0) $(e.target).val(0);
-                    if (value > 100) $(e.target).val(100);
-                    
-                    this.updateGlobalProgress();
-                });
-
-                // Save progress button
-                $('#saveProgressBtn').on('click', (e) => {
-                    e.preventDefault();
-                    this.saveProgress();
-                });
-
-                // Auto-save desactivado por ahora para evitar errores
-                // Se puede reactivar más adelante con un debounce mayor
-                /*
-                let autoSaveTimeout;
-                $(document).on('input', '.input-progress', () => {
-                    clearTimeout(autoSaveTimeout);
-                    autoSaveTimeout = setTimeout(() => {
-                        this.saveProgress(true); // Silent save
-                    }, 5000); // Aumentado a 5 segundos
-                });
-                */
-
-                // Window resize handler for chart responsiveness
-                $(window).on('resize', this.debounce(() => {
-                    if (this.config.chart) {
-                        this.config.chart.updateOptions({}, true, true);
-                    }
-                }, 300));
-            },
-
-            // Update global progress percentage
-            updateGlobalProgress: function() {
-                const progressInputs = $('.progress-input');
-                let total = 0;
-                let count = 0;
-
-                progressInputs.each(function() {
-                    const value = parseInt($(this).val()) || 0;
-                    total += value;
-                    count++;
-                });
-
-                const globalProgress = count > 0 ? Math.round(total / count) : 0;
-                
-                $('#globalProgressNumber').text(globalProgress + '%');
-                
-                // Update stats card
-                $('.stat-number').first().text(globalProgress + '%');
-            },
-
-            // Save progress to server
-            saveProgress: function(silent = false) {
-                if (this.config.isLoading) return;
-
-                this.config.isLoading = true;
-                const $btn = $('#saveProgressBtn');
-                const originalText = $btn.html();
-                
-                if (!silent) {
-                    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
-                }
-
-                // Collect all progress data from the table
-                const categories = [];
-                
-                $('#progressTableBody tr').each(function() {
-                    const $row = $(this);
-                    const categoryId = parseInt($row.data('category-id'));
-                    
-                    const meta = $row.find('.goal-input').val() || '';
-                    const porcentajeProgreso = parseInt($row.find('.progress-input').val()) || 0;
-                    const siguienteAccion = $row.find('.action-input').val() || '';
-                    const fechaLimiteValue = $row.find('.deadline-input').val();
-                    
-                    // Convertir fecha a formato ISO completo para PostgreSQL
-                    let fechaLimite = null;
-                    if (fechaLimiteValue && fechaLimiteValue.trim() !== '') {
-                        // Crear fecha local y convertir a ISO (incluye hora)
-                        const dateObj = new Date(fechaLimiteValue + 'T00:00:00');
-                        fechaLimite = dateObj.toISOString();
-                    }
-                    
-                    categories.push({
-                        CategoriaProgresoId: categoryId,
-                        Meta: meta,
-                        PorcentajeProgreso: porcentajeProgreso,
-                        SiguienteAccion: siguienteAccion,
-                        FechaLimite: fechaLimite
-                    });
-                });
-
-                const progressData = {
-                    Categories: categories
-                };
-
-                // Get CSRF token
-                const token = $('input[name="__RequestVerificationToken"]').val();
-                
-                $.ajax({
-                    url: `${this.config.baseUrl}/SaveProgress`,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
-                    data: JSON.stringify(progressData),
-                    success: (response) => {
-                        if (response.success) {
-                            if (!silent) {
-                                this.showMessage('success', response.message, response);
-                            }
-                            // Update statistics if provided
-                            if (response.updatedStats) {
-                                this.updateStatistics(response.updatedStats);
-                            }
-                        } else {
-                            this.showMessage('error', response.message || 'Error saving progress');
-                        }
-                    },
-                    error: (xhr) => {
-                        if (!silent && xhr.status >= 400) {
-                            this.showMessage('error', 'Error al guardar el progreso. Por favor intente nuevamente.');
-                        }
-                    },
-                    complete: () => {
-                        this.config.isLoading = false;
-                        if (!silent) {
-                            $btn.prop('disabled', false).html(originalText);
-                        }
-                    }
-                });
-            },
-
-            // Show success/error message
-            showMessage: function(type, message, data = null) {
-                const className = type === 'success' ? 'success-message' : 'error-message';
-                const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
-                
-                let extraInfo = '';
-                if (type === 'success' && data && data.updatedStats) {
-                    extraInfo = `
-                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">
-                            Progreso global: ${Math.round(data.updatedStats.progresoGlobal)}% | 
-                            Metas completadas: ${data.updatedStats.metasCompletadas}
-                        </div>
-                    `;
-                }
-
-                const messageHtml = `
-                    <div class="${className}">
-                        <i class="${icon} me-2"></i>${message}${extraInfo}
-                    </div>
-                `;
-                
-                $('#saveMessage').html(messageHtml);
-                
-                // Auto remove after 4 seconds
-                setTimeout(() => {
-                    $('#saveMessage').fadeOut(300, function() {
-                        $(this).empty().show();
-                    });
-                }, 4000);
-            },
-
-            // Utility functions
-            debounce: function(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func.apply(this, args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            },
-
-            // Show loading state
-            showLoading: function(show) {
-                if (show) {
-                    $('#chartLoading').removeClass('d-none');
-                } else {
-                    $('#chartLoading').addClass('d-none');
-                }
-            },
-
-            // Show error message
-            showError: function(message) {
-                console.error('Wheel of Progress Error:', message);
-                const tbody = $('#progressTableBody');
-                tbody.html(`
-                    <tr>
-                        <td colspan="6" class="text-center text-danger py-4">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                            <p class="mt-2">${message}</p>
-                        </td>
-                    </tr>
-                `);
-            }
-        };
-
-        // Initialize when document is ready
-        $(document).ready(function() {
-            WheelOfProgress.init();
-        });
-    </script>
+    <!-- Modern Wheel of Progress Script -->
+    <script src="~/js/wheel-of-progress-radial.js"></script>
 }

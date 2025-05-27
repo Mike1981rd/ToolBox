@@ -27,6 +27,12 @@
             position: relative;
             height: 650px;
             width: 100%;
+            padding: 20px;
+        }
+        
+        #wheelOfLifeChart {
+            max-height: 100%;
+            max-width: 100%;
         }
 
         .scores-panel {
@@ -347,7 +353,7 @@
                     Tu Rueda de Equilibrio de Vida
                 </h3>
                 <div class="chart-wrapper">
-                    <div id="wheelOfLifeChart"></div>
+                    <canvas id="wheelOfLifeChart"></canvas>
                     <div id="chartLoading" class="loading-spinner d-none">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading chart...</span>
@@ -413,9 +419,9 @@
 </div>
 
 @section Scripts {
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     
-    <!-- Wheel of Life JavaScript -->
-    <script src="~/js/wheel-of-life.js"></script>
+    <!-- Wheel of Life Radar JavaScript -->
+    <script src="~/js/wheel-of-life-radar.js"></script>
 }
