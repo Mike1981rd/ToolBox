@@ -193,6 +193,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 console.log('Events processed for calendar:', events);
+                
+                // Debug: log first event with users
+                const eventWithUsers = events.find(e => e.extendedProps.users && e.extendedProps.users.length > 0);
+                if (eventWithUsers) {
+                    console.log('Sample event with users:', eventWithUsers);
+                }
                 successCallback(events);
                 
                 // Filters are already set up in setupEventFilters()
@@ -225,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fechaHoraInicio: dropInfo.event.start,
                 fechaHoraFin: dropInfo.event.end,
                 ubicacion: dropInfo.event.extendedProps.ubicacion || '',
-                userIds: dropInfo.event.extendedProps.usuarios.map(u => u.userId)
+                userIds: dropInfo.event.extendedProps.users ? dropInfo.event.extendedProps.users.map(u => u.id) : []
             };
 
             const success = await updateSession(sessionId, updateData);
@@ -250,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fechaHoraInicio: resizeInfo.event.start,
                 fechaHoraFin: resizeInfo.event.end,
                 ubicacion: resizeInfo.event.extendedProps.ubicacion || '',
-                userIds: resizeInfo.event.extendedProps.usuarios.map(u => u.userId)
+                userIds: resizeInfo.event.extendedProps.users ? resizeInfo.event.extendedProps.users.map(u => u.id) : []
             };
 
             const success = await updateSession(sessionId, updateData);
@@ -403,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        loadUsers();
+        // loadUsers() is now called from the offcanvas shown event
     }
 
     // Create session
@@ -503,17 +509,31 @@ document.addEventListener('DOMContentLoaded', function() {
             if (users && Array.isArray(users)) {
                 console.log('Loading users into Choices:', users);
                 
+                // Check if we have pending user IDs to select
+                const pendingIds = config.pendingUserIds || [];
+                
                 const choices = users.map(user => ({
                     value: user.id.toString(),
                     label: user.fullName || user.userName,
-                    selected: false
+                    selected: pendingIds.includes(user.id.toString())
                 }));
                 
                 config.usersSelect.setChoices(choices, 'value', 'label', true);
+                
+                // If we have pending IDs, also explicitly set them
+                if (pendingIds.length > 0) {
+                    console.log('Setting pre-selected user IDs:', pendingIds);
+                    config.usersSelect.setChoiceByValue(pendingIds);
+                }
+                
+                // Return true to indicate successful load
+                return true;
             }
+            return false;
         } catch (error) {
             console.error('Error loading users:', error);
             showToast('Error al cargar usuarios', 'error');
+            return false;
         }
     }
 
@@ -763,8 +783,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Store selected users to set after initialization
-            if (event.extendedProps.users) {
+            if (event.extendedProps.users && event.extendedProps.users.length > 0) {
+                console.log('Event users data:', event.extendedProps.users);
                 config.pendingUserIds = event.extendedProps.users.map(u => u.id.toString());
+                console.log('Pending user IDs to select:', config.pendingUserIds);
+            } else {
+                console.log('No users found in event data');
+                config.pendingUserIds = [];
             }
         }
         
@@ -774,10 +799,15 @@ document.addEventListener('DOMContentLoaded', function() {
         offcanvas.show();
         
         // Initialize date pickers when offcanvas is shown
-        offcanvasEl.addEventListener('shown.bs.offcanvas', function() {
+        offcanvasEl.addEventListener('shown.bs.offcanvas', async function() {
             initializeDatePickers();
             initializeClientsSelect();
             loadCoaches();
+            
+            // Wait for users to load before setting values
+            if (config.usersSelect) {
+                await loadUsers();
+            }
             
             // Set dates after initialization if editing
             if (config.isEditMode) {
@@ -786,9 +816,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (config.pendingEndDate && config.endDatePicker) {
                     config.endDatePicker.setDate(config.pendingEndDate);
-                }
-                if (config.pendingUserIds && config.usersSelect) {
-                    config.usersSelect.setChoiceByValue(config.pendingUserIds);
                 }
                 
                 // Clear pending data
