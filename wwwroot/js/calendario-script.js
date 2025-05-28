@@ -167,6 +167,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Sessions loaded from API:', sessions);
             
             if (sessions && Array.isArray(sessions)) {
+                // Get active filters
+                const activeFilters = getActiveFilters();
+                console.log('Active filters:', activeFilters);
+                
                 const events = sessions.map(sesion => {
                     // Handle both users and clients properties
                     const users = sesion.users || [];
@@ -192,14 +196,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                 });
                 
-                console.log('Events processed for calendar:', events);
+                // Filter events based on active filters
+                const filteredEvents = activeFilters.length === 0 
+                    ? events 
+                    : events.filter(event => activeFilters.includes(event.extendedProps.estadoSesion));
+                
+                console.log('Events processed for calendar:', filteredEvents);
                 
                 // Debug: log first event with users
-                const eventWithUsers = events.find(e => e.extendedProps.users && e.extendedProps.users.length > 0);
+                const eventWithUsers = filteredEvents.find(e => e.extendedProps.users && e.extendedProps.users.length > 0);
                 if (eventWithUsers) {
                     console.log('Sample event with users:', eventWithUsers);
                 }
-                successCallback(events);
+                successCallback(filteredEvents);
                 
                 // Filters are already set up in setupEventFilters()
             }
@@ -826,6 +835,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { once: true });
     }
 
+    // Get active filters
+    function getActiveFilters() {
+        const activeFilters = [];
+        const filterCheckboxes = document.querySelectorAll('.form-check-input[id^="filter"]:checked');
+        const filterAll = document.getElementById('filterAll');
+        
+        // If "Ver Todos" is checked or all individual filters are checked, return empty array
+        // This means show all events without filtering
+        if (filterAll && filterAll.checked) {
+            return [];
+        }
+        
+        filterCheckboxes.forEach(checkbox => {
+            if (checkbox.id !== 'filterAll' && checkbox.checked) {
+                activeFilters.push(checkbox.value);
+            }
+        });
+        
+        // If no filters are selected, return empty array to show all events
+        return activeFilters;
+    }
+    
     // Setup event filters
     function setupEventFilters() {
         const filterCheckboxes = document.querySelectorAll('.form-check-input[id^="filter"]');

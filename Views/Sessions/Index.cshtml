@@ -108,7 +108,7 @@
             <table class="table table-hover" id="sessionsTable">
                 <thead>
                     <tr>
-                        <th data-translate-key="table_client">Cliente</th>
+                        <th data-translate-key="table_user">Usuario</th>
                         <th data-translate-key="table_session_date">Fecha Sesión</th>
                         <th data-translate-key="table_next_session_date">Próxima Sesión</th>
                         <th data-translate-key="table_ways_to_develop">Formas de Desarrollar</th>
@@ -128,14 +128,14 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="avatar me-2">
-                                            <img src="@(session.Client.AvatarUrl ?? "/img/default-avatar.png")" 
-                                                 alt="@session.Client.FullName" 
+                                            <img src="@(session.User.AvatarUrl ?? "/img/default-avatar.png")" 
+                                                 alt="@session.User.FullName" 
                                                  class="rounded-circle" 
                                                  width="40" height="40">
                                         </div>
                                         <div>
-                                            <div class="fw-medium">@session.Client.FullName</div>
-                                            <small class="text-muted">@session.Client.Email</small>
+                                            <div class="fw-medium">@session.User.FullName</div>
+                                            <small class="text-muted">@session.User.Email</small>
                                         </div>
                                     </div>
                                 </td>
@@ -212,7 +212,7 @@
                                                 <button type="button" class="btn btn-sm btn-icon text-warning toggle-status-btn" 
                                                         title="Desactivar Sesión"
                                                         data-session-id="@session.Id"
-                                                        data-session-title="@session.Client?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
+                                                        data-session-title="@session.User?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
                                                         data-current-status="active"
                                                         data-action="deactivate">
                                                     <i class="fas fa-pause-circle"></i>
@@ -223,7 +223,7 @@
                                                 <button type="button" class="btn btn-sm btn-icon text-success toggle-status-btn" 
                                                         title="Activar Sesión"
                                                         data-session-id="@session.Id"
-                                                        data-session-title="@session.Client?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
+                                                        data-session-title="@session.User?.FullName - @session.SessionDateTime.ToString("dd/MM/yyyy HH:mm")"
                                                         data-current-status="inactive"
                                                         data-action="activate">
                                                     <i class="fas fa-play-circle"></i>
