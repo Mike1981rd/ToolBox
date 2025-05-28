@@ -1,10 +1,11 @@
-// Notifications Bell Functionality
+// Enhanced Notifications Bell Functionality - Vuexy Style
 (function() {
     'use strict';
 
     // Configuration
     const API_BASE_URL = '/api/notifications';
     const POLL_INTERVAL = 60000; // 60 seconds
+    const MAX_DROPDOWN_NOTIFICATIONS = 5; // Show max 5 in dropdown
     
     // State
     let notificationDropdown = null;
@@ -12,6 +13,8 @@
     let notificationBell = null;
     let isDropdownOpen = false;
     let pollingInterval = null;
+    let currentLanguage = 'es';
+    let dismissedNotifications = new Set(); // Track dismissed notifications
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
@@ -19,241 +22,432 @@
     });
 
     function initializeNotificationBell() {
-        // Find the notification bell elements
-        const bellContainer = document.querySelector('.fa-bell')?.closest('.position-relative');
-        if (!bellContainer) return;
-
-        notificationBell = bellContainer.querySelector('.fa-bell');
-        notificationBadge = bellContainer.querySelector('.position-absolute');
+        // Get current language
+        currentLanguage = getCurrentLanguage();
         
-        // Update the HTML structure for better functionality
-        bellContainer.innerHTML = `
-            <a href="#" class="btn position-relative" id="notificationBellBtn">
-                <i class="fas fa-bell"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">
-                    <span id="notificationCount">0</span>
-                    <span class="visually-hidden">unread notifications</span>
-                </span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-end notification-dropdown d-none" id="notificationDropdown">
-                <div class="dropdown-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0" data-translate-key="notifications.title">Notificaciones</h6>
-                    <button class="btn btn-link btn-sm text-decoration-none" id="markAllReadBtn" data-translate-key="notifications.markAllAsRead">
-                        Marcar todas como leídas
-                    </button>
-                </div>
-                <div class="dropdown-divider"></div>
-                <div id="notificationDropdownContent" class="notification-list">
-                    <div class="text-center py-3">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="dropdown-divider"></div>
-                <a href="/NotificationsMvc" class="dropdown-item text-center text-primary" data-translate-key="notifications.viewAll">
-                    Ver todas las notificaciones
-                </a>
-            </div>
-        `;
-
-        // Re-get elements after updating HTML
+        // Load dismissed notifications from localStorage
+        loadDismissedNotifications();
+        
+        // Find the notification elements
         notificationBell = document.getElementById('notificationBellBtn');
         notificationBadge = document.getElementById('notificationBadge');
         notificationDropdown = document.getElementById('notificationDropdown');
-
-        // Add click event to bell
-        notificationBell.addEventListener('click', handleBellClick);
         
-        // Add click event to mark all as read button
-        const markAllBtn = document.getElementById('markAllReadBtn');
-        if (markAllBtn) {
-            markAllBtn.addEventListener('click', handleMarkAllAsRead);
+        if (!notificationBell || !notificationDropdown) {
+            console.warn('Notification elements not found');
+            return;
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!bellContainer.contains(e.target) && isDropdownOpen) {
-                closeNotificationDropdown();
+        // Add event listeners
+        setupEventListeners();
+        
+        // Listen for language changes
+        document.addEventListener('languageChanged', function(e) {
+            currentLanguage = e.detail.language;
+            console.log('Language changed to:', currentLanguage);
+            
+            // Force re-translate notification dropdown elements
+            setTimeout(() => {
+                applyNotificationTranslations();
+            }, 100);
+            
+            // Refresh notifications with new language
+            if (isDropdownOpen) {
+                loadNotificationsForDropdown();
             }
+            updateNotificationCount();
         });
 
-        // Load initial notification count
+        // Load initial notification count and data
         updateNotificationCount();
-
+        
+        // Apply initial translations
+        setTimeout(() => {
+            applyNotificationTranslations();
+        }, 500);
+        
         // Start polling for new notifications
         startPolling();
     }
 
-    function handleBellClick(e) {
-        e.preventDefault();
-        e.stopPropagation();
+    function setupEventListeners() {
+        // Bell click handler (Bootstrap handles dropdown toggle)
+        notificationBell.addEventListener('shown.bs.dropdown', function() {
+            isDropdownOpen = true;
+            loadNotificationsForDropdown();
+        });
 
-        if (isDropdownOpen) {
-            closeNotificationDropdown();
-        } else {
-            openNotificationDropdown();
+        notificationBell.addEventListener('hidden.bs.dropdown', function() {
+            isDropdownOpen = false;
+        });
+
+        // Mark all as read button
+        const markAllBtn = document.getElementById('markAllReadBtn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', handleMarkAllAsRead);
         }
-    }
-
-    function openNotificationDropdown() {
-        notificationDropdown.classList.remove('d-none');
-        notificationDropdown.classList.add('show');
-        isDropdownOpen = true;
-        
-        // Load latest notifications
-        loadLatestNotifications();
-    }
-
-    function closeNotificationDropdown() {
-        notificationDropdown.classList.add('d-none');
-        notificationDropdown.classList.remove('show');
-        isDropdownOpen = false;
     }
 
     async function updateNotificationCount() {
         try {
-            const response = await fetch(`${API_BASE_URL}/unread-count`, {
+            // Get all notifications to filter dismissed ones
+            const response = await fetch(`${API_BASE_URL}?pageNumber=1&pageSize=50`, {
                 method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
 
             if (response.ok) {
                 const data = await response.json();
-                const count = data.count || 0;
+                const allNotifications = data.notifications || [];
                 
-                const countElement = document.getElementById('notificationCount');
-                if (countElement) {
-                    countElement.textContent = count;
-                }
-
-                if (count > 0) {
-                    notificationBadge.classList.remove('d-none');
-                } else {
-                    notificationBadge.classList.add('d-none');
-                }
+                // Filter out dismissed notifications and count unread
+                const activeUnreadNotifications = allNotifications.filter(notification => 
+                    !notification.readAt && !dismissedNotifications.has(notification.id.toString())
+                );
+                
+                const count = activeUnreadNotifications.length;
+                
+                updateBadge(count);
+                updateDropdownHeader(count);
             }
         } catch (error) {
-            console.error('Error updating notification count:', error);
+            console.error('Error fetching notification count:', error);
         }
     }
 
-    async function loadLatestNotifications() {
-        const contentContainer = document.getElementById('notificationDropdownContent');
+    function updateBadge(count) {
+        const badge = document.getElementById('notificationBadge');
+        const countElement = document.getElementById('notificationCount');
         
+        if (badge && countElement) {
+            if (count > 0) {
+                badge.classList.remove('d-none');
+                countElement.textContent = count > 99 ? '99+' : count.toString();
+            } else {
+                badge.classList.add('d-none');
+            }
+        }
+    }
+
+    function updateDropdownHeader(count) {
+        const headerCount = document.getElementById('notificationHeaderCount');
+        if (headerCount) {
+            const lang = getCurrentLanguage();
+            const text = lang === 'es' ? `${count} Nuevas` : `${count} New`;
+            headerCount.textContent = text;
+        }
+    }
+
+    async function loadNotificationsForDropdown() {
+        const container = document.getElementById('notificationListContainer');
+        if (!container) return;
+
+        // Show loading
+        container.innerHTML = createLoadingHTML();
+
         try {
-            const response = await fetch(`${API_BASE_URL}/latest-unread?count=5`, {
+            // Get latest notifications (both read and unread) for the dropdown
+            const response = await fetch(`${API_BASE_URL}?pageNumber=1&pageSize=${MAX_DROPDOWN_NOTIFICATIONS}`, {
                 method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
 
             if (response.ok) {
                 const data = await response.json();
-                const notifications = data.notifications || [];
+                const allNotifications = data.notifications || [];
+                
+                // Filter out dismissed notifications
+                const notifications = allNotifications.filter(notification => 
+                    !dismissedNotifications.has(notification.id.toString())
+                );
                 
                 if (notifications.length === 0) {
-                    contentContainer.innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
-                            <p class="text-muted mb-0" data-translate-key="notifications.noUnread">No tienes notificaciones sin leer</p>
-                        </div>
-                    `;
+                    container.innerHTML = createEmptyNotificationsHTML();
                 } else {
-                    contentContainer.innerHTML = notifications.map(notification => 
-                        createNotificationItem(notification)
+                    container.innerHTML = notifications.map(notification => 
+                        createNotificationItemHTML(notification)
                     ).join('');
                     
-                    // Add click events to notification items
-                    contentContainer.querySelectorAll('.notification-item').forEach(item => {
-                        item.addEventListener('click', function() {
-                            handleNotificationClick(this.dataset.notificationId);
-                        });
-                    });
+                    // Add event listeners to notification items
+                    addNotificationItemListeners(container);
                 }
             } else {
-                contentContainer.innerHTML = `
-                    <div class="text-center py-3 text-danger">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p class="mb-0">Error al cargar notificaciones</p>
-                    </div>
-                `;
+                container.innerHTML = createErrorHTML();
             }
         } catch (error) {
             console.error('Error loading notifications:', error);
-            contentContainer.innerHTML = `
-                <div class="text-center py-3 text-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p class="mb-0">Error al cargar notificaciones</p>
-                </div>
-            `;
+            container.innerHTML = createErrorHTML();
         }
     }
 
-    function createNotificationItem(notification) {
-        const message = formatNotificationMessage(notification.type, notification.data);
+    function createNotificationItemHTML(notification) {
+        const notificationData = parseNotificationData(notification.data);
+        const { avatar, icon } = getNotificationAvatarAndIcon(notification.type, notificationData);
+        const { title, subtitle } = formatNotificationMessage(notification.type, notificationData);
         const timeAgo = formatTimeAgo(notification.createdAt);
-        const icon = getNotificationIcon(notification.type);
-        
+        const isUnread = !notification.readAt;
+
         return `
-            <div class="notification-item dropdown-item px-3 py-2" data-notification-id="${notification.id}">
-                <div class="d-flex align-items-start">
-                    <div class="notification-icon ${icon.class} me-3">
-                        <i class="${icon.icon}"></i>
+            <div class="notification-item-vuexy ${isUnread ? 'unread' : ''}" data-notification-id="${notification.id}">
+                <div class="d-flex align-items-start px-3 py-3 notification-item-content-vuexy position-relative">
+                    <!-- Avatar/Icon -->
+                    <div class="notification-avatar-vuexy me-3">
+                        ${avatar ? 
+                            `<img src="${avatar}" alt="Avatar" class="rounded-circle" width="32" height="32">` :
+                            `<div class="notification-icon-vuexy ${icon.class}">
+                                <i class="${icon.icon}"></i>
+                            </div>`
+                        }
                     </div>
-                    <div class="flex-grow-1">
-                        <p class="mb-1">${message}</p>
-                        <small class="text-muted">${timeAgo}</small>
+                    
+                    <!-- Content -->
+                    <div class="notification-content-vuexy flex-grow-1 me-2">
+                        <div class="notification-title-text">${title}</div>
+                        <div class="notification-subtitle-text">${subtitle}</div>
+                        <div class="notification-time-vuexy">${timeAgo}</div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="notification-actions-vuexy">
+                        <!-- Unread indicator -->
+                        ${isUnread ? '<div class="notification-dot-vuexy"></div>' : ''}
+                        <!-- Dismiss button -->
+                        <button class="notification-dismiss" data-notification-id="${notification.id}" title="${currentLanguage === 'es' ? 'Eliminar notificación' : 'Remove notification'}">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     }
 
-    function formatNotificationMessage(type, dataJson) {
+    function addNotificationItemListeners(container) {
+        // Add click listeners to notification items
+        container.querySelectorAll('.notification-item-vuexy').forEach(item => {
+            const contentArea = item.querySelector('.notification-item-content-vuexy');
+            contentArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent dropdown from closing
+                
+                // Don't handle click if it's on the dismiss button
+                if (e.target.closest('.notification-dismiss')) {
+                    return;
+                }
+                
+                const notificationId = item.dataset.notificationId;
+                handleNotificationItemClick(notificationId, item);
+            });
+        });
+        
+        // Add click listeners to dismiss buttons
+        container.querySelectorAll('.notification-dismiss').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent dropdown from closing
+                
+                const notificationId = this.dataset.notificationId;
+                const itemElement = this.closest('.notification-item-vuexy');
+                handleNotificationDismiss(notificationId, itemElement);
+            });
+        });
+    }
+
+    async function handleNotificationDismiss(notificationId, itemElement) {
         try {
-            const data = JSON.parse(dataJson);
-            const lang = getCurrentLanguage();
+            // Mark as read on server
+            await markNotificationAsRead(notificationId);
             
+            // Add to dismissed notifications (locally)
+            dismissedNotifications.add(notificationId.toString());
+            saveDismissedNotifications();
+            
+            // Remove the item with animation
+            itemElement.style.opacity = '0';
+            itemElement.style.transform = 'translateX(100%)';
+            
+            setTimeout(() => {
+                itemElement.remove();
+                
+                // Check if no more notifications
+                const container = document.getElementById('notificationListContainer');
+                const remainingItems = container.querySelectorAll('.notification-item-vuexy');
+                
+                if (remainingItems.length === 0) {
+                    container.innerHTML = createEmptyNotificationsHTML();
+                }
+            }, 300);
+            
+            // Update counters
+            updateNotificationCount();
+            
+        } catch (error) {
+            console.error('Error dismissing notification:', error);
+            const lang = getCurrentLanguage();
+            showToast(lang === 'es' ? 'Error al descartar notificación' : 'Error dismissing notification', 'error');
+        }
+    }
+
+    async function handleNotificationItemClick(notificationId, itemElement) {
+        // Mark as read if unread
+        if (itemElement.classList.contains('unread')) {
+            try {
+                await markNotificationAsRead(notificationId);
+                
+                // Update UI - remove unread class and dot, but keep item in card
+                itemElement.classList.remove('unread');
+                const dot = itemElement.querySelector('.notification-dot-vuexy');
+                if (dot) dot.remove();
+                
+                // Update counters
+                updateNotificationCount();
+                
+                console.log('Notification marked as read, but kept in card');
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+        
+        // Optionally redirect or perform action based on notification type
+        // This can be enhanced based on specific notification types
+    }
+
+
+    async function handleMarkAllAsRead() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mark-all-as-read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getAntiForgeryToken()
+                }
+            });
+
+            if (response.ok) {
+                // Update UI
+                const container = document.getElementById('notificationListContainer');
+                container.innerHTML = createEmptyNotificationsHTML();
+                
+                // Update counters
+                updateBadge(0);
+                updateDropdownHeader(0);
+                
+                showToast(currentLanguage === 'en' ? 'All notifications marked as read' : 'Todas las notificaciones marcadas como leídas', 'success');
+            } else {
+                throw new Error('Failed to mark all as read');
+            }
+        } catch (error) {
+            console.error('Error marking all as read:', error);
+            showToast(currentLanguage === 'en' ? 'Error marking notifications as read' : 'Error al marcar notificaciones como leídas', 'error');
+        }
+    }
+
+    async function markNotificationAsRead(notificationId) {
+        const response = await fetch(`${API_BASE_URL}/${notificationId}/mark-as-read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': getAntiForgeryToken()
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to mark notification as read');
+        }
+        
+        return response.json();
+    }
+
+    function getNotificationAvatarAndIcon(type, data) {
+        // Try to get avatar from data first
+        let avatar = null;
+        if (data && (data.senderAvatarUrl || data.coachAvatarUrl)) {
+            avatar = data.senderAvatarUrl || data.coachAvatarUrl;
+        }
+
+        // Get icon based on notification type - using colorful icons like Vuexy
+        let icon = { icon: 'fas fa-bell', class: 'default' };
+        
+        switch(type) {
+            case 'session_scheduled_by_coach':
+                icon = { icon: 'fas fa-calendar-check', class: 'session' }; // Calendar icon for sessions
+                break;
+            case 'calendar_event_invitation':
+                icon = { icon: 'fas fa-envelope', class: 'message' }; // Envelope icon for invitations
+                break;
+            case 'calendar_event_scheduled_for_client':
+                icon = { icon: 'fas fa-calendar-alt', class: 'order' }; // Calendar icon for events
+                break;
+            default:
+                icon = { icon: 'fas fa-bell', class: 'approved' }; // Bell icon for general notifications
+        }
+
+        return { avatar, icon };
+    }
+
+    function formatNotificationMessage(type, data) {
+        const lang = getCurrentLanguage();
+        
+        try {
             switch(type) {
                 case 'session_scheduled_by_coach':
                     if (lang === 'es') {
-                        return `${data.CoachName || 'Tu coach'} ha programado una nueva sesión para ti.`;
+                        return {
+                            title: 'Nueva Sesión Programada 📅',
+                            subtitle: `${data.CoachName || 'Tu coach'} ha programado una nueva sesión para ti`
+                        };
                     } else {
-                        return `${data.CoachName || 'Your coach'} has scheduled a new session for you.`;
+                        return {
+                            title: 'New Session Scheduled 📅',
+                            subtitle: `${data.CoachName || 'Your coach'} has scheduled a new session for you`
+                        };
+                    }
+                    
+                case 'calendar_event_invitation':
+                    if (lang === 'es') {
+                        return {
+                            title: 'Invitación a Evento 💬',
+                            subtitle: `${data.InvitedBy || 'Alguien'} te invitó a "${data.EventTitle || 'un evento'}"`
+                        };
+                    } else {
+                        return {
+                            title: 'Event Invitation 💬',
+                            subtitle: `${data.InvitedBy || 'Someone'} invited you to "${data.EventTitle || 'an event'}"`
+                        };
                     }
                     
                 case 'calendar_event_scheduled_for_client':
                     if (lang === 'es') {
-                        return `Nuevo evento del calendario: ${data.EventTitle || 'Sin título'}`;
+                        return {
+                            title: 'Nuevo Evento Programado 📋',
+                            subtitle: `El evento "${data.EventTitle || 'Sin título'}" ha sido programado para ti`
+                        };
                     } else {
-                        return `New calendar event: ${data.EventTitle || 'Untitled'}`;
+                        return {
+                            title: 'New Event Scheduled 📋',
+                            subtitle: `Event "${data.EventTitle || 'Untitled'}" has been scheduled for you`
+                        };
                     }
                     
                 default:
                     if (lang === 'es') {
-                        return 'Nueva notificación';
+                        return {
+                            title: 'Nueva Notificación 🔔',
+                            subtitle: 'Has recibido una nueva notificación'
+                        };
                     } else {
-                        return 'New notification';
+                        return {
+                            title: 'New Notification 🔔',
+                            subtitle: 'You have received a new notification'
+                        };
                     }
             }
         } catch (error) {
-            console.error('Error parsing notification data:', error);
-            return 'Nueva notificación';
-        }
-    }
-
-    function getNotificationIcon(type) {
-        switch(type) {
-            case 'session_scheduled_by_coach':
-                return { icon: 'fas fa-calendar-check', class: 'bg-primary text-white' };
-            case 'calendar_event_scheduled_for_client':
-                return { icon: 'fas fa-calendar-alt', class: 'bg-info text-white' };
-            default:
-                return { icon: 'fas fa-bell', class: 'bg-secondary text-white' };
+            console.error('Error formatting notification message:', error);
+            return lang === 'es' 
+                ? { title: 'Notificación', subtitle: 'Error al cargar' }
+                : { title: 'Notification', subtitle: 'Error loading' };
         }
     }
 
@@ -268,150 +462,155 @@
         const lang = getCurrentLanguage();
         
         if (diffMins < 1) {
-            return lang === 'es' ? 'Justo ahora' : 'Just now';
+            return lang === 'es' ? 'Ahora' : 'Now';
         } else if (diffMins < 60) {
-            return lang === 'es' ? `Hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}` : `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            return lang === 'es' ? `hace ${diffMins}m` : `${diffMins}m ago`;
         } else if (diffHours < 24) {
-            return lang === 'es' ? `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}` : `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            return lang === 'es' ? `hace ${diffHours}h` : `${diffHours}h ago`;
+        } else if (diffDays === 1) {
+            return lang === 'es' ? 'hace 1 día' : '1 day ago';
+        } else if (diffDays === 2) {
+            return lang === 'es' ? 'hace 2 días' : '2 days ago';
         } else if (diffDays < 7) {
-            return lang === 'es' ? `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}` : `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            return lang === 'es' ? `hace ${diffDays} días` : `${diffDays} days ago`;
         } else {
             return date.toLocaleDateString();
         }
     }
 
-    function getCurrentLanguage() {
-        // Get language from localStorage or default to 'es'
-        return localStorage.getItem('selectedLanguage') || 'es';
-    }
-
-    async function handleNotificationClick(notificationId) {
+    function parseNotificationData(dataJson) {
         try {
-            const response = await fetch(`${API_BASE_URL}/${notificationId}/mark-as-read`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="__RequestVerificationToken"]')?.value
-                }
-            });
-
-            if (response.ok) {
-                // Update notification count
-                updateNotificationCount();
-                
-                // TODO: Handle redirect if notification has a URL
-                // For now, just close the dropdown
-                closeNotificationDropdown();
-            }
+            return typeof dataJson === 'string' ? JSON.parse(dataJson) : dataJson;
         } catch (error) {
-            console.error('Error marking notification as read:', error);
+            console.error('Error parsing notification data:', error);
+            return {};
         }
     }
 
-    async function handleMarkAllAsRead(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}/mark-all-as-read`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="__RequestVerificationToken"]')?.value
-                }
-            });
 
-            if (response.ok) {
-                // Update notification count
-                updateNotificationCount();
-                
-                // Reload notifications
-                loadLatestNotifications();
-            }
-        } catch (error) {
-            console.error('Error marking all notifications as read:', error);
-        }
+    function createLoadingHTML() {
+        const lang = getCurrentLanguage();
+        return `
+            <div class="notification-loading text-center py-4">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-2 text-muted small">${lang === 'es' ? 'Cargando...' : 'Loading...'}</div>
+            </div>
+        `;
+    }
+
+    function createEmptyNotificationsHTML() {
+        const lang = getCurrentLanguage();
+        return `
+            <div class="notification-empty text-center py-4">
+                <i class="fas fa-bell-slash text-muted mb-2" style="font-size: 2rem;"></i>
+                <div class="text-muted">${lang === 'es' ? 'Sin notificaciones' : 'No notifications'}</div>
+                <small class="text-muted">${lang === 'es' ? '¡Estás al día!' : 'You\'re all caught up!'}</small>
+            </div>
+        `;
+    }
+
+    function createErrorHTML() {
+        const lang = getCurrentLanguage();
+        return `
+            <div class="notification-error text-center py-4">
+                <i class="fas fa-exclamation-triangle text-warning mb-2"></i>
+                <div class="text-muted small">${lang === 'es' ? 'Error al cargar notificaciones' : 'Error loading notifications'}</div>
+            </div>
+        `;
     }
 
     function startPolling() {
-        // Poll for new notifications every minute
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+        
         pollingInterval = setInterval(() => {
             updateNotificationCount();
+            
+            // If dropdown is open, refresh its content
+            if (isDropdownOpen) {
+                loadNotificationsForDropdown();
+            }
         }, POLL_INTERVAL);
     }
 
-    function stopPolling() {
-        if (pollingInterval) {
-            clearInterval(pollingInterval);
-            pollingInterval = null;
+    function getCurrentLanguage() {
+        return localStorage.getItem('selectedLanguage') || 'es';
+    }
+
+    function getAntiForgeryToken() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        return token ? token.value : '';
+    }
+
+    function showToast(message, type = 'info') {
+        // Simple toast implementation - can be enhanced
+        console.log(`Toast (${type}): ${message}`);
+        
+        // If you have a toast system, use it here
+        // For now, just log to console
+    }
+
+    // Dismissed notifications management
+    function loadDismissedNotifications() {
+        try {
+            const stored = localStorage.getItem('dismissedNotifications');
+            if (stored) {
+                dismissedNotifications = new Set(JSON.parse(stored));
+            }
+        } catch (error) {
+            console.error('Error loading dismissed notifications:', error);
+            dismissedNotifications = new Set();
         }
     }
 
-    // Clean up on page unload
+    function saveDismissedNotifications() {
+        try {
+            localStorage.setItem('dismissedNotifications', JSON.stringify([...dismissedNotifications]));
+        } catch (error) {
+            console.error('Error saving dismissed notifications:', error);
+        }
+    }
+
+    // Force apply translations to notification elements
+    function applyNotificationTranslations() {
+        const lang = getCurrentLanguage();
+        
+        // Try to get translations from the global admin script
+        if (typeof window.translations !== 'undefined' && window.translations[lang]) {
+            const translations = window.translations[lang];
+            
+            // Update notification title
+            const titleElement = document.querySelector('.notification-title-vuexy[data-translate-key="notifications.title"]');
+            if (titleElement && translations['notifications.title']) {
+                titleElement.textContent = translations['notifications.title'];
+            }
+            
+            // Update view all button
+            const viewAllElement = document.querySelector('.notification-view-all-vuexy[data-translate-key="notifications.viewAll"]');
+            if (viewAllElement && translations['notifications.viewAll']) {
+                viewAllElement.textContent = translations['notifications.viewAll'];
+            }
+            
+            // Update count badge
+            updateDropdownHeader(getCurrentUnreadCount());
+            
+            console.log('Applied notification translations for language:', lang);
+        }
+    }
+    
+    function getCurrentUnreadCount() {
+        const badge = document.getElementById('notificationCount');
+        return badge ? parseInt(badge.textContent) || 0 : 0;
+    }
+
+    // Cleanup on page unload
     window.addEventListener('beforeunload', function() {
-        stopPolling();
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
     });
 
-    // Add custom CSS for notification dropdown
-    const style = document.createElement('style');
-    style.textContent = `
-        .notification-dropdown {
-            width: 350px;
-            max-height: 400px;
-            overflow-y: auto;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            border-radius: 0.375rem;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            z-index: 1050;
-            background: white;
-            margin-top: 0.5rem;
-        }
-        
-        .notification-dropdown .dropdown-header {
-            padding: 0.75rem 1rem;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .notification-dropdown .notification-item {
-            border-bottom: 1px solid #f1f1f1;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .notification-dropdown .notification-item:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .notification-dropdown .notification-item:last-child {
-            border-bottom: none;
-        }
-        
-        .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .notification-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        #notificationBadge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            min-width: 1.25rem;
-        }
-    `;
-    document.head.appendChild(style);
 })();

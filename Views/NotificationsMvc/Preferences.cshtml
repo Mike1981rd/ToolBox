@@ -1,0 +1,269 @@
+@{
+    ViewData["Title"] = "Preferencias de Notificaciones";
+    Layout = "_AdminLayout";
+}
+
+@section Styles {
+    <style>
+        .notification-preferences-table {
+            background: #fff;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .notification-preferences-table thead {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-preferences-table th {
+            font-weight: 600;
+            color: #5a5c69;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            padding: 1rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+        
+        .notification-preferences-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .notification-type-name {
+            font-weight: 500;
+            color: #2c2c2c;
+        }
+        
+        .form-check-input:checked {
+            background-color: #7367f0;
+            border-color: #7367f0;
+        }
+        
+        .preferences-card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
+            border: none;
+        }
+        
+        .save-preferences-btn {
+            min-width: 150px;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 0.5rem;
+        }
+    </style>
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Users" asp-action="Details" asp-route-id="1" data-translate-key="breadcrumbs.profile">Mi Perfil</a></li>
+        <li class="breadcrumb-item active" aria-current="page" data-translate-key="breadcrumb_notification_preferences">Preferencias de Notificaciones</li>
+    </ol>
+</nav>
+
+<div class="card preferences-card">
+    <div class="card-header">
+        <h5 class="mb-0" data-translate-key="notification_preferences_title">Preferencias de Notificaciones</h5>
+        <p class="text-muted mb-0" data-translate-key="notification_preferences_subtitle">
+            Gestiona cómo y cuándo deseas recibir notificaciones
+        </p>
+    </div>
+    
+    <div class="card-body position-relative">
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="preferencesLoading" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table notification-preferences-table mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col" data-translate-key="table_notification_type">Tipo de Notificación</th>
+                        <th scope="col" class="text-center" style="width: 150px;" data-translate-key="table_email">Email</th>
+                        <th scope="col" class="text-center" style="width: 150px;" data-translate-key="table_in_app">En Aplicación</th>
+                    </tr>
+                </thead>
+                <tbody id="preferencesTableBody">
+                    <!-- Preferences will be loaded here via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary save-preferences-btn" id="savePreferencesBtn">
+                <i class="fas fa-save me-2"></i>
+                <span data-translate-key="save_preferences_button">Guardar Cambios</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body d-flex align-items-center">
+            <i class="fas fa-check-circle text-success me-2" id="toastIcon"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const preferencesTableBody = document.getElementById('preferencesTableBody');
+            const saveButton = document.getElementById('savePreferencesBtn');
+            const loadingOverlay = document.getElementById('preferencesLoading');
+            let currentPreferences = [];
+
+            // Notification type translations
+            const notificationTypeTranslations = {
+                'notification_type_session_scheduled': 'Sesión Programada por Coach',
+                'notification_type_calendar_invitation': 'Invitación a Evento de Calendario',
+                'notification_type_task_reminder': 'Recordatorio de Tarea',
+                'notification_type_task_completed': 'Tarea Completada',
+                'notification_type_progress_update': 'Actualización de Progreso',
+                'notification_type_habit_reminder': 'Recordatorio de Hábito',
+                'notification_type_achievement_unlocked': 'Logro Desbloqueado'
+            };
+
+            // Show toast notification
+            function showToast(message, isSuccess = true) {
+                const toastEl = document.getElementById('notificationToast');
+                const toastIcon = document.getElementById('toastIcon');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                toastMessage.textContent = message;
+                
+                if (isSuccess) {
+                    toastIcon.className = 'fas fa-check-circle text-success me-2';
+                } else {
+                    toastIcon.className = 'fas fa-exclamation-circle text-danger me-2';
+                }
+                
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+
+            // Load preferences
+            async function loadPreferences() {
+                try {
+                    loadingOverlay.style.display = 'flex';
+                    
+                    const response = await fetch('/api/notifications/preferences', {
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Error loading preferences');
+
+                    currentPreferences = await response.json();
+                    renderPreferencesTable();
+                } catch (error) {
+                    console.error('Error loading preferences:', error);
+                    showToast('Error al cargar las preferencias', false);
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+
+            // Render preferences table
+            function renderPreferencesTable() {
+                preferencesTableBody.innerHTML = '';
+
+                currentPreferences.forEach(pref => {
+                    const row = document.createElement('tr');
+                    const displayName = notificationTypeTranslations[pref.notificationTypeDisplayName] || pref.notificationTypeDisplayName;
+                    
+                    row.innerHTML = `
+                        <td>
+                            <span class="notification-type-name">${displayName}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input" type="checkbox" 
+                                       id="email_${pref.notificationType}"
+                                       data-type="${pref.notificationType}"
+                                       data-channel="email"
+                                       ${pref.isEnabledEmail ? 'checked' : ''}>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input" type="checkbox" 
+                                       id="inapp_${pref.notificationType}"
+                                       data-type="${pref.notificationType}"
+                                       data-channel="inapp"
+                                       ${pref.isEnabledInApp ? 'checked' : ''}>
+                            </div>
+                        </td>
+                    `;
+                    
+                    preferencesTableBody.appendChild(row);
+                });
+            }
+
+            // Save preferences
+            async function savePreferences() {
+                try {
+                    saveButton.disabled = true;
+                    saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+
+                    // Collect current checkbox states
+                    const updates = currentPreferences.map(pref => {
+                        const emailCheckbox = document.getElementById(`email_${pref.notificationType}`);
+                        const inAppCheckbox = document.getElementById(`inapp_${pref.notificationType}`);
+                        
+                        return {
+                            notificationType: pref.notificationType,
+                            isEnabledEmail: emailCheckbox ? emailCheckbox.checked : false,
+                            isEnabledInApp: inAppCheckbox ? inAppCheckbox.checked : true
+                        };
+                    });
+
+                    const response = await fetch('/api/notifications/preferences', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(updates)
+                    });
+
+                    if (!response.ok) throw new Error('Error saving preferences');
+
+                    showToast('Preferencias guardadas exitosamente');
+                } catch (error) {
+                    console.error('Error saving preferences:', error);
+                    showToast('Error al guardar las preferencias', false);
+                } finally {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '<i class="fas fa-save me-2"></i>Guardar Cambios';
+                }
+            }
+
+            // Event listeners
+            saveButton.addEventListener('click', savePreferences);
+
+            // Load preferences on page load
+            loadPreferences();
+        });
+    </script>
+}

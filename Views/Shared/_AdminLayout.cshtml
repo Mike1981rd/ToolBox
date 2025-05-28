@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css"/>
     
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/admin-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/roles-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/users-style.css" asp-append-version="true" />
@@ -184,6 +185,11 @@
                     </a>
                 }
                 
+                @* Notification Preferences - available for all authenticated users *@
+                <a href="@Url.Action("Preferences", "NotificationsMvc")" class="list-group-item list-group-item-action" data-translate-key="sidebar.notificationPreferences">
+                    <i class="fas fa-cog fa-fw"></i><span class="sidebar-item-text">Notification Preferences</span>
+                </a>
+                
                 @if (readableModules.Contains("WelcomeMessage"))
                 {
                     <a href="@Url.Action("Edit", "WelcomeMessage")" class="list-group-item list-group-item-action" data-translate-key="default_welcome_message">
@@ -294,13 +300,47 @@
                         </button>
                         
                         <!-- Notifications -->
-                        <div class="me-3 position-relative">
-                            <a href="#" class="btn position-relative">
-                                <i class="fas fa-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                                    <span class="visually-hidden">New alerts</span>
+                        <div class="me-3 position-relative dropdown" id="notificationDropdownContainer">
+                            <a href="#" class="btn position-relative" id="notificationBellBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell" id="notificationBellIcon"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">
+                                    <span id="notificationCount">0</span>
+                                    <span class="visually-hidden">unread notifications</span>
                                 </span>
                             </a>
+                            
+                            <!-- Notification Dropdown -->
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown-vuexy" id="notificationDropdown" aria-labelledby="notificationBellBtn">
+                                <!-- Header -->
+                                <div class="notification-header-vuexy">
+                                    <div class="d-flex justify-content-between align-items-center px-3 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <h6 class="notification-title-vuexy mb-0 me-3" data-translate-key="notifications.title">Notification</h6>
+                                            <span class="notification-count-badge" id="notificationHeaderCount" data-translate-key="notifications.newCount">0 New</span>
+                                        </div>
+                                        <button class="btn btn-link p-0 notification-envelope-btn" id="markAllReadBtn" title="Marcar todas como leídas">
+                                            <i class="far fa-envelope"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Notifications List -->
+                                <div class="notification-list-container-vuexy" id="notificationListContainer">
+                                    <div class="notification-loading text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <div class="mt-2 text-muted small" data-translate-key="common.loading">Cargando...</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="notification-footer-vuexy">
+                                    <a href="@Url.Action("Index", "NotificationsMvc")" class="notification-view-all-vuexy d-block text-center" data-translate-key="notifications.viewAll">
+                                        View All Notifications
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- User Profile -->
@@ -390,7 +430,8 @@
     
     <!-- Custom JavaScript -->
     <script src="~/js/admin-script.js" asp-append-version="true"></script>
-    <script src="~/js/notifications-bell.js" asp-append-version="true"></script>
+    <script src="~/js/notifications-bell.js?v=@DateTime.Now.Ticks" asp-append-version="true"></script>
+    <script src="~/js/notifications-debug.js?v=@DateTime.Now.Ticks" asp-append-version="true"></script>
     <!-- No necesitamos image-url-fixer.js ya que todas las URLs ahora son SVG en base64 -->
     
     <!-- Active Link and Mobile Sidebar Script -->

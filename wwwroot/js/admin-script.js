@@ -1238,6 +1238,7 @@ const translations = {
         "required_fields_note": "Required fields",
         // Notifications Module
         "sidebar.notifications": "Notifications",
+        "sidebar.notificationPreferences": "Notification Preferences",
         "notifications.title": "Notifications",
         "notifications.markAllAsRead": "Mark all as read",
         "notifications.viewAll": "View all notifications",
@@ -1247,7 +1248,11 @@ const translations = {
         "pagination.next": "Next",
         "pagination.page": "Page",
         "notification_types.session_scheduled_by_coach": "New session scheduled",
-        "notification_types.calendar_event_scheduled_for_client": "New calendar event"
+        "notification_types.calendar_event_scheduled_for_client": "New calendar event",
+        "notification_types.calendar_event_invitation": "Event invitation",
+        "notifications.newCount": "New",
+        "notifications.markAllAsReadTooltip": "Mark all as read",
+        "common.loading": "Loading..."
     },
     es: {
         dashboard: "Tablero",
@@ -2528,6 +2533,7 @@ const translations = {
         "required_fields_note": "Campos obligatorios",
         // Módulo de Notificaciones
         "sidebar.notifications": "Notificaciones",
+        "sidebar.notificationPreferences": "Preferencias de Notificaciones",
         "notifications.title": "Notificaciones",
         "notifications.markAllAsRead": "Marcar todas como leídas",
         "notifications.viewAll": "Ver todas las notificaciones",
@@ -2537,7 +2543,11 @@ const translations = {
         "pagination.next": "Siguiente",
         "pagination.page": "Página",
         "notification_types.session_scheduled_by_coach": "Nueva sesión programada",
-        "notification_types.calendar_event_scheduled_for_client": "Nuevo evento en el calendario"
+        "notification_types.calendar_event_scheduled_for_client": "Nuevo evento en el calendario",
+        "notification_types.calendar_event_invitation": "Invitación a evento",
+        "notifications.newCount": "Nuevas",
+        "notifications.markAllAsReadTooltip": "Marcar todas como leídas",
+        "common.loading": "Cargando..."
     }
 };
 

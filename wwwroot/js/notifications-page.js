@@ -139,6 +139,8 @@
                 return lang === 'es' ? 'Nueva sesión programada' : 'New session scheduled';
             case 'calendar_event_scheduled_for_client':
                 return lang === 'es' ? 'Nuevo evento en el calendario' : 'New calendar event';
+            case 'calendar_event_invitation':
+                return lang === 'es' ? 'Invitación a evento' : 'Event invitation';
             default:
                 return lang === 'es' ? 'Notificación' : 'Notification';
         }
@@ -166,6 +168,14 @@
                         return `Event "${data.EventTitle || 'Untitled'}" scheduled for ${eventDate}${data.Location ? ` at ${data.Location}` : ''}.`;
                     }
                     
+                case 'calendar_event_invitation':
+                    const inviteDate = new Date(data.EventStartDate).toLocaleString();
+                    if (lang === 'es') {
+                        return `${data.InvitedBy || 'Un coach'} te ha invitado al evento "${data.EventTitle || 'Sin título'}" el ${inviteDate}.`;
+                    } else {
+                        return `${data.InvitedBy || 'A coach'} has invited you to the event "${data.EventTitle || 'Untitled'}" on ${inviteDate}.`;
+                    }
+                    
                 default:
                     return JSON.stringify(data);
             }
@@ -181,6 +191,8 @@
                 return { icon: 'fas fa-calendar-check', class: 'session' };
             case 'calendar_event_scheduled_for_client':
                 return { icon: 'fas fa-calendar-alt', class: 'calendar' };
+            case 'calendar_event_invitation':
+                return { icon: 'fas fa-calendar-plus', class: 'calendar' };
             default:
                 return { icon: 'fas fa-bell', class: 'default' };
         }

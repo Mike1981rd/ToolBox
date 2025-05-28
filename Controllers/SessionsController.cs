@@ -187,32 +187,26 @@ namespace ToolBox.Controllers
                     // Trigger notification for client (if client has an associated user account)
                     // NOTE: Currently, customers don't have user accounts in the system.
                     // This notification would only work if we implement a Customer-User relationship
-                    // or convert customers to users with a "Client" role.
+                    // Create notification for the user
                     try
                     {
-                        // TODO: Once Customer-User relationship is established, uncomment this code:
-                        /*
-                        if (session.Client?.UserId != null)
+                        var coachUser = await _context.Users.FindAsync(GetCurrentUserId());
+                        var coachName = coachUser?.FullName ?? User.Identity?.Name ?? "Coach";
+                        var sessionData = new
                         {
-                            var coachName = User.Identity?.Name ?? "Tu coach";
-                            var sessionData = new
-                            {
-                                SessionId = session.Id,
-                                SessionDateTime = session.SessionDateTime,
-                                CoachName = coachName
-                            };
-                            
-                            await _notificationService.CreateNotificationAsync(
-                                session.UserId,
-                                "session_scheduled_by_coach",
-                                sessionData
-                            );
-                        }
-                        */
+                            SessionId = session.Id,
+                            SessionDateTime = session.SessionDateTime,
+                            CoachName = coachName
+                        };
                         
-                        // For now, log that a session was created
+                        await _notificationService.CreateNotificationAsync(
+                            session.UserId,
+                            "session_scheduled_by_coach",
+                            sessionData
+                        );
+                        
                         _logger.LogInformation("Session {SessionId} created for user {UserId} by coach {CoachName}", 
-                            session.Id, session.UserId, User.Identity?.Name ?? "Unknown");
+                            session.Id, session.UserId, coachName);
                     }
                     catch (Exception notificationEx)
                     {

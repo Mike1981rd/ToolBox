@@ -38,6 +38,7 @@ namespace ToolBox.Data
         public DbSet<Session> Sessions { get; set; }
         public DbSet<SessionFile> SessionFiles { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<NotificationPreference> NotificationPreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -441,6 +442,20 @@ namespace ToolBox.Data
             modelBuilder.Entity<Notification>()
                 .Property(n => n.Data)
                 .HasColumnType("TEXT");
+
+            // NotificationPreference configuration
+            modelBuilder.Entity<NotificationPreference>()
+                .HasKey(np => np.Id);
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasOne(np => np.User)
+                .WithMany()
+                .HasForeignKey(np => np.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasIndex(np => new { np.UserId, np.NotificationType })
+                .IsUnique();
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)

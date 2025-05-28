@@ -21,5 +21,12 @@ namespace ToolBox.Controllers
             ViewData["Title"] = "Notificaciones";
             return View();
         }
+
+        [Authorize]
+        public IActionResult Preferences()
+        {
+            ViewData["Title"] = "Preferencias de Notificaciones";
+            return View();
+        }
     }
 }

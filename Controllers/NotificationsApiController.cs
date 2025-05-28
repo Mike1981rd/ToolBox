@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ToolBox.Interfaces;
+using ToolBox.Models.ViewModels;
 
 namespace ToolBox.Controllers
 {
@@ -11,11 +12,16 @@ namespace ToolBox.Controllers
     public class NotificationsApiController : ControllerBase
     {
         private readonly INotificationService _notificationService;
+        private readonly INotificationPreferenceService _preferenceService;
         private readonly ILogger<NotificationsApiController> _logger;
 
-        public NotificationsApiController(INotificationService notificationService, ILogger<NotificationsApiController> logger)
+        public NotificationsApiController(
+            INotificationService notificationService, 
+            INotificationPreferenceService preferenceService,
+            ILogger<NotificationsApiController> logger)
         {
             _notificationService = notificationService;
+            _preferenceService = preferenceService;
             _logger = logger;
         }
 
@@ -191,6 +197,57 @@ namespace ToolBox.Controllers
             {
                 _logger.LogError(ex, "Error marking all notifications as read");
                 return StatusCode(500, "An error occurred while marking notifications as read");
+            }
+        }
+
+        /// <summary>
+        /// Gets the notification preferences for the current user
+        /// </summary>
+        /// <returns>List of notification preferences</returns>
+        [HttpGet("preferences")]
+        public async Task<IActionResult> GetPreferences()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var preferences = await _preferenceService.GetUserPreferencesAsync(userId.Value.ToString());
+                return Ok(preferences);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting notification preferences");
+                return StatusCode(500, "An error occurred while getting notification preferences");
+            }
+        }
+
+        /// <summary>
+        /// Updates the notification preferences for the current user
+        /// </summary>
+        /// <param name="preferences">List of preferences to update</param>
+        /// <returns>Success status</returns>
+        [HttpPost("preferences")]
+        public async Task<IActionResult> UpdatePreferences([FromBody] IEnumerable<NotificationPreferenceUpdateModel> preferences)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                await _preferenceService.UpdateUserPreferencesAsync(userId.Value.ToString(), preferences);
+                return Ok(new { success = true, message = "Preferences updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating notification preferences");
+                return StatusCode(500, "An error occurred while updating notification preferences");
             }
         }
 

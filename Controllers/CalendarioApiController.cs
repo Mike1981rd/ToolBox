@@ -255,7 +255,7 @@ namespace ToolBox.Controllers
                 {
                     // Get coach info for notifications
                     var coach = await _context.Users.FindAsync(session.CoachId);
-                    var coachName = coach?.FullName ?? "Tu coach";
+                    var coachName = coach?.FullName ?? "Coach";
                     
                     // For each client associated with this calendar event
                     if (dto.ClientIds != null && dto.ClientIds.Any())
@@ -301,14 +301,12 @@ namespace ToolBox.Controllers
                                 EventId = session.Id,
                                 EventTitle = session.Titulo,
                                 EventStartDate = session.FechaHoraInicio,
-                                EventEndDate = session.FechaHoraFin,
-                                CoachName = coachName,
-                                Location = session.UbicacionOEnlace
+                                InvitedBy = coachName
                             };
                             
                             await _notificationService.CreateNotificationAsync(
                                 userId,
-                                "calendar_event_scheduled_for_client",
+                                "calendar_event_invitation",
                                 eventData
                             );
                         }
