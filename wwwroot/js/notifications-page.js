@@ -161,19 +161,51 @@
                     }
                     
                 case 'calendar_event_scheduled_for_client':
-                    const eventDate = new Date(data.EventStartDate).toLocaleString();
+                    const eventDate = new Date(data.eventStartDate).toLocaleString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
                     if (lang === 'es') {
-                        return `Evento "${data.EventTitle || 'Sin título'}" programado para el ${eventDate}${data.Location ? ` en ${data.Location}` : ''}.`;
+                        return `Evento "${data.eventTitle || 'Sin título'}" programado para el ${eventDate}${data.location ? ` en ${data.location}` : ''}.`;
                     } else {
-                        return `Event "${data.EventTitle || 'Untitled'}" scheduled for ${eventDate}${data.Location ? ` at ${data.Location}` : ''}.`;
+                        return `Event "${data.eventTitle || 'Untitled'}" scheduled for ${eventDate}${data.location ? ` at ${data.location}` : ''}.`;
                     }
                     
                 case 'calendar_event_invitation':
-                    const inviteDate = new Date(data.EventStartDate).toLocaleString();
-                    if (lang === 'es') {
-                        return `${data.InvitedBy || 'Un coach'} te ha invitado al evento "${data.EventTitle || 'Sin título'}" el ${inviteDate}.`;
+                    const inviteDate = new Date(data.eventStartDate);
+                    let inviteDateStr = '';
+                    if (!isNaN(inviteDate.getTime())) {
+                        if (lang === 'es') {
+                            inviteDateStr = inviteDate.toLocaleDateString('es-ES', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        } else {
+                            inviteDateStr = inviteDate.toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
                     } else {
-                        return `${data.InvitedBy || 'A coach'} has invited you to the event "${data.EventTitle || 'Untitled'}" on ${inviteDate}.`;
+                        inviteDateStr = lang === 'es' ? 'fecha no válida' : 'invalid date';
+                    }
+                    
+                    if (lang === 'es') {
+                        return `${data.invitedBy || 'Un coach'} te ha invitado al evento "${data.eventTitle || 'Sin título'}" el ${inviteDateStr}.`;
+                    } else {
+                        return `${data.invitedBy || 'A coach'} has invited you to the event "${data.eventTitle || 'Untitled'}" on ${inviteDateStr}.`;
                     }
                     
                 default:

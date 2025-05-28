@@ -389,6 +389,9 @@
     function formatNotificationMessage(type, data) {
         const lang = getCurrentLanguage();
         
+        // Debug log to see what data we're receiving
+        console.log('formatNotificationMessage - type:', type, 'data:', data);
+        
         try {
             switch(type) {
                 case 'session_scheduled_by_coach':
@@ -405,15 +408,42 @@
                     }
                     
                 case 'calendar_event_invitation':
+                    // Format the event date
+                    let eventDateStr = '';
+                    if (data.eventStartDate) {
+                        const eventDate = new Date(data.eventStartDate);
+                        if (!isNaN(eventDate.getTime())) {
+                            if (lang === 'es') {
+                                eventDateStr = ` el ${eventDate.toLocaleDateString('es-ES', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}`;
+                            } else {
+                                eventDateStr = ` on ${eventDate.toLocaleDateString('en-US', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}`;
+                            }
+                        }
+                    }
+                    
                     if (lang === 'es') {
                         return {
                             title: 'Invitación a Evento 💬',
-                            subtitle: `${data.InvitedBy || 'Alguien'} te invitó a "${data.EventTitle || 'un evento'}"`
+                            subtitle: `${data.invitedBy || 'Un coach'} te ha invitado al evento "${data.eventTitle || 'Sin título'}"${eventDateStr}`
                         };
                     } else {
                         return {
                             title: 'Event Invitation 💬',
-                            subtitle: `${data.InvitedBy || 'Someone'} invited you to "${data.EventTitle || 'an event'}"`
+                            subtitle: `${data.invitedBy || 'A coach'} invited you to "${data.eventTitle || 'Untitled event'}"${eventDateStr}`
                         };
                     }
                     
@@ -421,12 +451,12 @@
                     if (lang === 'es') {
                         return {
                             title: 'Nuevo Evento Programado 📋',
-                            subtitle: `El evento "${data.EventTitle || 'Sin título'}" ha sido programado para ti`
+                            subtitle: `El evento "${data.eventTitle || 'Sin título'}" ha sido programado para ti`
                         };
                     } else {
                         return {
                             title: 'New Event Scheduled 📋',
-                            subtitle: `Event "${data.EventTitle || 'Untitled'}" has been scheduled for you`
+                            subtitle: `Event "${data.eventTitle || 'Untitled'}" has been scheduled for you`
                         };
                     }
                     
