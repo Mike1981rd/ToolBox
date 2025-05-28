@@ -70,6 +70,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 return ['fc-event-' + status.toLowerCase()];
             },
             
+            // Custom event content
+            eventContent: function(arg) {
+                let timeDisplay = '';
+                
+                if (arg.event.start) {
+                    const hours = arg.event.start.getHours();
+                    const minutes = arg.event.start.getMinutes();
+                    timeDisplay = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                }
+                
+                return {
+                    html: `<div class="fc-event-main-frame">
+                            ${timeDisplay ? `<div class="fc-event-time">${timeDisplay}</div>` : ''}
+                            <div class="fc-event-title-container">
+                                <div class="fc-event-title fc-sticky">${arg.event.title}</div>
+                            </div>
+                           </div>`
+                };
+            },
+            
             eventDidMount: function(info) {
                 // Add tooltip
                 if (info.event.extendedProps.descripcion) {
@@ -204,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 descripcion: dropInfo.event.extendedProps.descripcion || '',
                 fechaHoraInicio: dropInfo.event.start,
                 fechaHoraFin: dropInfo.event.end,
-                ubicacionOEnlace: dropInfo.event.extendedProps.ubicacionOEnlace || '',
+                ubicacion: dropInfo.event.extendedProps.ubicacion || '',
                 userIds: dropInfo.event.extendedProps.usuarios.map(u => u.userId)
             };
 
@@ -229,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 descripcion: resizeInfo.event.extendedProps.descripcion || '',
                 fechaHoraInicio: resizeInfo.event.start,
                 fechaHoraFin: resizeInfo.event.end,
-                ubicacionOEnlace: resizeInfo.event.extendedProps.ubicacionOEnlace || '',
+                ubicacion: resizeInfo.event.extendedProps.ubicacion || '',
                 userIds: resizeInfo.event.extendedProps.usuarios.map(u => u.userId)
             };
 
@@ -512,6 +532,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Validate date pickers
+        if (!config.startDatePicker || !config.startDatePicker.selectedDates.length) {
+            showToast('Por favor selecciona la fecha y hora de inicio', 'warning');
+            return;
+        }
+        
+        if (!config.endDatePicker || !config.endDatePicker.selectedDates.length) {
+            showToast('Por favor selecciona la fecha y hora de fin', 'warning');
+            return;
+        }
+        
         const sessionData = {
             titulo: document.getElementById('titulo').value,
             descripcion: document.getElementById('descripcion').value,
@@ -708,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (config.isEditMode && event) {
             document.getElementById('titulo').value = event.title || '';
             document.getElementById('descripcion').value = event.extendedProps.descripcion || '';
-            document.getElementById('ubicacion').value = event.extendedProps.ubicacionOEnlace || '';
+            document.getElementById('ubicacion').value = event.extendedProps.ubicacion || '';
             document.getElementById('estadoSesion').value = event.extendedProps.estadoSesion || 'Programada';
             document.getElementById('tipoSesion').value = event.extendedProps.tipoSesion || 'Individual';
             
@@ -721,13 +752,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Set dates
-            if (config.startDatePicker && event.start) {
-                config.startDatePicker.setDate(event.start);
-            }
-            if (config.endDatePicker && event.end) {
-                config.endDatePicker.setDate(event.end);
-            }
+            // Store dates to set after initialization
+            config.pendingStartDate = event.start;
+            config.pendingEndDate = event.end;
             
             // Set all day
             const allDayCheck = document.getElementById('allDay');
@@ -735,10 +762,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 allDayCheck.checked = event.allDay || false;
             }
             
-            // Set selected users if editing
-            if (event.extendedProps.users && config.usersSelect) {
-                const userIds = event.extendedProps.users.map(u => u.id.toString());
-                config.usersSelect.setChoiceByValue(userIds);
+            // Store selected users to set after initialization
+            if (event.extendedProps.users) {
+                config.pendingUserIds = event.extendedProps.users.map(u => u.id.toString());
             }
         }
         
@@ -752,6 +778,24 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeDatePickers();
             initializeClientsSelect();
             loadCoaches();
+            
+            // Set dates after initialization if editing
+            if (config.isEditMode) {
+                if (config.pendingStartDate && config.startDatePicker) {
+                    config.startDatePicker.setDate(config.pendingStartDate);
+                }
+                if (config.pendingEndDate && config.endDatePicker) {
+                    config.endDatePicker.setDate(config.pendingEndDate);
+                }
+                if (config.pendingUserIds && config.usersSelect) {
+                    config.usersSelect.setChoiceByValue(config.pendingUserIds);
+                }
+                
+                // Clear pending data
+                config.pendingStartDate = null;
+                config.pendingEndDate = null;
+                config.pendingUserIds = null;
+            }
         }, { once: true });
     }
 

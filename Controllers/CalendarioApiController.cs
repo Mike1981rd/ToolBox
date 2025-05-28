@@ -161,7 +161,7 @@ namespace ToolBox.Controllers
                     .Select(s => new
                     {
                         id = s.Id,
-                        title = s.Titulo + (s.SesionUsuarios.Any() ? $" ({s.SesionUsuarios.Count()} usuarios)" : ""),
+                        title = s.Titulo,
                         start = s.FechaHoraInicio,
                         end = s.FechaHoraFin,
                         estadoSesion = s.EstadoSesion,

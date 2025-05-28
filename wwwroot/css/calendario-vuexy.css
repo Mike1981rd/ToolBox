@@ -79,6 +79,120 @@
     opacity: 0.5;
 }
 
+/* Event styling as pills */
+.fc-event {
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 4px 12px !important;
+    margin: 2px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.fc-event-main-frame {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fc-event-time {
+    font-weight: 600;
+    opacity: 0.9;
+    font-size: 0.8rem;
+    border-right: 1px solid rgba(255,255,255,0.3);
+    padding-right: 6px;
+    margin-right: 2px;
+}
+
+.fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Event colors based on status */
+.fc-event-programada {
+    background-color: #7367f0 !important;
+    color: #fff !important;
+}
+
+.fc-event-confirmada {
+    background-color: #28c76f !important;
+    color: #fff !important;
+}
+
+.fc-event-enprogreso {
+    background-color: #ff9f43 !important;
+    color: #fff !important;
+}
+
+.fc-event-completada {
+    background-color: #00cfe8 !important;
+    color: #fff !important;
+}
+
+.fc-event-cancelada {
+    background-color: #ea5455 !important;
+    color: #fff !important;
+}
+
+/* Ensure text color is always white in events */
+.fc-event * {
+    color: #fff !important;
+}
+
+/* Remove default FullCalendar event styles */
+.fc-event .fc-event-main {
+    color: inherit !important;
+}
+
+.fc-h-event .fc-event-main {
+    color: inherit !important;
+}
+
+/* Day grid view specific */
+.fc-daygrid-event {
+    margin: 2px 4px !important;
+}
+
+/* Time grid view specific */
+.fc-timegrid-event {
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.fc-timegrid-event .fc-event-main {
+    padding: 2px 8px;
+}
+
+/* List view specific */
+.fc-list-event-title {
+    text-decoration: none !important;
+}
+
+.fc-list-event-dot {
+    display: none !important;
+}
+
+/* Animation for events */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Mini calendar styling - Vuexy compact style */
 #calendarMini {
     background: #f8f8f8;
