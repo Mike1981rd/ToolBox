@@ -38,6 +38,9 @@ namespace ToolBox.Models
         
         // Many-to-many relationship with Clientes
         public virtual ICollection<SesionCliente> SesionClientes { get; set; } = new List<SesionCliente>();
+        
+        // Many-to-many relationship with Usuarios
+        public virtual ICollection<SesionUsuario> SesionUsuarios { get; set; } = new List<SesionUsuario>();
     }
     
     // Estado de sesión constants

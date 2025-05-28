@@ -1,5 +1,84 @@
 /* Calendar module specific styles that work with admin layout */
 
+/* Choices.js Bootstrap Integration */
+.choices {
+    width: 100%;
+}
+
+.choices[data-type*="select-multiple"] .choices__inner,
+.choices[data-type*="text"] .choices__inner {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    min-height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.choices__inner:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.choices__list--multiple .choices__item {
+    background-color: #7367f0;
+    border: 1px solid #7367f0;
+    border-radius: 0.25rem;
+    color: #fff;
+    margin-bottom: 0;
+    margin-right: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.choices__list--dropdown {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    margin-top: 0.125rem;
+    z-index: 9999;
+}
+
+.choices__list--dropdown .choices__item--selectable {
+    padding: 0.375rem 0.75rem;
+    background-color: #fff;
+    color: #000;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: #e9ecef;
+    color: #000 !important;
+}
+
+/* Fix for dropdown text visibility */
+.choices__list--dropdown .choices__item {
+    color: #000;
+}
+
+/* Ensure highlighted text is always black */
+.choices__list--dropdown .choices__item--selectable:hover {
+    background-color: #e9ecef;
+    color: #000 !important;
+}
+
+.choices__list--dropdown .choices__item.is-highlighted {
+    color: #000 !important;
+}
+
+/* Force all text inside highlighted items to be black */
+.choices__list--dropdown .choices__item--selectable.is-highlighted *,
+.choices__list--dropdown .choices__item--selectable:hover * {
+    color: #000 !important;
+}
+
+.choices__list--dropdown {
+    background-color: #fff;
+}
+
+.choices__placeholder {
+    opacity: 0.5;
+}
+
 /* Mini calendar styling - Vuexy compact style */
 #calendarMini {
     background: #f8f8f8;

@@ -49,6 +49,7 @@ builder.Services.AddScoped<IWebsiteConfigurationService, WebsiteConfigurationSer
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<ISesionCalendarioService, SesionCalendarioService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 

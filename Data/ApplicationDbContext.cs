@@ -34,8 +34,10 @@ namespace ToolBox.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SesionCalendario> SesionesCalendario { get; set; }
         public DbSet<SesionCliente> SesionesClientes { get; set; }
+        public DbSet<SesionUsuario> SesionesUsuarios { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<SessionFile> SessionFiles { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -352,6 +354,27 @@ namespace ToolBox.Data
                 .WithMany()
                 .HasForeignKey(sc => sc.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
+                
+            // SesionUsuario configuration (Many-to-Many relationship)
+            modelBuilder.Entity<SesionUsuario>()
+                .HasKey(su => new { su.SesionCalendarioId, su.UsuarioId });
+                
+            modelBuilder.Entity<SesionUsuario>()
+                .HasOne(su => su.SesionCalendario)
+                .WithMany(s => s.SesionUsuarios)
+                .HasForeignKey(su => su.SesionCalendarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<SesionUsuario>()
+                .HasOne(su => su.Usuario)
+                .WithMany()
+                .HasForeignKey(su => su.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // Configure nullable DateTime for PostgreSQL
+            modelBuilder.Entity<SesionUsuario>()
+                .Property(su => su.FechaConfirmacion)
+                .HasColumnType("timestamp with time zone");
 
             // Session configuration
             modelBuilder.Entity<Session>()
@@ -398,6 +421,26 @@ namespace ToolBox.Data
 
             modelBuilder.Entity<SessionFile>()
                 .HasIndex(sf => sf.SessionId);
+
+            // Notification configuration
+            modelBuilder.Entity<Notification>()
+                .HasKey(n => n.Id);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.CreatedAt });
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.ReadAt });
+
+            modelBuilder.Entity<Notification>()
+                .Property(n => n.Data)
+                .HasColumnType("TEXT");
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -455,6 +498,7 @@ namespace ToolBox.Data
                 }
             }
 
+            // Seed permissions data
             modelBuilder.Entity<Permission>().HasData(permissions);
         }
 
@@ -468,7 +512,8 @@ namespace ToolBox.Data
                 "WheelOfLife" or "WheelOfProgress" or "XRayLife" or "LifeAssessment" or "LifeAreas" => "Herramientas de Vida",
                 "Tasks" or "HabitTracker" => "Productividad",
                 "EmailContents" or "WebsiteSettings" or "WelcomeMessage" => "Configuración",
-                "Calendario" => "Gestión de Sesiones",
+                "Calendario" or "Sessions" => "Gestión de Sesiones",
+                "Notifications" => "General",
                 _ => "Otros"
             };
         }
@@ -496,6 +541,8 @@ namespace ToolBox.Data
                 "WebsiteSettings" => "Configuración del Sitio",
                 "WelcomeMessage" => "Mensaje de Bienvenida",
                 "Calendario" => "Calendario de Sesiones",
+                "Sessions" => "Sesiones",
+                "Notifications" => "Notificaciones",
                 _ => module
             };
         }

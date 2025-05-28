@@ -6,8 +6,8 @@
 @section Styles {
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
-    <!-- Select2 for multi-select -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Choices.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <!-- Flatpickr for date/time picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Vuexy Calendar Styles -->
@@ -213,10 +213,18 @@
                 </select>
             </div>
 
-            <!-- Clients -->
-            <div class="mb-3">
+            <!-- Clients (mantener oculto para compatibilidad) -->
+            <div class="mb-3 d-none">
                 <label class="form-label" data-translate-key="calendar.participants">Participants</label>
                 <select class="form-select" id="clientIds" name="clientIds" multiple>
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </div>
+            
+            <!-- Users to Invite -->
+            <div class="mb-3">
+                <label class="form-label" data-translate-key="calendar.inviteUsers">Invitar Usuarios</label>
+                <select class="form-select" id="userIds" name="userIds" multiple>
                     <!-- Options will be loaded dynamically -->
                 </select>
             </div>
@@ -273,13 +281,13 @@
 </div>
 
 @section Scripts {
-    <!-- FullCalendar JS -->
+    <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <!-- Flatpickr JS -->
+    <!-- Choices.js -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <!-- Flatpickr -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <!-- Calendar Script -->
-    <script src="~/js/calendario-vuexy.js"></script>
+    <!-- Calendar Scripts -->
+    <script src="~/js/calendario-script.js"></script>
 }

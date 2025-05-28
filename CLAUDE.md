@@ -201,6 +201,16 @@ if (result.success) {
 - **Lección clave**: Hard delete a veces es mejor que soft delete
 - **Problema resuelto**: Reutilizar estructura existente vs crear desde cero
 
+### 4. Calendario (Calendar Events)
+- **Feature único**: Invitación de múltiples usuarios con notificaciones automáticas
+- **Lección clave**: Relación many-to-many con tabla intermedia (SesionUsuario)
+- **Problema resuelto**: Transición de Customers a Users para invitaciones
+- **Implementación**: 
+  - Tabla `SesionesUsuarios` para relación N:N entre eventos y usuarios
+  - API endpoint `/api/users/invitable` excluye al coach actual
+  - Notificaciones automáticas al crear eventos con usuarios invitados
+  - Select2 múltiple para selección de usuarios
+
 ## 🚨 PROBLEMA CRÍTICO: GetCurrentUserId() Hardcodeado
 
 ### Descripción del Problema
@@ -291,6 +301,97 @@ private int GetCurrentUserId()
 ### ⚠️ IMPORTANTE: NUNCA CREAR ARCHIVOS DE MIGRACIÓN MANUALMENTE
 **Problema Recurrente**: Crear archivos de migración manualmente causa que Visual Studio no los reconozca y genera conflictos con IDs de permisos.
 
+### 🔴 PROBLEMA ESPECÍFICO CON PERMISOS - PROBLEMA REAL Y SOLUCIÓN DEFINITIVA
+
+#### EL PROBLEMA REAL:
+1. La tabla `Permissions` tiene un campo `Id` que NO es autoincremental (IDENTITY)
+2. El método `SeedPermissions` en `ApplicationDbContext` usa IDs fijos secuenciales
+3. Cuando EF genera una migración para un nuevo módulo, intenta insertar permisos con IDs que YA EXISTEN
+4. Esto causa: `duplicate key value violates unique constraint "PK_Permissions"`
+
+#### ERRORES QUE VERÁS:
+- Durante `dotnet ef database update`: "already exists with the key value '{Id: 61}'"
+- Al ejecutar SQL sin ID: "duplicate key value violates unique constraint"
+
+### ✅ SOLUCIÓN DEFINITIVA PARA NUEVOS MÓDULOS
+
+#### PASO 1: NUNCA agregues el módulo al array en ApplicationDbContext
+```csharp
+// ❌ NO HAGAS ESTO:
+var modules = new[]
+{
+    "Dashboard",
+    "Users",
+    "NuevoModulo" // ❌ NO LO AGREGUES AQUÍ
+};
+```
+
+#### PASO 2: Si ya creaste una migración con permisos, ELIMÍNALA
+```bash
+# Si ves archivos como 20250527193725_AddNotificationPermissions.cs
+rm Migrations/*AddNotificationPermissions*
+```
+
+#### PASO 3: Crea los permisos con SQL que incluya ID automático
+```sql
+-- SCRIPT COMPLETO Y FUNCIONAL para add_[modulo]_permissions.sql
+DO $$
+DECLARE
+    next_id INTEGER;
+BEGIN
+    -- Permiso Read
+    SELECT COALESCE(MAX("Id"), 0) + 1 INTO next_id FROM "Permissions";
+    IF NOT EXISTS (
+        SELECT 1 FROM "Permissions" 
+        WHERE "ModuleName" = 'NuevoModulo' AND "ActionName" = 'Read'
+    ) THEN
+        INSERT INTO "Permissions" ("Id", "ModuleName", "ActionName", "Description", "Category")
+        VALUES (next_id, 'NuevoModulo', 'Read', 'Ver y listar en Nuevo Módulo', 'General');
+    END IF;
+
+    -- Permiso Write
+    SELECT COALESCE(MAX("Id"), 0) + 1 INTO next_id FROM "Permissions";
+    IF NOT EXISTS (
+        SELECT 1 FROM "Permissions" 
+        WHERE "ModuleName" = 'NuevoModulo' AND "ActionName" = 'Write'
+    ) THEN
+        INSERT INTO "Permissions" ("Id", "ModuleName", "ActionName", "Description", "Category")
+        VALUES (next_id, 'NuevoModulo', 'Write', 'Editar y actualizar en Nuevo Módulo', 'General');
+    END IF;
+
+    -- Permiso Create
+    SELECT COALESCE(MAX("Id"), 0) + 1 INTO next_id FROM "Permissions";
+    IF NOT EXISTS (
+        SELECT 1 FROM "Permissions" 
+        WHERE "ModuleName" = 'NuevoModulo' AND "ActionName" = 'Create'
+    ) THEN
+        INSERT INTO "Permissions" ("Id", "ModuleName", "ActionName", "Description", "Category")
+        VALUES (next_id, 'NuevoModulo', 'Create', 'Crear nuevos registros en Nuevo Módulo', 'General');
+    END IF;
+END $$;
+
+-- Asignar a roles (ejecutar por separado)
+INSERT INTO "RolePermissions" ("RoleId", "PermissionId")
+SELECT 1, p."Id"
+FROM "Permissions" p
+WHERE p."ModuleName" = 'NuevoModulo'
+AND NOT EXISTS (
+    SELECT 1 FROM "RolePermissions" rp 
+    WHERE rp."RoleId" = 1 AND rp."PermissionId" = p."Id"
+);
+```
+
+#### PASO 4: Para el sidebar, agrega la condición pero NO el módulo al seed
+```csharp
+// En _AdminLayout.cshtml
+@if (readableModules.Contains("NuevoModulo"))
+{
+    <a href="@Url.Action("Index", "NuevoModulo")" class="list-group-item">
+        <i class="fas fa-icon"></i><span>Nuevo Módulo</span>
+    </a>
+}
+```
+
 ### ✅ PROCESO CORRECTO PARA NUEVOS MÓDULOS
 
 #### Paso 1: Preparar SOLO los Modelos y DbContext
@@ -365,43 +466,290 @@ Update-Database
    - [ ] Agregar módulo en _AdminLayout.cshtml
    - [ ] Asignar permisos al rol en UI de Roles
 
-### ⚠️ PATRÓN CRÍTICO: BÚSQUEDA Y FILTROS
+## 🔍 PATRÓN FILTROS Y BÚSQUEDA - GUÍA COMPLETA DE IMPLEMENTACIÓN
 
-**IMPORTANTE**: La búsqueda siempre es del lado cliente, NUNCA del servidor.
+### ⚠️ REGLA FUNDAMENTAL
+- **Filtro de Estado**: Del lado servidor (recarga página)
+- **Búsqueda de Texto**: Del lado cliente (tiempo real)
+- **AJAX**: Siempre form-data, nunca JSON
 
-#### Filtros de Estado (Servidor)
+---
+
+### 📋 CHECKLIST RÁPIDO PARA IMPLEMENTAR FILTROS
+
+#### Paso 1: Controlador (2 cambios)
 ```csharp
-// Controller - Solo filtro de estado
+// ✅ PATRÓN CORRECTO
 public async Task<IActionResult> Index(string? statusFilter = null)
 {
-    statusFilter = statusFilter ?? "active"; // Default active
-    // Aplicar filtro de estado en query
+    statusFilter = statusFilter ?? "active"; // 🚨 DEFAULT ACTIVE
+    ViewBag.CurrentStatusFilter = statusFilter; // 🚨 IMPORTANTE PARA VISTA
+    
+    var query = _context.Entidades.AsQueryable();
+    
+    // ✅ Solo filtro de estado
     if (statusFilter == "active") query = query.Where(x => x.Status == true);
+    else if (statusFilter == "inactive") query = query.Where(x => x.Status == false);
+    // "all" no filtra
+    
+    // ❌ NO HACER BÚSQUEDA AQUÍ
+    
+    var entities = await query.ToListAsync();
+    return View(new IndexViewModel { Entities = entities, CurrentStatusFilter = statusFilter });
 }
 ```
 
-#### Búsqueda (Cliente)
-```javascript
-// JavaScript - Búsqueda del lado cliente
-searchInput.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase().trim();
-    const tableRows = document.querySelectorAll('#tableId tbody tr');
+#### Paso 2: HTML Vista (Copiar exacto)
+```html
+<!-- ✅ ESTRUCTURA CORRECTA -->
+<form method="get" class="d-flex gap-2">
+    <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="search" name="searchQuery" class="form-control" 
+               placeholder="Buscar..." id="searchInput">
+    </div>
     
-    tableRows.forEach(row => {
-        // Obtener texto de celdas relevantes
-        const matches = /* lógica de búsqueda */;
-        row.style.display = matches ? '' : 'none';
-    });
+    <select name="statusFilter" id="statusFilter" class="form-select">
+        @if (Model.CurrentStatusFilter == "all")
+        {
+            <option value="all" selected>Todos</option>
+        }
+        else
+        {
+            <option value="all">Todos</option>
+        }
+        
+        @if (Model.CurrentStatusFilter == "active")
+        {
+            <option value="active" selected>Activos</option>
+        }
+        else
+        {
+            <option value="active">Activos</option>
+        }
+        
+        @if (Model.CurrentStatusFilter == "inactive")
+        {
+            <option value="inactive" selected>Inactivos</option>
+        }
+        else
+        {
+            <option value="inactive">Inactivos</option>
+        }
+    </select>
+    
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i>
+    </button>
+</form>
+```
+
+#### Paso 3: JavaScript (Copiar exacto)
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    // 🚨 FILTRO DE ESTADO - Recarga página
+    const statusFilter = document.getElementById('statusFilter');
+    
+    function applyFilters() {
+        const params = new URLSearchParams();
+        const statusValue = statusFilter ? statusFilter.value : '';
+        
+        if (statusValue && statusValue !== 'all') params.append('statusFilter', statusValue);
+        
+        window.location.href = '@Url.Action("Index", "ControllerName")' + 
+                              (params.toString() ? '?' + params.toString() : '');
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+    }
+    
+    // 🚨 BÚSQUEDA - Tiempo real, lado cliente
+    const searchInput = document.querySelector('input[name="searchQuery"]');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const tableRows = document.querySelectorAll('#tablaId tbody tr');
+            
+            tableRows.forEach(row => {
+                if (row.cells.length === 1) return; // Skip "no results" row
+                
+                // 🚨 AJUSTAR SEGÚN COLUMNAS DE CADA MÓDULO
+                const cell1 = row.cells[0]?.textContent.toLowerCase() || '';
+                const cell2 = row.cells[1]?.textContent.toLowerCase() || '';
+                // Agregar más celdas según necesidad
+                
+                const matches = cell1.includes(searchTerm) || 
+                              cell2.includes(searchTerm);
+                
+                row.style.display = matches ? '' : 'none';
+            });
+            
+            // Mensaje "No encontrado"
+            const visibleRows = Array.from(tableRows).filter(row => 
+                row.style.display !== 'none' && row.cells.length > 1
+            );
+            
+            if (visibleRows.length === 0) {
+                const tbody = document.querySelector('#tablaId tbody');
+                const noResultsRow = tbody.querySelector('.no-results-row');
+                
+                if (!noResultsRow) {
+                    const newRow = tbody.insertRow();
+                    newRow.className = 'no-results-row';
+                    newRow.innerHTML = '<td colspan="X" class="text-center py-4"><div class="text-muted"><i class="fas fa-search fa-2x mb-3 d-block"></i><span>No se encontraron resultados</span></div></td>';
+                }
+            } else {
+                const noResultsRow = document.querySelector('.no-results-row');
+                if (noResultsRow) noResultsRow.remove();
+            }
+        });
+        
+        // Prevenir submit en Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    }
 });
 ```
 
-#### Envío de Datos AJAX
+#### Paso 4: ViewModel (Agregar propiedad)
+```csharp
+public class ModuloIndexViewModel
+{
+    public List<Entidad> Entidades { get; set; } = new List<Entidad>();
+    public string? CurrentStatusFilter { get; set; } // 🚨 OBLIGATORIO
+}
+```
+
+#### Paso 5: AJAX Toggle Status (Copiar exacto)
 ```javascript
-// SIEMPRE usar form-data, NUNCA JSON para compatibilidad con [ValidateAntiForgeryToken]
-fetch('/Controller/Action', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ 'id': value, '__RequestVerificationToken': token })
+// 🚨 PATRÓN AJAX FORM-DATA
+function toggleStatus(entityId, button) {
+    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    
+    fetch('/Controller/ToggleStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'id': entityId,
+            '__RequestVerificationToken': token
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Actualizar UI según filtro actual
+            const currentFilter = '@Model.CurrentStatusFilter';
+            const row = button.closest('tr');
+            
+            if ((currentFilter === 'active' && !result.newIsActiveState) || 
+                (currentFilter === 'inactive' && result.newIsActiveState)) {
+                // Remover con animación si no coincide con filtro
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
+            }
+        }
+    });
+}
+```
+
+---
+
+### 🚨 ERRORES COMUNES QUE SIEMPRE EVITAR
+
+1. **❌ NO usar JSON en AJAX**
+   ```javascript
+   // ❌ INCORRECTO
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ id: entityId })
+   ```
+
+2. **❌ NO hacer búsqueda en servidor**
+   ```csharp
+   // ❌ INCORRECTO
+   if (!string.IsNullOrWhiteSpace(searchQuery)) {
+       query = query.Where(x => x.Name.Contains(searchQuery));
+   }
+   ```
+
+3. **❌ NO olvidar ViewBag.CurrentStatusFilter**
+   ```csharp
+   // ❌ INCORRECTO - Vista no sabrá qué opción seleccionar
+   return View(viewModel);
+   
+   // ✅ CORRECTO
+   ViewBag.CurrentStatusFilter = statusFilter;
+   return View(viewModel);
+   ```
+
+4. **❌ NO olvidar default "active"**
+   ```csharp
+   // ❌ INCORRECTO - Sin default
+   public async Task<IActionResult> Index(string? statusFilter = null)
+   
+   // ✅ CORRECTO - Con default
+   statusFilter = statusFilter ?? "active";
+   ```
+
+---
+
+### 📝 PLANTILLA RÁPIDA PARA COPIAR Y PEGAR
+
+#### JavaScript completo para cualquier módulo:
+```javascript
+// 🚨 CAMBIAR: ControllerName, tablaId, columnas de búsqueda, colspan
+document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('statusFilter');
+    const searchInput = document.querySelector('input[name="searchQuery"]');
+    
+    // Filtro estado
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            const params = new URLSearchParams();
+            if (this.value && this.value !== 'all') params.append('statusFilter', this.value);
+            window.location.href = '@Url.Action("Index", "CAMBIAR_CONTROLLER")' + 
+                                  (params.toString() ? '?' + params.toString() : '');
+        });
+    }
+    
+    // Búsqueda cliente
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const tableRows = document.querySelectorAll('#CAMBIAR_TABLA_ID tbody tr');
+            
+            tableRows.forEach(row => {
+                if (row.cells.length === 1) return;
+                
+                // 🚨 CAMBIAR COLUMNAS SEGÚN MÓDULO
+                const matches = row.cells[0]?.textContent.toLowerCase().includes(searchTerm) ||
+                              row.cells[1]?.textContent.toLowerCase().includes(searchTerm);
+                
+                row.style.display = matches ? '' : 'none';
+            });
+            
+            const visibleRows = Array.from(tableRows).filter(row => 
+                row.style.display !== 'none' && row.cells.length > 1);
+            
+            if (visibleRows.length === 0) {
+                const tbody = document.querySelector('#CAMBIAR_TABLA_ID tbody');
+                if (!tbody.querySelector('.no-results-row')) {
+                    const newRow = tbody.insertRow();
+                    newRow.className = 'no-results-row';
+                    newRow.innerHTML = '<td colspan="CAMBIAR_NUMERO" class="text-center py-4"><div class="text-muted"><i class="fas fa-search fa-2x mb-3 d-block"></i><span>No se encontraron resultados</span></div></td>';
+                }
+            } else {
+                const noResultsRow = document.querySelector('.no-results-row');
+                if (noResultsRow) noResultsRow.remove();
+            }
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    }
 });
 ```
 

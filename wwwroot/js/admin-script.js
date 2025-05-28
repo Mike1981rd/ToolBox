@@ -1124,6 +1124,7 @@ const translations = {
         "calendar.allDay": "All Day",
         "calendar.coach": "Coach",
         "calendar.participants": "Participants",
+        "calendar.inviteUsers": "Invite Users",
         "calendar.location": "Location",
         "calendar.description": "Description",
         "calendar.sessionType": "Session Type",
@@ -1234,7 +1235,19 @@ const translations = {
         "notification_title": "Notification",
         "validation_errors_title": "Validation errors:",
         "confirm_delete_file": "Are you sure you want to delete this file?",
-        "required_fields_note": "Required fields"
+        "required_fields_note": "Required fields",
+        // Notifications Module
+        "sidebar.notifications": "Notifications",
+        "notifications.title": "Notifications",
+        "notifications.markAllAsRead": "Mark all as read",
+        "notifications.viewAll": "View all notifications",
+        "notifications.noUnread": "No unread notifications",
+        "notifications.noNotifications": "No notifications",
+        "pagination.previous": "Previous",
+        "pagination.next": "Next",
+        "pagination.page": "Page",
+        "notification_types.session_scheduled_by_coach": "New session scheduled",
+        "notification_types.calendar_event_scheduled_for_client": "New calendar event"
     },
     es: {
         dashboard: "Tablero",
@@ -2404,6 +2417,7 @@ const translations = {
         "calendar.allDay": "Todo el Día",
         "calendar.coach": "Coach",
         "calendar.participants": "Participantes",
+        "calendar.inviteUsers": "Invitar Usuarios",
         "calendar.location": "Ubicación",
         "calendar.description": "Descripción",
         "calendar.sessionType": "Tipo de Sesión",
@@ -2511,7 +2525,19 @@ const translations = {
         "notification_title": "Notificación",
         "validation_errors_title": "Errores de validación:",
         "confirm_delete_file": "¿Estás seguro de que deseas eliminar este archivo?",
-        "required_fields_note": "Campos obligatorios"
+        "required_fields_note": "Campos obligatorios",
+        // Módulo de Notificaciones
+        "sidebar.notifications": "Notificaciones",
+        "notifications.title": "Notificaciones",
+        "notifications.markAllAsRead": "Marcar todas como leídas",
+        "notifications.viewAll": "Ver todas las notificaciones",
+        "notifications.noUnread": "No tienes notificaciones sin leer",
+        "notifications.noNotifications": "No tienes notificaciones",
+        "pagination.previous": "Anterior",
+        "pagination.next": "Siguiente",
+        "pagination.page": "Página",
+        "notification_types.session_scheduled_by_coach": "Nueva sesión programada",
+        "notification_types.calendar_event_scheduled_for_client": "Nuevo evento en el calendario"
     }
 };
 

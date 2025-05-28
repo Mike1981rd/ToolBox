@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToolBox.Data;
+using ToolBox.Interfaces;
 using ToolBox.Models;
 using ToolBox.Models.ViewModels;
 
@@ -12,11 +13,13 @@ namespace ToolBox.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<SessionsController> _logger;
+        private readonly INotificationService _notificationService;
 
-        public SessionsController(ApplicationDbContext context, ILogger<SessionsController> logger)
+        public SessionsController(ApplicationDbContext context, ILogger<SessionsController> logger, INotificationService notificationService)
         {
             _context = context;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         // GET: Sessions
@@ -180,6 +183,42 @@ namespace ToolBox.Controllers
                         }
 
                         await _context.SaveChangesAsync();
+                    }
+
+                    // Trigger notification for client (if client has an associated user account)
+                    // NOTE: Currently, customers don't have user accounts in the system.
+                    // This notification would only work if we implement a Customer-User relationship
+                    // or convert customers to users with a "Client" role.
+                    try
+                    {
+                        // TODO: Once Customer-User relationship is established, uncomment this code:
+                        /*
+                        if (session.Client?.UserId != null)
+                        {
+                            var coachName = User.Identity?.Name ?? "Tu coach";
+                            var sessionData = new
+                            {
+                                SessionId = session.Id,
+                                SessionDateTime = session.SessionDateTime,
+                                CoachName = coachName
+                            };
+                            
+                            await _notificationService.CreateNotificationAsync(
+                                session.Client.UserId.Value,
+                                "session_scheduled_by_coach",
+                                sessionData
+                            );
+                        }
+                        */
+                        
+                        // For now, log that a session was created
+                        _logger.LogInformation("Session {SessionId} created for client {ClientId} by coach {CoachName}", 
+                            session.Id, session.ClientId, User.Identity?.Name ?? "Unknown");
+                    }
+                    catch (Exception notificationEx)
+                    {
+                        // Don't fail the transaction if notification fails
+                        _logger.LogError(notificationEx, "Failed to create notification for session {SessionId}", session.Id);
                     }
 
                     await transaction.CommitAsync();

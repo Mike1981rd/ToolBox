@@ -347,6 +347,29 @@ document.addEventListener('DOMContentLoaded', function() {
             $(config.clientsSelect).val(null).trigger('change');
         }
         
+        // Set users
+        const userIds = clickInfo.event.extendedProps.users?.map(u => u.id.toString()) || clickInfo.event.extendedProps.userIds || [];
+        console.log('Event data:', clickInfo.event.extendedProps);
+        console.log('Users from event:', clickInfo.event.extendedProps.users);
+        console.log('Setting user IDs:', userIds);
+        console.log('config.usersSelect:', config.usersSelect);
+        
+        // Use a small delay to ensure Select2 is ready
+        setTimeout(() => {
+            // Debug: show all available options
+            $('#userIds option').each(function() {
+                console.log('Option value:', this.value, 'text:', this.textContent);
+            });
+            
+            if (userIds.length > 0) {
+                console.log('Trying to set these user IDs:', userIds);
+                $('#userIds').val(userIds).trigger('change');
+                console.log('Final select value:', $('#userIds').val());
+            } else {
+                $('#userIds').val(null).trigger('change');
+            }
+        }, 100);
+        
         // Show delete button for edit mode
         document.getElementById('btnDeleteSession').classList.remove('d-none');
         
@@ -436,10 +459,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Initialize Select2 for clients (will be configured when loading clients)
         config.clientsSelect = $('#clientIds');
+        config.usersSelect = $('#userIds');
         
         // Load initial data
         loadCoaches();
         loadClients();
+        loadInvitableUsers();
     }
 
     // Load coaches (from Users table)
@@ -499,6 +524,47 @@ document.addEventListener('DOMContentLoaded', function() {
             config.clientsSelect = $(select);
         } catch (error) {
             console.error('Error loading clients:', error);
+        }
+    }
+    
+    // Load invitable users (excluding current coach)
+    async function loadInvitableUsers() {
+        try {
+            const response = await fetch('/api/users/invitable');
+            const users = await response.json();
+            
+            const select = document.getElementById('userIds');
+            if (!select) return; // Exit if element doesn't exist
+            
+            select.innerHTML = '';
+            
+            // Destroy Select2 only if it exists
+            if ($(select).hasClass('select2-hidden-accessible')) {
+                $(select).select2('destroy');
+            }
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.fullName || user.userName;
+                option.setAttribute('data-avatar', user.avatarUrl || '/img/default-avatar.png');
+                select.appendChild(option);
+            });
+            
+            // Initialize Select2 with custom template
+            $(select).select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Seleccionar usuarios a invitar',
+                allowClear: true,
+                dropdownParent: $('#sessionOffcanvas'),
+                templateResult: formatParticipant,
+                templateSelection: formatParticipantSelection
+            });
+            
+            // Store reference for later use
+            config.usersSelect = $(select);
+        } catch (error) {
+            console.error('Error loading invitable users:', error);
         }
     }
 
@@ -606,6 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (config.clientsSelect && config.clientsSelect.length) {
             config.clientsSelect.val(null).trigger('change');
         }
+        if (config.usersSelect && config.usersSelect.length) {
+            config.usersSelect.val(null).trigger('change');
+        }
     }
 
     // Status is now handled by select element, no need for updateSelectedStateLabel
@@ -650,6 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ubicacion: formData.get('ubicacion'),
             coachId: formData.get('coachId') ? parseInt(formData.get('coachId')) : null,
             clientIds: $(config.clientsSelect).val() ? $(config.clientsSelect).val().map(id => parseInt(id)) : [],
+            userIds: $(config.usersSelect).val() ? $(config.usersSelect).val().map(id => parseInt(id)) : [],
             tipoSesion: formData.get('tipoSesion')
         };
         

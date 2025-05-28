@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Notificaciones";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .notification-item {
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fc;
+        }
+        
+        .notification-item.unread {
+            background-color: #f0f3ff;
+            border-left: 4px solid #4e73df;
+        }
+        
+        .notification-item.read {
+            opacity: 0.7;
+        }
+        
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .notification-icon.session {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .notification-icon.calendar {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .notification-icon.default {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .notification-time {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .notification-content {
+            flex: 1;
+            margin: 0 1rem;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-message {
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+        
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @@keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    </style>
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary" data-translate-key="notifications.title">
+                        <i class="fas fa-bell me-2"></i>Notificaciones
+                    </h6>
+                    <button class="btn btn-sm btn-outline-primary" id="markAllAsReadBtn" data-translate-key="notifications.markAllAsRead">
+                        <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Notifications List -->
+                    <div id="notificationsList">
+                        <!-- Loading skeleton -->
+                        <div class="notification-skeleton">
+                            <div class="d-flex align-items-center p-3">
+                                <div class="loading-skeleton rounded-circle" style="width: 48px; height: 48px;"></div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="loading-skeleton rounded mb-2" style="height: 20px; width: 30%;"></div>
+                                    <div class="loading-skeleton rounded mb-2" style="height: 16px; width: 60%;"></div>
+                                    <div class="loading-skeleton rounded" style="height: 14px; width: 20%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- No notifications message -->
+                    <div id="noNotificationsMessage" class="text-center py-5 d-none">
+                        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                        <p class="text-muted" data-translate-key="notifications.noNotifications">No tienes notificaciones</p>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div id="paginationContainer" class="pagination-container d-none">
+                        <nav aria-label="Notifications pagination">
+                            <ul class="pagination">
+                                <li class="page-item" id="prevPageItem">
+                                    <a class="page-link" href="#" id="prevPageBtn" data-translate-key="pagination.previous">
+                                        <i class="fas fa-chevron-left"></i> Anterior
+                                    </a>
+                                </li>
+                                <li class="page-item active">
+                                    <span class="page-link" id="currentPageInfo">
+                                        <span data-translate-key="pagination.page">Página</span> <span id="currentPage">1</span>
+                                    </span>
+                                </li>
+                                <li class="page-item" id="nextPageItem">
+                                    <a class="page-link" href="#" id="nextPageBtn" data-translate-key="pagination.next">
+                                        Siguiente <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/notifications-page.js" asp-append-version="true"></script>
+}
