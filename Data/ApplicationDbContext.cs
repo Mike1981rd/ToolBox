@@ -381,13 +381,13 @@ namespace ToolBox.Data
                 .HasKey(s => s.Id);
 
             modelBuilder.Entity<Session>()
-                .HasOne(s => s.Client)
+                .HasOne(s => s.User)
                 .WithMany()
-                .HasForeignKey(s => s.ClientId)
+                .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Session>()
-                .HasIndex(s => new { s.ClientId, s.SessionDateTime });
+                .HasIndex(s => new { s.UserId, s.SessionDateTime });
 
             modelBuilder.Entity<Session>()
                 .Property(s => s.KeyPoints)

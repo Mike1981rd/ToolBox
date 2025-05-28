@@ -13,9 +13,9 @@ namespace ToolBox.Models.ViewModels
 
     public class SessionCreateViewModel
     {
-        [Required(ErrorMessage = "El cliente es requerido")]
-        [Display(Name = "Cliente")]
-        public int ClientId { get; set; }
+        [Required(ErrorMessage = "El usuario es requerido")]
+        [Display(Name = "Usuario")]
+        public int UserId { get; set; }
 
         [Required(ErrorMessage = "La fecha y hora de la sesión es requerida")]
         [Display(Name = "Fecha y hora de la sesión")]

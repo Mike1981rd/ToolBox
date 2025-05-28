@@ -10,8 +10,8 @@ namespace ToolBox.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El cliente es requerido")]
-        public int ClientId { get; set; }
+        [Required(ErrorMessage = "El usuario es requerido")]
+        public int UserId { get; set; }
 
         [Required(ErrorMessage = "La fecha y hora de la sesión es requerida")]
         public DateTime SessionDateTime { get; set; }
@@ -44,8 +44,8 @@ namespace ToolBox.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        [ForeignKey("ClientId")]
-        public virtual Customer Client { get; set; } = null!;
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; } = null!;
 
         public virtual ICollection<SessionFile> SessionFiles { get; set; } = new List<SessionFile>();
     }

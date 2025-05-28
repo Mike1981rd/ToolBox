@@ -30,7 +30,7 @@ namespace ToolBox.Controllers
             ViewBag.CurrentStatusFilter = statusFilter;
 
             var query = _context.Sessions
-                .Include(s => s.Client)
+                .Include(s => s.User)
                 .AsQueryable();
 
             // Apply status filter
@@ -65,19 +65,18 @@ namespace ToolBox.Controllers
         // GET: Sessions/Create
         public async Task<IActionResult> Create()
         {
-            // Get active clients for dropdown
-            var activeClients = await _context.Customers
-                .Where(c => c.IsActive)
-                .OrderBy(c => c.FirstName)
-                .ThenBy(c => c.LastName)
-                .Select(c => new
+            // Get active users for dropdown
+            var activeUsers = await _context.Users
+                .Where(u => u.IsActive)
+                .OrderBy(u => u.FullName)
+                .Select(u => new
                 {
-                    c.Id,
-                    FullName = c.FirstName + " " + c.LastName
+                    u.Id,
+                    u.FullName
                 })
                 .ToListAsync();
 
-            ViewBag.Clients = activeClients;
+            ViewBag.Users = activeUsers;
             return View();
         }
 
@@ -122,7 +121,7 @@ namespace ToolBox.Controllers
                 {
                     var session = new Session
                     {
-                        ClientId = model.ClientId,
+                        UserId = model.UserId,
                         SessionDateTime = DateTime.SpecifyKind(model.SessionDateTime, DateTimeKind.Utc),
                         NextSessionDateTime = model.NextSessionDateTime.HasValue 
                             ? DateTime.SpecifyKind(model.NextSessionDateTime.Value, DateTimeKind.Utc) 
@@ -204,7 +203,7 @@ namespace ToolBox.Controllers
                             };
                             
                             await _notificationService.CreateNotificationAsync(
-                                session.Client.UserId.Value,
+                                session.UserId,
                                 "session_scheduled_by_coach",
                                 sessionData
                             );
@@ -212,8 +211,8 @@ namespace ToolBox.Controllers
                         */
                         
                         // For now, log that a session was created
-                        _logger.LogInformation("Session {SessionId} created for client {ClientId} by coach {CoachName}", 
-                            session.Id, session.ClientId, User.Identity?.Name ?? "Unknown");
+                        _logger.LogInformation("Session {SessionId} created for user {UserId} by coach {CoachName}", 
+                            session.Id, session.UserId, User.Identity?.Name ?? "Unknown");
                     }
                     catch (Exception notificationEx)
                     {
@@ -234,18 +233,17 @@ namespace ToolBox.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            var activeClients = await _context.Customers
-                .Where(c => c.IsActive)
-                .OrderBy(c => c.FirstName)
-                .ThenBy(c => c.LastName)
-                .Select(c => new
+            var activeUsers = await _context.Users
+                .Where(u => u.IsActive)
+                .OrderBy(u => u.FullName)
+                .Select(u => new
                 {
-                    c.Id,
-                    FullName = c.FirstName + " " + c.LastName
+                    u.Id,
+                    u.FullName
                 })
                 .ToListAsync();
 
-            ViewBag.Clients = activeClients;
+            ViewBag.Users = activeUsers;
             return View("Create", model);
         }
 
@@ -253,7 +251,7 @@ namespace ToolBox.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var session = await _context.Sessions
-                .Include(s => s.Client)
+                .Include(s => s.User)
                 .Include(s => s.SessionFiles)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
@@ -262,22 +260,21 @@ namespace ToolBox.Controllers
                 return NotFound();
             }
 
-            // Get active clients for dropdown
-            var activeClients = await _context.Customers
-                .Where(c => c.IsActive)
-                .OrderBy(c => c.FirstName)
-                .ThenBy(c => c.LastName)
-                .Select(c => new
+            // Get active users for dropdown
+            var activeUsers = await _context.Users
+                .Where(u => u.IsActive)
+                .OrderBy(u => u.FullName)
+                .Select(u => new
                 {
-                    c.Id,
-                    FullName = c.FirstName + " " + c.LastName
+                    u.Id,
+                    u.FullName
                 })
                 .ToListAsync();
 
             var viewModel = new SessionEditViewModel
             {
                 Id = session.Id,
-                ClientId = session.ClientId,
+                UserId = session.UserId,
                 SessionDateTime = session.SessionDateTime,
                 NextSessionDateTime = session.NextSessionDateTime,
                 KeyPoints = session.KeyPoints,
@@ -290,7 +287,7 @@ namespace ToolBox.Controllers
                 SessionFiles = session.SessionFiles.ToList()
             };
 
-            ViewBag.Clients = activeClients;
+            ViewBag.Users = activeUsers;
             return View(viewModel);
         }
 
@@ -345,7 +342,7 @@ namespace ToolBox.Controllers
                     }
 
                     // Update session properties
-                    session.ClientId = model.ClientId;
+                    session.UserId = model.UserId;
                     session.SessionDateTime = DateTime.SpecifyKind(model.SessionDateTime, DateTimeKind.Utc);
                     session.NextSessionDateTime = model.NextSessionDateTime.HasValue 
                         ? DateTime.SpecifyKind(model.NextSessionDateTime.Value, DateTimeKind.Utc) 
@@ -430,14 +427,13 @@ namespace ToolBox.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            var activeClients = await _context.Customers
-                .Where(c => c.IsActive)
-                .OrderBy(c => c.FirstName)
-                .ThenBy(c => c.LastName)
-                .Select(c => new
+            var activeUsers = await _context.Users
+                .Where(u => u.IsActive)
+                .OrderBy(u => u.FullName)
+                .Select(u => new
                 {
-                    c.Id,
-                    FullName = c.FirstName + " " + c.LastName
+                    u.Id,
+                    u.FullName
                 })
                 .ToListAsync();
 
@@ -446,7 +442,7 @@ namespace ToolBox.Controllers
                 .Where(sf => sf.SessionId == id)
                 .ToListAsync();
 
-            ViewBag.Clients = activeClients;
+            ViewBag.Users = activeUsers;
             return View("Edit", model);
         }
 

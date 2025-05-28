@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Editar Sesión";
     Layout = "_AdminLayout";
-    var clients = ViewBag.Clients as dynamic;
+    var users = ViewBag.Users as dynamic;
 }
 
 <!-- Breadcrumbs -->
@@ -28,27 +28,27 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <!-- Cliente -->
+                        <!-- Usuario -->
                         <div class="col-12">
-                            <label asp-for="ClientId" class="form-label" data-translate-key="field_client">Cliente <span class="text-danger">*</span></label>
-                            <select asp-for="ClientId" class="form-select" required>
-                                <option value="" data-translate-key="select_client_placeholder">Seleccione un cliente</option>
-                                @if (clients != null)
+                            <label asp-for="UserId" class="form-label" data-translate-key="field_user">Usuario <span class="text-danger">*</span></label>
+                            <select asp-for="UserId" class="form-select" required>
+                                <option value="" data-translate-key="select_user_placeholder">Seleccione un usuario</option>
+                                @if (users != null)
                                 {
-                                    @foreach (var client in clients)
+                                    @foreach (var user in users)
                                     {
-                                        @if (client.Id == Model.ClientId)
+                                        @if (user.Id == Model.UserId)
                                         {
-                                            <option value="@client.Id" selected>@client.FullName</option>
+                                            <option value="@user.Id" selected>@user.FullName</option>
                                         }
                                         else
                                         {
-                                            <option value="@client.Id">@client.FullName</option>
+                                            <option value="@user.Id">@user.FullName</option>
                                         }
                                     }
                                 }
                             </select>
-                            <span asp-validation-for="ClientId" class="text-danger"></span>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
                         </div>
 
                         <!-- Fecha y Hora de Sesión -->
