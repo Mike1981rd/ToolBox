@@ -1,0 +1,153 @@
+@model ToolBox.Models.ViewModels.LifeEventViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Evento - Línea de la Vida";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .impact-badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.5rem;
+        }
+        
+        .delete-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .event-details {
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        @@media (max-width: 768px) {
+            .event-details {
+                padding: 1rem;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" data-translate-key="life_events.delete_title">Eliminar Evento</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" data-translate-key="common.dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")" data-translate-key="life_events.page_title">Línea de la Vida</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" data-translate-key="life_events.delete_title">Eliminar Evento</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i><span data-translate-key="common.back">Volver</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span data-translate-key="life_events.confirm_delete">Confirmar Eliminación</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Warning Message -->
+                    <div class="delete-warning">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle text-warning fs-3 me-3"></i>
+                            <div>
+                                <h6 class="mb-1" data-translate-key="life_events.delete_warning_title">¿Estás seguro de que deseas eliminar este evento?</h6>
+                                <p class="mb-0 text-muted" data-translate-key="life_events.delete_warning_message">
+                                    Esta acción no se puede deshacer. El evento será eliminado permanentemente de tu línea de la vida.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Details -->
+                    <div class="event-details">
+                        <h6 class="mb-3" data-translate-key="life_events.event_to_delete">Evento a eliminar:</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" data-translate-key="life_events.form.title">Título del Evento:</label>
+                                    <p class="mb-0">@Model.EventTitle</p>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.Description))
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold" data-translate-key="life_events.form.description">Descripción:</label>
+                                        <p class="mb-0">@Model.Description</p>
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" data-translate-key="life_events.form.year">Año:</label>
+                                    <p class="mb-0 fs-5 fw-bold text-primary">@Model.EventYear</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" data-translate-key="life_events.form.impact">Impacto:</label>
+                                    <div>
+                                        <span class="badge impact-badge @Model.ImpactScoreCssClass">
+                                            @Model.ImpactScoreText (@Model.ImpactScore)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i><span data-translate-key="common.cancel">Cancelar</span>
+                        </a>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input asp-for="Id" type="hidden" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás completamente seguro de que deseas eliminar este evento?')">
+                                <i class="fas fa-trash me-1"></i><span data-translate-key="life_events.confirm_delete_button">Sí, Eliminar Evento</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add confirmation dialog
+            const deleteForm = document.querySelector('form[asp-action="Delete"]');
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    const confirmed = confirm('¿Estás completamente seguro de que deseas eliminar este evento?\n\nEsta acción no se puede deshacer.');
+                    if (!confirmed) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+}

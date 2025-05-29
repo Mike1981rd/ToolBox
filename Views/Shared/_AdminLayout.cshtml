@@ -129,6 +129,13 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("LifeEvents"))
+                {
+                    <a href="@Url.Action("Index", "LifeEvents")" class="list-group-item list-group-item-action" data-translate-key="sidebar.lifeEvents">
+                        <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">Life Line</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("LifeAssessment"))
                 {
                     <a href="@Url.Action("Index", "LifeAssessment")" class="list-group-item list-group-item-action" data-translate-key="sidebar.lifeAssessmentQuestionnaires">

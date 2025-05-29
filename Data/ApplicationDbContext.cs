@@ -43,6 +43,7 @@ namespace ToolBox.Data
         public DbSet<QuestionTemplate> QuestionTemplates { get; set; }
         public DbSet<QuestionnaireInstance> QuestionnaireInstances { get; set; }
         public DbSet<Answer> Answers { get; set; }
+        public DbSet<LifeEvent> LifeEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -795,6 +796,32 @@ namespace ToolBox.Data
 
             modelBuilder.Entity<CategoriaHabito>().HasData(categoriasHabitos);
             modelBuilder.Entity<FrecuenciaHabito>().HasData(frecuenciasHabitos);
+
+            // LifeEvent configuration
+            modelBuilder.Entity<LifeEvent>()
+                .HasKey(le => le.Id);
+
+            modelBuilder.Entity<LifeEvent>()
+                .HasOne(le => le.User)
+                .WithMany()
+                .HasForeignKey(le => le.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LifeEvent>()
+                .Property(le => le.EventTitle)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            modelBuilder.Entity<LifeEvent>()
+                .Property(le => le.Description)
+                .HasColumnType("TEXT");
+
+            // Create indexes for better query performance
+            modelBuilder.Entity<LifeEvent>()
+                .HasIndex(le => le.UserId);
+
+            modelBuilder.Entity<LifeEvent>()
+                .HasIndex(le => new { le.UserId, le.EventYear });
         }
     }
 }

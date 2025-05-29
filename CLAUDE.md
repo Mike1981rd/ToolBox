@@ -783,6 +783,151 @@ Si ya se crearon migraciones con conflictos:
 3. Comentar InsertData/DeleteData de permisos si hay conflictos
 4. Usuario ejecuta: `Update-Database`
 
+## 🔧 SOLUCIÓN DEFINITIVA: GRÁFICAS BORROSAS EN CHART.JS
+
+### 🚨 PROBLEMA RECURRENTE
+**Síntomas:**
+- Texto borroso en gráficas de Chart.js
+- Líneas y puntos se ven pixelados
+- Mala calidad visual en pantallas de alta resolución (Retina, 4K)
+
+**Causas:**
+- Chart.js no maneja automáticamente el `devicePixelRatio`
+- Fuentes predeterminadas no están optimizadas
+- Canvas no está configurado para pantallas de alta densidad
+
+### ✅ SOLUCIÓN COMPLETA Y FUNCIONAL
+
+#### Paso 1: CSS para Canvas (obligatorio)
+```css
+.chart-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+```
+
+#### Paso 2: Configuración Chart.js (copiar exacto)
+```javascript
+new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: { /* tus datos */ },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        
+        // 🚨 CRÍTICO: Configuración para pantallas de alta resolución
+        devicePixelRatio: window.devicePixelRatio || 2,
+        
+        // 🚨 CRÍTICO: Configuración de fuentes optimizada
+        scales: {
+            y: {
+                ticks: {
+                    font: {
+                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                        size: 12,
+                        weight: '500'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Título del Eje',
+                    font: {
+                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                        size: 13,
+                        weight: '600'
+                    }
+                }
+            }
+        }
+    }
+});
+```
+
+#### Paso 3: Configuración del Contenedor
+```css
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin: 2rem 0;
+}
+```
+
+### 🎯 IMPLEMENTACIÓN RÁPIDA (5 MINUTOS)
+
+Para cualquier gráfica nueva, copiar exactamente:
+
+```javascript
+// Plantilla completa para gráficas nítidas
+new Chart(document.getElementById('miGrafica').getContext('2d'), {
+    type: 'line', // o 'bar', 'pie', etc.
+    data: {
+        labels: tusDatos.labels,
+        datasets: tusDatos.datasets
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        devicePixelRatio: window.devicePixelRatio || 2, // 🚨 OBLIGATORIO
+        
+        scales: {
+            y: {
+                ticks: {
+                    font: {
+                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            }
+        }
+    }
+});
+```
+
+### 📝 CHECKLIST PARA GRÁFICAS NÍTIDAS
+
+- [ ] Agregar CSS `image-rendering` al canvas
+- [ ] Configurar `devicePixelRatio: window.devicePixelRatio || 2`
+- [ ] Definir fuentes personalizadas en `ticks.font`
+- [ ] Usar familia de fuente optimizada: `'Inter, system-ui, -apple-system, sans-serif'`
+- [ ] Configurar `responsive: true` y `maintainAspectRatio: false`
+
+### ⚠️ ERRORES QUE EVITAR
+
+```javascript
+// ❌ NO HAGAS ESTO
+new Chart(ctx, {
+    // Sin devicePixelRatio - causará texto borroso
+    // Sin configuración de fuentes - usará defaults pixelados
+});
+
+// ❌ NO OLVIDES EL CSS
+// Sin image-rendering en canvas - no funcionará
+```
+
+**RESULTADO:** Gráficas perfectamente nítidas en cualquier pantalla (1080p, 4K, Retina).
+
+---
+
 ## 💡 Soluciones Rápidas a Problemas Comunes
 
 ```csharp
