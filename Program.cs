@@ -52,6 +52,7 @@ builder.Services.AddScoped<ISesionCalendarioService, SesionCalendarioService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationPreferenceService, NotificationPreferenceService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IQuestionnaireTemplateService, QuestionnaireTemplateService>();
 
 var app = builder.Build();
 

@@ -79,7 +79,7 @@
     opacity: 0.5;
 }
 
-/* Event styling as pills */
+/* Event styling as pills - Adjusted to fit text */
 .fc-event {
     border: none !important;
     border-radius: 20px !important;
@@ -89,6 +89,9 @@
     font-weight: 500 !important;
     cursor: pointer;
     transition: all 0.2s ease;
+    width: auto !important;
+    max-width: fit-content !important;
+    display: inline-block !important;
 }
 
 .fc-event:hover {
@@ -113,8 +116,37 @@
 
 .fc-event-title {
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible !important;
+    text-overflow: initial !important;
+}
+
+/* Force event content to fit */
+.fc-event-main {
+    width: auto !important;
+    min-width: auto !important;
+}
+
+.fc-event-title-container {
+    width: auto !important;
+}
+
+/* Calendar view specific adjustments */
+.fc-daygrid-event {
+    width: auto !important;
+    max-width: fit-content !important;
+}
+
+.fc-timegrid-event {
+    width: auto !important;
+    min-width: auto !important;
+}
+
+/* Fix for badges in sidebar filters */
+.form-check-label .badge {
+    width: 12px !important;
+    height: 12px !important;
+    padding: 0 !important;
+    display: inline-block !important;
 }
 
 /* Event colors based on status */

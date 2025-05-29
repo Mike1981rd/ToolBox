@@ -39,6 +39,10 @@ namespace ToolBox.Data
         public DbSet<SessionFile> SessionFiles { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationPreference> NotificationPreferences { get; set; }
+        public DbSet<QuestionnaireTemplate> QuestionnaireTemplates { get; set; }
+        public DbSet<QuestionTemplate> QuestionTemplates { get; set; }
+        public DbSet<QuestionnaireInstance> QuestionnaireInstances { get; set; }
+        public DbSet<Answer> Answers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -456,6 +460,106 @@ namespace ToolBox.Data
             modelBuilder.Entity<NotificationPreference>()
                 .HasIndex(np => new { np.UserId, np.NotificationType })
                 .IsUnique();
+
+            // QuestionnaireTemplate configuration
+            modelBuilder.Entity<QuestionnaireTemplate>()
+                .HasKey(qt => qt.Id);
+
+            modelBuilder.Entity<QuestionnaireTemplate>()
+                .HasOne(qt => qt.Coach)
+                .WithMany()
+                .HasForeignKey(qt => qt.CoachId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionnaireTemplate>()
+                .HasIndex(qt => qt.CoachId);
+
+            modelBuilder.Entity<QuestionnaireTemplate>()
+                .HasIndex(qt => qt.CreatedAt);
+
+            modelBuilder.Entity<QuestionnaireTemplate>()
+                .Property(qt => qt.Description)
+                .HasColumnType("TEXT");
+
+            // QuestionTemplate configuration
+            modelBuilder.Entity<QuestionTemplate>()
+                .HasKey(q => q.Id);
+
+            modelBuilder.Entity<QuestionTemplate>()
+                .HasOne(q => q.QuestionnaireTemplate)
+                .WithMany(qt => qt.Questions)
+                .HasForeignKey(q => q.QuestionnaireTemplateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionTemplate>()
+                .HasIndex(q => new { q.QuestionnaireTemplateId, q.Order });
+
+            modelBuilder.Entity<QuestionTemplate>()
+                .Property(q => q.QuestionText)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<QuestionTemplate>()
+                .Property(q => q.OptionsJson)
+                .HasColumnType("TEXT");
+
+            // QuestionnaireInstance configuration
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .ToTable("QuestionnaireInstances");
+                
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasKey(qi => qi.Id);
+
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasOne(qi => qi.QuestionnaireTemplate)
+                .WithMany()
+                .HasForeignKey(qi => qi.QuestionnaireTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasOne(qi => qi.Client)
+                .WithMany()
+                .HasForeignKey(qi => qi.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasOne(qi => qi.AssignedByCoach)
+                .WithMany()
+                .HasForeignKey(qi => qi.AssignedByCoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasIndex(qi => new { qi.ClientId, qi.Status });
+
+            modelBuilder.Entity<QuestionnaireInstance>()
+                .HasIndex(qi => qi.AssignedAt);
+
+            // Answer configuration
+            modelBuilder.Entity<Answer>()
+                .ToTable("Answers");
+                
+            modelBuilder.Entity<Answer>()
+                .HasKey(a => a.Id);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.QuestionnaireInstance)
+                .WithMany(qi => qi.Answers)
+                .HasForeignKey(a => a.QuestionnaireInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.QuestionTemplate)
+                .WithMany()
+                .HasForeignKey(a => a.QuestionTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Answer>()
+                .Property(a => a.ResponseText)
+                .HasColumnType("TEXT");
+
+            // Índice único para evitar respuestas duplicadas
+            modelBuilder.Entity<Answer>()
+                .HasIndex(a => new { a.QuestionnaireInstanceId, a.QuestionTemplateId })
+                .IsUnique();
         }
 
         private void SeedPermissions(ModelBuilder modelBuilder)
@@ -485,7 +589,8 @@ namespace ToolBox.Data
                 "WebsiteSettings",
                 "WelcomeMessage",
                 "Calendario",
-                "Sessions"
+                "Sessions",
+                "QuestionnaireTemplates"
             };
 
             var actions = new[]
@@ -529,6 +634,7 @@ namespace ToolBox.Data
                 "EmailContents" or "WebsiteSettings" or "WelcomeMessage" => "Configuración",
                 "Calendario" or "Sessions" => "Gestión de Sesiones",
                 "Notifications" => "General",
+                "QuestionnaireTemplates" => "Herramientas de Evaluación",
                 _ => "Otros"
             };
         }
@@ -558,6 +664,7 @@ namespace ToolBox.Data
                 "Calendario" => "Calendario de Sesiones",
                 "Sessions" => "Sesiones",
                 "Notifications" => "Notificaciones",
+                "QuestionnaireTemplates" => "Cuestionarios",
                 _ => module
             };
         }

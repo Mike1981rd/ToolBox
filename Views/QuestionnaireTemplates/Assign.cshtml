@@ -1,0 +1,124 @@
+@model ToolBox.Models.ViewModels.AssignQuestionnaireViewModel
+
+@{
+    ViewData["Title"] = "Asignar Cuestionario";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light" data-translate-key="questionnaire_templates">Plantillas de Cuestionarios</span> /
+        <span data-translate-key="assign_questionnaire">Asignar Cuestionario</span>
+    </h4>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" data-translate-key="questionnaire_details">Detalles del Cuestionario</h5>
+                    <small class="text-muted float-end" data-translate-key="required_fields">Campos Requeridos</small>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Assign" method="post">
+                        <input type="hidden" asp-for="QuestionnaireTemplateId" />
+                        <input type="hidden" asp-for="TemplateTitle" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label" data-translate-key="questionnaire_title">Título del Cuestionario</label>
+                            <input type="text" class="form-control" value="@Model.TemplateTitle" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="SelectedClientIds" class="form-label" data-translate-key="select_clients">
+                                Seleccionar Clientes <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="SelectedClientIds" class="form-select" multiple required>
+                                @foreach (var client in Model.AvailableClients)
+                                {
+                                    <option value="@client.Value">@client.Text</option>
+                                }
+                            </select>
+                            <div class="form-text" data-translate-key="select_clients_help">
+                                Seleccione uno o más clientes para asignar este cuestionario. Use Ctrl+Click para selección múltiple.
+                            </div>
+                            <span asp-validation-for="SelectedClientIds" class="text-danger"></span>
+                        </div>
+
+                        @if (Model.AlreadyAssignedClients.Any())
+                        {
+                            <div class="alert alert-info" role="alert">
+                                <h6 class="alert-heading mb-2" data-translate-key="already_assigned">
+                                    <i class="fas fa-info-circle"></i> Clientes ya asignados
+                                </h6>
+                                <div class="small">
+                                    @foreach (var assignment in Model.AlreadyAssignedClients)
+                                    {
+                                        <div class="mb-1">
+                                            <strong>@assignment.ClientName</strong> - 
+                                            <span class="badge @(assignment.Status == QuestionnaireStatus.Completed ? "bg-success" : assignment.Status == QuestionnaireStatus.InProgress ? "bg-warning" : "bg-secondary")">
+                                                @assignment.Status.GetDisplayName()
+                                            </span>
+                                            <small class="text-muted">
+                                                (Asignado: @assignment.AssignedAt.ToString("dd/MM/yyyy HH:mm"))
+                                            </small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="pt-4">
+                            <button type="submit" class="btn btn-primary me-sm-3 me-1" data-translate-key="assign">
+                                <i class="fas fa-paper-plane"></i> Asignar
+                            </button>
+                            <a asp-action="Index" class="btn btn-label-secondary" data-translate-key="cancel">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" data-translate-key="assignment_info">Información de Asignación</h5>
+                    <p class="card-text text-muted" data-translate-key="assignment_info_text">
+                        Al asignar este cuestionario:
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <span data-translate-key="assignment_benefit_1">Los clientes recibirán una notificación</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <span data-translate-key="assignment_benefit_2">Podrán completar el cuestionario en su panel</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <span data-translate-key="assignment_benefit_3">Podrás ver las respuestas una vez completadas</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectElement = document.getElementById('SelectedClientIds');
+            
+            // Inicializar Select2 para mejor experiencia de selección múltiple
+            if (typeof $ !== 'undefined' && $.fn.select2) {
+                $(selectElement).select2({
+                    placeholder: 'Seleccione clientes...',
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
+        });
+    </script>
+}

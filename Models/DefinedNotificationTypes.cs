@@ -13,7 +13,9 @@ namespace ToolBox.Models
             { "task_completed", "notification_type_task_completed" },
             { "progress_update", "notification_type_progress_update" },
             { "habit_reminder", "notification_type_habit_reminder" },
-            { "achievement_unlocked", "notification_type_achievement_unlocked" }
+            { "achievement_unlocked", "notification_type_achievement_unlocked" },
+            { "questionnaire_assigned", "notification_type_questionnaire_assigned" },
+            { "questionnaire_completed_by_client", "notification_type_questionnaire_completed" }
         };
 
         public static IEnumerable<string> GetAllTypeKeys() => Types.Keys;

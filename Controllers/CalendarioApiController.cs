@@ -8,7 +8,7 @@ namespace ToolBox.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class CalendarioApiController : ControllerBase
+    public class CalendarioApiController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CalendarioApiController> _logger;
@@ -413,18 +413,6 @@ namespace ToolBox.Controllers
             }
         }
 
-        private int GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(userIdClaim, out int userId))
-            {
-                return userId;
-            }
-
-            // For development - return test user while login is not implemented
-            // TODO: Remove this when real authentication is implemented
-            return 1; // Test user ID
-        }
     }
 
     public class CreateSessionDto

@@ -437,11 +437,6 @@ namespace ToolBox.Controllers
             return Json(new { success = true, message = "Video Management Controller is working", timestamp = DateTime.Now });
         }
         
-        private int GetCurrentUserId()
-        {
-            // TODO: Get actual user ID from authentication
-            return 1;
-        }
     }
 
     public class DeleteVideoRequest

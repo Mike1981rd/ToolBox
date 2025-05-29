@@ -1,0 +1,217 @@
+/* Questionnaire Templates Styles */
+
+/* Bootstrap Badge Override for Question Cards */
+.question-item .badge {
+    min-width: auto !important;
+    width: auto !important;
+    display: inline-block !important;
+}
+
+/* Question Cards */
+.question-item {
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.question-item:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.question-drag-handle {
+    cursor: move;
+    padding: 0.5rem;
+}
+
+.question-drag-handle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0.25rem;
+}
+
+/* Question Meta - Fix for overlapping badges */
+.question-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.question-meta .badge {
+    display: inline-flex !important;
+    align-items: center;
+    white-space: nowrap;
+    width: auto !important;
+    max-width: fit-content !important;
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500;
+    line-height: 1;
+    vertical-align: baseline;
+}
+
+/* Specific badge styles */
+.question-meta .badge.bg-info {
+    background-color: #0dcaf0 !important;
+    color: #000 !important;
+}
+
+.question-meta .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+/* Question Text */
+.question-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #344054;
+    margin-bottom: 0.5rem;
+}
+
+/* Question Actions */
+.question-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.question-actions .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Question Options */
+.question-options {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.75rem;
+}
+
+.question-options ul {
+    margin-bottom: 0;
+    padding-left: 1.25rem;
+}
+
+.question-options li {
+    color: #6c757d;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    opacity: 0.5;
+}
+
+/* Sortable States */
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.sortable-drag {
+    background-color: #fff;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Styles */
+#questionModal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Option Items */
+.option-item,
+.likert-option-item {
+    margin-bottom: 0.5rem;
+}
+
+/* Modern delete buttons for options */
+.remove-option-btn,
+.remove-likert-option-btn {
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease;
+    border-color: #dc3545 !important;
+    flex-shrink: 0;
+}
+
+.remove-option-btn:hover,
+.remove-likert-option-btn:hover {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    transform: scale(1.05);
+}
+
+.remove-option-btn i,
+.remove-likert-option-btn i {
+    transition: transform 0.2s ease;
+}
+
+.remove-option-btn:hover i,
+.remove-likert-option-btn:hover i {
+    transform: rotate(-10deg);
+}
+
+/* Option items with gap */
+.option-item,
+.likert-option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.option-item .form-control {
+    flex: 1;
+}
+
+/* Bootstrap gap utilities for spacing */
+.gap-2 {
+    gap: 0.5rem !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+    .question-item .row {
+        flex-direction: column;
+    }
+    
+    .question-drag-handle {
+        display: none;
+    }
+    
+    .question-actions {
+        margin-top: 0.5rem;
+    }
+    
+    .question-meta {
+        margin-top: 0.5rem;
+    }
+}
+
+/* Fix for ALL badges in questionnaire module to fit text */
+.badge {
+    display: inline-block !important;
+    width: auto !important;
+    max-width: fit-content !important;
+    padding: 0.35rem 0.65rem !important;
+    white-space: nowrap;
+}
+
+/* Specific fix for table badges in AllAssignments view */
+.table .badge {
+    min-width: auto !important;
+    width: auto !important;
+    display: inline-block !important;
+    font-size: 0.75rem !important;
+}
+
+/* Status badges specific styling */
+.badge.bg-secondary,
+.badge.bg-warning,
+.badge.bg-success,
+.badge.bg-primary,
+.badge.bg-info,
+.badge.bg-danger {
+    width: auto !important;
+    padding: 0.25rem 0.5rem !important;
+}

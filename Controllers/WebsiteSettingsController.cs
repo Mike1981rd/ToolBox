@@ -304,12 +304,6 @@ namespace ToolBox.Controllers
             }
         }
 
-        private int GetCurrentUserId()
-        {
-            // TODO: Obtener el usuario actual desde la sesión o claims
-            // Por ahora retornamos un ID hardcodeado para pruebas
-            return 1;
-        }
 
         #endregion
     }

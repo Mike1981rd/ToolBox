@@ -1,0 +1,270 @@
+@model ToolBox.Models.ViewModels.ViewResponsesViewModel
+
+@{
+    ViewData["Title"] = "Ver Respuestas";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/questionnaire-templates.css" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-gray-800">Ver Respuestas del Cuestionario</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "QuestionnaireTemplates")">Cuestionarios</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("AllAssignments", "QuestionnaireTemplates")">Asignaciones</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Ver Respuestas</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("ExportResponses", "QuestionnaireTemplates", new { instanceId = Model.InstanceId })" 
+               class="btn btn-outline-primary">
+                <i class="fas fa-download me-1"></i>Exportar PDF
+            </a>
+            <a href="@Url.Action("AllAssignments", "QuestionnaireTemplates")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Información del Cuestionario -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Información del Cuestionario</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-dark">@Model.QuestionnaireTitle</h5>
+                    @if (!string.IsNullOrEmpty(Model.QuestionnaireDescription))
+                    {
+                        <p class="text-muted mb-3">@Model.QuestionnaireDescription</p>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <div class="text-md-end">
+                        <p class="mb-1"><strong>Cliente:</strong> @Model.ClientName</p>
+                        <p class="mb-1"><strong>Asignado:</strong> @Model.AssignedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p class="mb-1"><strong>Completado:</strong> @(Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "No completado")</p>
+                        <span class="badge bg-@(Model.Status == ToolBox.Models.QuestionnaireStatus.Completed ? "success" : Model.Status == ToolBox.Models.QuestionnaireStatus.InProgress ? "warning" : "secondary")">
+                            @(Model.Status == ToolBox.Models.QuestionnaireStatus.Completed ? "Completado" : Model.Status == ToolBox.Models.QuestionnaireStatus.InProgress ? "En Progreso" : "Pendiente")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.QuestionAnswers != null && Model.QuestionAnswers.Any())
+    {
+        <!-- Respuestas -->
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Respuestas (@Model.QuestionAnswers.Count preguntas)</h6>
+            </div>
+            <div class="card-body">
+                @foreach (var question in Model.QuestionAnswers)
+                {
+                    <div class="question-container mb-4 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h6 class="text-dark mb-0">
+                                <span class="badge bg-primary me-2">@question.QuestionOrder</span>
+                                @question.QuestionText
+                            </h6>
+                            <span class="badge bg-info">@question.QuestionType.ToString()</span>
+                        </div>
+
+
+                        <div class="answer-section">
+                            @if (string.IsNullOrEmpty(question.ClientResponseText))
+                            {
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    No respondida
+                                </div>
+                            }
+                            else
+                            {
+                                @switch (question.QuestionType.ToString())
+                                {
+                                    case "SingleChoice":
+                                        <div class="single-choice-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-check-circle me-1"></i>Respuesta seleccionada:
+                                            </h6>
+                                            <div class="p-2 bg-white border border-success rounded">
+                                                @question.ClientResponseText
+                                            </div>
+                                            @if (question.OriginalOptions != null && question.OriginalOptions.Any())
+                                            {
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Otras opciones disponibles:</small>
+                                                    <ul class="list-unstyled mt-1">
+                                                        @foreach (var option in question.OriginalOptions.Where(o => o != question.ClientResponseText))
+                                                        {
+                                                            <li class="text-muted small">• @option</li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            }
+                                        </div>
+                                        break;
+
+                                    case "MultipleChoice":
+                                        <div class="multiple-choice-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-check-square me-1"></i>Respuestas seleccionadas:
+                                            </h6>
+                                            <div class="row">
+                                                @if (question.OriginalOptions != null && question.OriginalOptions.Any())
+                                                {
+                                                    @foreach (var option in question.OriginalOptions)
+                                                    {
+                                                        var isSelected = question.ClientMultipleChoiceResponse.Contains(option);
+                                                        <div class="col-md-6 mb-2">
+                                                            <div class="p-2 border rounded @(isSelected ? "bg-success text-white" : "bg-white text-muted")">
+                                                                <i class="fas fa-@(isSelected ? "check" : "times") me-1"></i>
+                                                                @option
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var answer in question.ClientMultipleChoiceResponse)
+                                                    {
+                                                        <div class="col-md-6 mb-2">
+                                                            <div class="p-2 bg-success text-white border rounded">
+                                                                <i class="fas fa-check me-1"></i>@answer
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        break;
+
+                                    case "ShortText":
+                                        <div class="short-text-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-edit me-1"></i>Respuesta de texto:
+                                            </h6>
+                                            <div class="p-3 bg-white border rounded">
+                                                @question.ClientResponseText
+                                            </div>
+                                        </div>
+                                        break;
+
+                                    case "LongText":
+                                        <div class="long-text-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-align-left me-1"></i>Respuesta detallada:
+                                            </h6>
+                                            <div class="p-3 bg-white border rounded" style="white-space: pre-wrap;">@question.ClientResponseText</div>
+                                        </div>
+                                        break;
+
+                                    case "LikertScale":
+                                        <div class="likert-scale-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-star me-1"></i>Puntuación seleccionada:
+                                            </h6>
+                                            @{
+                                                var selectedValue = question.ClientLikertResponse ?? 0;
+                                                var scaleMax = 5; // Default scale 1-5
+                                            }
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="text-muted">1</span>
+                                                <div class="d-flex gap-1">
+                                                    @for (int i = 1; i <= scaleMax; i++)
+                                                    {
+                                                        <div class="likert-item p-2 border rounded text-center @(i == selectedValue ? "bg-primary text-white" : "bg-white text-muted")" 
+                                                             style="width: 40px;">
+                                                            @if (i == selectedValue)
+                                                            {
+                                                                <i class="fas fa-check"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                @i
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <span class="text-muted">@scaleMax</span>
+                                                <div class="ms-3">
+                                                    <span class="badge bg-primary">Valor: @selectedValue</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        break;
+
+                                    default:
+                                        <div class="default-answer">
+                                            <h6 class="text-success mb-2">
+                                                <i class="fas fa-comment me-1"></i>Respuesta:
+                                            </h6>
+                                            <div class="p-3 bg-white border rounded">
+                                                @question.ClientResponseText
+                                            </div>
+                                        </div>
+                                        break;
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay preguntas en este cuestionario</h5>
+                <p class="text-muted">El cuestionario no contiene preguntas o aún no ha sido configurado.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.question-container {
+    border-left: 4px solid #4e73df;
+}
+
+.answer-section {
+    margin-left: 1rem;
+}
+
+.likert-item {
+    transition: all 0.2s ease;
+}
+
+.single-choice-answer .p-2,
+.multiple-choice-answer .p-2 {
+    transition: all 0.2s ease;
+}
+
+.long-text-answer .p-3 {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+@@media (max-width: 768px) {
+    .question-container {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .answer-section {
+        margin-left: 0;
+    }
+}
+</style>

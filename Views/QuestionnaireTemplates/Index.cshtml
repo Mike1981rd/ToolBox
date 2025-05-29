@@ -1,0 +1,134 @@
+@model object
+
+@{
+    ViewData["Title"] = "Plantillas de Cuestionarios";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title" data-translate-key="questionnaire_templates.page_title">
+                    Plantillas de Cuestionarios
+                </h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="@Url.Action("Create")" class="btn btn-primary d-none d-sm-inline-block">
+                        <i class="fas fa-plus me-2"></i>
+                        <span data-translate-key="questionnaire_templates.create_template">Crear Plantilla</span>
+                    </a>
+                    <a href="@Url.Action("Create")" class="btn btn-primary d-sm-none btn-icon">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="card-title" data-translate-key="questionnaire_templates.list_title">Mis Plantillas</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filters and Search -->
+            <div class="card-body">
+                <form method="get" class="d-flex gap-2 mb-3">
+                    <div class="input-group flex-fill">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="search" name="searchQuery" class="form-control" 
+                               placeholder="Buscar plantillas..." id="searchInput" data-translate-key="common.search_placeholder">
+                    </div>
+                    
+                    <select name="statusFilter" id="statusFilter" class="form-select" style="min-width: 120px;">
+                        <option value="active" data-translate-key="common.filter_active">Activas</option>
+                        <option value="inactive" data-translate-key="common.filter_inactive">Inactivas</option>
+                        <option value="all" data-translate-key="common.filter_all">Todas</option>
+                    </select>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <div class="mt-2 text-muted">
+                        <span data-translate-key="common.loading">Cargando plantillas...</span>
+                    </div>
+                </div>
+
+                <!-- Templates Table -->
+                <div class="table-responsive" id="templatesTableContainer">
+                    <table class="table table-vcenter" id="templatesTable">
+                        <thead>
+                            <tr>
+                                <th data-translate-key="questionnaire_templates.table.title">Título</th>
+                                <th data-translate-key="questionnaire_templates.table.description">Descripción</th>
+                                <th data-translate-key="questionnaire_templates.table.questions_count">Preguntas</th>
+                                <th data-translate-key="questionnaire_templates.table.status">Estado</th>
+                                <th data-translate-key="questionnaire_templates.table.created_at">Creada</th>
+                                <th data-translate-key="questionnaire_templates.table.actions">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="templatesTableBody">
+                            <!-- Content will be loaded via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Templates pagination" id="paginationContainer" class="mt-3" style="display: none;">
+                    <ul class="pagination pagination-sm justify-content-center">
+                        <li class="page-item" id="prevPageItem">
+                            <a class="page-link" href="#" id="prevPageLink">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link">
+                                <span data-translate-key="common.page">Página</span> <span id="currentPage">1</span>
+                            </span>
+                        </li>
+                        <li class="page-item" id="nextPageItem">
+                            <a class="page-link" href="#" id="nextPageLink">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <strong class="me-auto" data-translate-key="common.notification">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="notificationToastBody">
+            <!-- Message will be set via JavaScript -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/questionnaire-templates.js?v=@DateTime.Now.Ticks" asp-append-version="true"></script>
+}

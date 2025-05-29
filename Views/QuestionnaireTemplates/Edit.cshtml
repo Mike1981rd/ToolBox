@@ -1,0 +1,323 @@
+@model ToolBox.Models.ViewModels.QuestionnaireTemplateCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Plantilla de Cuestionario";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index")" data-translate-key="questionnaire_templates.page_title">Plantillas de Cuestionarios</a>
+                        </li>
+                        <li class="breadcrumb-item active" data-translate-key="questionnaire_templates.edit_template">
+                            Editar Plantilla
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span data-translate-key="common.back">Volver</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row">
+            <!-- Template Details -->
+            <div class="col-12 col-lg-4">
+                <form asp-action="Edit" method="post" class="card">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="Id" type="hidden" />
+                    
+                    <div class="card-header">
+                        <h3 class="card-title" data-translate-key="questionnaire_templates.template_details">
+                            Detalles de la Plantilla
+                        </h3>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label required" data-translate-key="questionnaire_templates.form.title">
+                                Título
+                            </label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label" data-translate-key="questionnaire_templates.form.description">
+                                Descripción
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>
+                            <span data-translate-key="common.save_changes">Guardar Cambios</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Template Stats -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h4 class="card-title" data-translate-key="questionnaire_templates.stats.title">
+                            Estadísticas
+                        </h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="h2 text-primary" id="questionsCount">@Model.Questions.Count</div>
+                                    <div class="text-muted" data-translate-key="questionnaire_templates.stats.questions">Preguntas</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="h2 text-info">@Model.Questions.Count(q => q.IsRequired)</div>
+                                    <div class="text-muted" data-translate-key="questionnaire_templates.stats.required">Obligatorias</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Questions Management -->
+            <div class="col-12 col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="card-title" data-translate-key="questionnaire_templates.questions_manager.title">
+                                    Constructor de Preguntas
+                                </h3>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-primary" id="addQuestionBtn">
+                                    <i class="fas fa-plus me-2"></i>
+                                    <span data-translate-key="questionnaire_templates.questions_manager.add_question">Agregar Pregunta</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Questions List -->
+                        <div id="questionsList" class="questions-container">
+                            @if (Model.Questions.Any())
+                            {
+                                @foreach (var question in Model.Questions.OrderBy(q => q.Order))
+                                {
+                                    <div class="question-item card mb-3" data-question-id="@question.Id" data-order="@question.Order">
+                                        <div class="card-body">
+                                            <div class="row align-items-start">
+                                                <div class="col-auto">
+                                                    <div class="question-drag-handle">
+                                                        <i class="fas fa-grip-vertical text-muted"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h5 class="question-text mb-1">@question.QuestionText</h5>
+                                                        <div class="question-actions">
+                                                            <button type="button" class="btn btn-sm btn-outline-primary edit-question-btn" 
+                                                                    data-question-id="@question.Id">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn" 
+                                                                    data-question-id="@question.Id">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="question-meta">
+                                                        <span class="badge bg-info me-2">@question.TypeDisplayName</span>
+                                                        @if (question.IsRequired)
+                                                        {
+                                                            <span class="badge bg-warning">Obligatoria</span>
+                                                        }
+                                                    </div>
+                                                    @if (question.Options.Any() || question.LikertOptions.Any())
+                                                    {
+                                                        <div class="question-options mt-2">
+                                                            <small class="text-muted">Opciones:</small>
+                                                            <ul class="mb-0">
+                                                                @if (question.Type == ToolBox.Models.QuestionType.LikertScale && question.LikertOptions.Any())
+                                                                {
+                                                                    @foreach (var option in question.LikertOptions)
+                                                                    {
+                                                                        <li><small>@option.Value - @option.Text</small></li>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    @foreach (var option in question.Options)
+                                                                    {
+                                                                        <li><small>@option</small></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-state text-center py-5" id="emptyQuestionsState">
+                                    <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted" data-translate-key="questionnaire_templates.questions_manager.no_questions">
+                                        No hay preguntas todavía
+                                    </h4>
+                                    <p class="text-muted mb-4" data-translate-key="questionnaire_templates.questions_manager.no_questions_help">
+                                        Comienza agregando tu primera pregunta para construir el cuestionario.
+                                    </p>
+                                    <button type="button" class="btn btn-primary" id="addFirstQuestionBtn">
+                                        <i class="fas fa-plus me-2"></i>
+                                        <span data-translate-key="questionnaire_templates.questions_manager.add_first_question">Agregar Primera Pregunta</span>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Question Modal -->
+<div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="questionForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="questionModalLabel" data-translate-key="questionnaire_templates.question_modal.title">
+                        Agregar Pregunta
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="questionId" value="">
+                    <input type="hidden" id="templateId" value="@Model.Id">
+                    
+                    <!-- Question Text -->
+                    <div class="mb-3">
+                        <label for="questionText" class="form-label required" data-translate-key="questionnaire_templates.question_modal.question_text">
+                            Texto de la Pregunta
+                        </label>
+                        <textarea id="questionText" class="form-control" rows="3" 
+                                  placeholder="Ej: ¿Qué tan satisfecho estás con el servicio?"
+                                  data-translate-key="questionnaire_templates.question_modal.question_text_placeholder"></textarea>
+                        <div class="invalid-feedback" id="questionTextError"></div>
+                    </div>
+                    
+                    <!-- Question Type -->
+                    <div class="mb-3">
+                        <label for="questionType" class="form-label required" data-translate-key="questionnaire_templates.question_modal.question_type">
+                            Tipo de Pregunta
+                        </label>
+                        <select id="questionType" class="form-select">
+                            <option value="SingleChoice" data-translate-key="questionnaire_templates.question_types.single_choice">Opción Múltiple (Una respuesta)</option>
+                            <option value="MultipleChoice" data-translate-key="questionnaire_templates.question_types.multiple_choice">Opción Múltiple (Múltiples respuestas)</option>
+                            <option value="ShortText" data-translate-key="questionnaire_templates.question_types.short_text">Respuesta Corta</option>
+                            <option value="LongText" data-translate-key="questionnaire_templates.question_types.long_text">Respuesta Larga</option>
+                            <option value="LikertScale" data-translate-key="questionnaire_templates.question_types.likert_scale">Escala Likert</option>
+                            <option value="TrueFalse" data-translate-key="questionnaire_templates.question_types.true_false">Verdadero/Falso</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Options Section (for SingleChoice, MultipleChoice) -->
+                    <div id="optionsSection" class="mb-3" style="display: none;">
+                        <label class="form-label" data-translate-key="questionnaire_templates.question_modal.options">
+                            Opciones de Respuesta
+                        </label>
+                        <div id="optionsList"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="addOptionBtn">
+                            <i class="fas fa-plus me-1"></i>
+                            <span data-translate-key="questionnaire_templates.question_modal.add_option">Agregar Opción</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Likert Scale Section -->
+                    <div id="likertSection" class="mb-3" style="display: none;">
+                        <label class="form-label" data-translate-key="questionnaire_templates.question_modal.likert_options">
+                            Escala Likert
+                        </label>
+                        <div id="likertOptionsList"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="addLikertOptionBtn">
+                            <i class="fas fa-plus me-1"></i>
+                            <span data-translate-key="questionnaire_templates.question_modal.add_likert_option">Agregar Opción</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Is Required -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isRequired" checked>
+                            <label class="form-check-label" for="isRequired" data-translate-key="questionnaire_templates.question_modal.is_required">
+                                Esta pregunta es obligatoria
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate-key="common.cancel">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="saveQuestionBtn">
+                        <i class="fas fa-save me-2"></i>
+                        <span data-translate-key="questionnaire_templates.question_modal.save_question">Guardar Pregunta</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <strong class="me-auto" data-translate-key="common.notification">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="notificationToastBody">
+            <!-- Message will be set via JavaScript -->
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/questionnaire-templates.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/questionnaire-template-edit.js?v=@DateTime.Now.Ticks" asp-append-version="true"></script>
+}

@@ -136,6 +136,20 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("QuestionnaireTemplates"))
+                {
+                    <a href="@Url.Action("Index", "QuestionnaireTemplates")" class="list-group-item list-group-item-action" data-translate-key="sidebar.questionnaireTemplates">
+                        <i class="fas fa-file-alt fa-fw"></i><span class="sidebar-item-text">Cuestionarios</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("ClientQuizzes"))
+                {
+                    <a href="@Url.Action("Index", "ClientQuizzes")" class="list-group-item list-group-item-action" data-translate-key="sidebar.clientQuizzes">
+                        <i class="fas fa-clipboard-check fa-fw"></i><span class="sidebar-item-text">Quiz</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("WheelOfLife"))
                 {
                     <a href="@Url.Action("Index", "WheelOfLife")" class="list-group-item list-group-item-action" data-translate-key="sidebar.wheelOfLife">

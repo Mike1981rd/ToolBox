@@ -1,0 +1,205 @@
+@model List<ToolBox.Models.ViewModels.ClientQuizInstanceViewModel>
+
+@{
+    ViewData["Title"] = "Mis Cuestionarios";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Home")" data-translate-key="common.dashboard">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active" data-translate-key="client_quizzes.page_title">
+                            Mis Cuestionarios
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" data-translate-key="client_quizzes.list_title">Cuestionarios Asignados</h3>
+                <div class="card-actions">
+                    <span class="text-muted">
+                        Total: <strong>@Model.Count</strong> cuestionarios
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-vcenter table-mobile-md">
+                            <thead>
+                                <tr>
+                                    <th data-translate-key="client_quizzes.table.title">Cuestionario</th>
+                                    <th data-translate-key="client_quizzes.table.assigned_date">Fecha Asignación</th>
+                                    <th data-translate-key="client_quizzes.table.status">Estado</th>
+                                    <th data-translate-key="client_quizzes.table.progress">Progreso</th>
+                                    <th data-translate-key="client_quizzes.table.actions">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var quiz in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <div class="strong">@quiz.QuestionnaireTitle</div>
+                                                @if (!string.IsNullOrEmpty(quiz.QuestionnaireDescription))
+                                                {
+                                                    <div class="text-muted">@quiz.QuestionnaireDescription</div>
+                                                }
+                                                <small class="text-muted">
+                                                    @quiz.TotalQuestions preguntas en total
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>@quiz.AssignedAt.ToString("dd/MM/yyyy")</div>
+                                            <small class="text-muted">@quiz.AssignedAt.ToString("HH:mm")</small>
+                                        </td>
+                                        <td>
+                                            @switch (quiz.Status)
+                                            {
+                                                case QuestionnaireStatus.Pending:
+                                                    <span class="badge bg-secondary" data-translate-key="client_quizzes.status.pending">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Pendiente
+                                                    </span>
+                                                    break;
+                                                case QuestionnaireStatus.InProgress:
+                                                    <span class="badge bg-warning" data-translate-key="client_quizzes.status.in_progress">
+                                                        <i class="fas fa-edit me-1"></i>
+                                                        En Progreso
+                                                    </span>
+                                                    @if (quiz.StartedAt.HasValue)
+                                                    {
+                                                        <div class="small text-muted mt-1">
+                                                            Iniciado: @quiz.StartedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                                        </div>
+                                                    }
+                                                    break;
+                                                case QuestionnaireStatus.Completed:
+                                                    <span class="badge bg-success" data-translate-key="client_quizzes.status.completed">
+                                                        <i class="fas fa-check me-1"></i>
+                                                        Completado
+                                                    </span>
+                                                    @if (quiz.CompletedAt.HasValue)
+                                                    {
+                                                        <div class="small text-muted mt-1">
+                                                            Completado: @quiz.CompletedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                                        </div>
+                                                    }
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (quiz.Status != QuestionnaireStatus.Pending)
+                                            {
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar @(quiz.Status == QuestionnaireStatus.Completed ? "bg-success" : "bg-warning")" 
+                                                         style="width: @quiz.ProgressPercentage%"></div>
+                                                </div>
+                                                <small class="text-muted">
+                                                    @quiz.AnsweredQuestions/@quiz.TotalQuestions preguntas (@quiz.ProgressPercentage%)
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No iniciado</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-inline-block text-nowrap">
+                                                @if (quiz.Status == QuestionnaireStatus.Completed)
+                                                {
+                                                    <button class="btn btn-sm btn-icon text-success" title="Completado" disabled>
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@Url.Action("Respond", new { id = quiz.InstanceId })" 
+                                                       class="btn btn-sm btn-icon text-primary" 
+                                                       title="@(quiz.Status == QuestionnaireStatus.Pending ? "Empezar" : "Continuar")">
+                                                        <i class="fas fa-@(quiz.Status == QuestionnaireStatus.Pending ? "play" : "edit")"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <h3 class="text-muted" data-translate-key="client_quizzes.no_quizzes">No tienes cuestionarios asignados</h3>
+                        <p class="text-muted" data-translate-key="client_quizzes.no_quizzes_description">
+                            Cuando tu coach te asigne cuestionarios aparecerán aquí.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" data-translate-key="common.notification">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="notificationToastBody">
+            <!-- Message will be set via JavaScript -->
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('@TempData["SuccessMessage"]', 'success');
+        });
+        
+        function showToast(message, type = 'info') {
+            const toastElement = document.getElementById('notificationToast');
+            const toastBody = document.getElementById('notificationToastBody');
+            
+            toastBody.textContent = message;
+            toastElement.className = `toast text-bg-${type === 'success' ? 'success' : 'info'}`;
+            
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('@TempData["ErrorMessage"]', 'danger');
+        });
+    </script>
+}

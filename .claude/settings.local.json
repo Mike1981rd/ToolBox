@@ -15,8 +15,10 @@
       "Bash(mv:*)",
       "Bash(/usr/bin/dotnet ef migrations add:*)",
       "Bash(ls:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(dotnet build:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": false
 }

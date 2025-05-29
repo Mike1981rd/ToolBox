@@ -1,0 +1,286 @@
+@model ToolBox.Models.ViewModels.RespondQuizViewModel
+
+@{
+    ViewData["Title"] = "Responder Cuestionario";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Home")" data-translate-key="common.dashboard">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index")" data-translate-key="client_quizzes.page_title">Mis Cuestionarios</a>
+                        </li>
+                        <li class="breadcrumb-item active" data-translate-key="client_quizzes.respond_title">
+                            Responder
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span data-translate-key="common.back">Volver</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">@Model.QuestionnaireTitle</h3>
+                        @if (Model.Status == QuestionnaireStatus.InProgress)
+                        {
+                            <div class="card-actions">
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-edit me-1"></i>
+                                    En Progreso
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(Model.QuestionnaireDescription))
+                        {
+                            <div class="alert alert-info">
+                                <div class="alert-title" data-translate-key="client_quizzes.instructions">Instrucciones</div>
+                                <div class="text-muted">@Model.QuestionnaireDescription</div>
+                            </div>
+                        }
+
+                        <form id="quizForm" asp-action="SubmitAnswers" method="post">
+                            <input type="hidden" asp-for="InstanceId" />
+                            
+                            @for (int i = 0; i < Model.Questions.Count; i++)
+                            {
+                                var question = Model.Questions[i];
+                                <div class="mb-4 question-container" data-question-id="@question.QuestionTemplateId">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-label">
+                                                <span class="badge bg-blue me-2">@(i + 1)</span>
+                                                @question.QuestionText
+                                                @if (question.IsRequired)
+                                                {
+                                                    <span class="text-danger">*</span>
+                                                }
+                                            </label>
+                                            
+                                            @switch (question.Type)
+                                            {
+                                                case QuestionType.ShortText:
+                                                    <input type="text" 
+                                                           class="form-control question-input" 
+                                                           name="Questions[@i].Response"
+                                                           data-question-id="@question.QuestionTemplateId"
+                                                           value="@question.ClientResponseText"
+                                                           @(question.IsRequired ? "required" : "") />
+                                                    break;
+
+                                                case QuestionType.LongText:
+                                                    <textarea class="form-control question-input" 
+                                                              name="Questions[@i].Response"
+                                                              data-question-id="@question.QuestionTemplateId"
+                                                              rows="4"
+                                                              @(question.IsRequired ? "required" : "")>@question.ClientResponseText</textarea>
+                                                    break;
+
+                                                case QuestionType.SingleChoice:
+                                                    <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                                                        @for (int j = 0; j < question.Options.Count; j++)
+                                                        {
+                                                            var option = question.Options[j];
+                                                            var inputId = $"question_{question.QuestionTemplateId}_option_{j}";
+                                                            <label class="form-selectgroup-item">
+                                                                <input type="radio" 
+                                                                       name="Questions[@i].Response"
+                                                                       data-question-id="@question.QuestionTemplateId"
+                                                                       value="@option" 
+                                                                       class="form-selectgroup-input question-input"
+                                                                       id="@inputId"
+                                                                       @(option == question.ClientResponseText ? "checked" : "")
+                                                                       @(question.IsRequired ? "required" : "") />
+                                                                <span class="form-selectgroup-label">@option</span>
+                                                            </label>
+                                                        }
+                                                    </div>
+                                                    break;
+
+                                                case QuestionType.MultipleChoice:
+                                                    <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                                                        @for (int j = 0; j < question.Options.Count; j++)
+                                                        {
+                                                            var option = question.Options[j];
+                                                            var inputId = $"question_{question.QuestionTemplateId}_option_{j}";
+                                                            var isChecked = question.ClientMultipleChoiceResponse.Contains(option);
+                                                            <label class="form-selectgroup-item">
+                                                                <input type="checkbox" 
+                                                                       name="Questions[@i].MultipleResponse"
+                                                                       data-question-id="@question.QuestionTemplateId"
+                                                                       value="@option" 
+                                                                       class="form-selectgroup-input question-input-multiple"
+                                                                       id="@inputId"
+                                                                       @(isChecked ? "checked" : "") />
+                                                                <span class="form-selectgroup-label">@option</span>
+                                                            </label>
+                                                        }
+                                                        <input type="hidden" name="Questions[@i].Response" data-question-id="@question.QuestionTemplateId" class="multiple-choice-hidden" />
+                                                    </div>
+                                                    break;
+
+                                                case QuestionType.TrueFalse:
+                                                    <div class="form-selectgroup form-selectgroup-boxes d-flex">
+                                                        @{
+                                                            var trueFalseOptions = new[] { "Verdadero", "Falso" };
+                                                            for (int j = 0; j < trueFalseOptions.Length; j++)
+                                                            {
+                                                                var option = trueFalseOptions[j];
+                                                                var inputId = $"question_{question.QuestionTemplateId}_tf_{j}";
+                                                                <label class="form-selectgroup-item flex-fill">
+                                                                    <input type="radio" 
+                                                                           name="Questions[@i].Response"
+                                                                           data-question-id="@question.QuestionTemplateId"
+                                                                           value="@option" 
+                                                                           class="form-selectgroup-input question-input"
+                                                                           id="@inputId"
+                                                                           @(option == question.ClientResponseText ? "checked" : "")
+                                                                           @(question.IsRequired ? "required" : "") />
+                                                                    <span class="form-selectgroup-label d-flex align-items-center justify-content-center">
+                                                                        <i class="fas fa-@(option == "Verdadero" ? "check-circle text-success" : "times-circle text-danger") me-2"></i>
+                                                                        @option
+                                                                    </span>
+                                                                </label>
+                                                            }
+                                                        }
+                                                    </div>
+                                                    break;
+
+                                                case QuestionType.LikertScale:
+                                                    <div class="likert-scale mb-3">
+                                                        <div class="row text-center">
+                                                            @foreach (var likertOption in question.LikertOptions)
+                                                            {
+                                                                var inputId = $"question_{question.QuestionTemplateId}_likert_{likertOption.Value}";
+                                                                <div class="col">
+                                                                    <label class="form-check form-check-inline">
+                                                                        <input type="radio" 
+                                                                               name="Questions[@i].Response"
+                                                                               data-question-id="@question.QuestionTemplateId"
+                                                                               value="@likertOption.Value" 
+                                                                               class="form-check-input question-input"
+                                                                               id="@inputId"
+                                                                               @(question.ClientLikertResponse == likertOption.Value ? "checked" : "")
+                                                                               @(question.IsRequired ? "required" : "") />
+                                                                        <span class="form-check-label">
+                                                                            <div class="fw-bold">@likertOption.Value</div>
+                                                                            <div class="text-muted small">@likertOption.Text</div>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    break;
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                @if (i < Model.Questions.Count - 1)
+                                {
+                                    <hr class="my-4" />
+                                }
+                            }
+
+                            <div class="card-footer bg-transparent mt-4">
+                                <div class="btn-list justify-content-end">
+                                    <button type="button" class="btn btn-outline-secondary" id="saveDraftBtn">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span data-translate-key="client_quizzes.save_draft">Guardar Borrador</span>
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        <span data-translate-key="client_quizzes.submit_answers">Enviar Respuestas</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" data-translate-key="client_quizzes.progress_title">Progreso</h4>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-muted mb-3">
+                            <span id="answeredCount">0</span> de <span id="totalCount">@Model.Questions.Count</span> preguntas respondidas
+                        </p>
+                        
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-clock text-muted me-3"></i>
+                                <div class="flex-fill">
+                                    <div class="font-weight-medium" data-translate-key="client_quizzes.auto_save">Guardado automático</div>
+                                    <div class="text-muted small">Tus respuestas se guardan automáticamente</div>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-asterisk text-danger me-3"></i>
+                                <div class="flex-fill">
+                                    <div class="font-weight-medium" data-translate-key="client_quizzes.required_fields">Campos obligatorios</div>
+                                    <div class="text-muted small">Marcados con asterisco (*)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" data-translate-key="common.notification">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="notificationToastBody">
+            <!-- Message will be set via JavaScript -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/client-quiz-respond.js" asp-append-version="true"></script>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('@TempData["ErrorMessage"]', 'danger');
+            });
+        </script>
+    }
+}

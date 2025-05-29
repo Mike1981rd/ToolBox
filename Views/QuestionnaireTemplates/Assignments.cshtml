@@ -1,0 +1,240 @@
+@{
+    ViewData["Title"] = "Cuestionarios Asignados";
+}
+
+<div class="container-fluid px-4">
+    <div class="alert alert-info">
+        <h4>Vista en Mantenimiento</h4>
+        <p>Esta vista está temporalmente deshabilitada. Por favor usa:</p>
+        <a href="@Url.Action("AllAssignments")" class="btn btn-primary">Ver Todas las Asignaciones</a>
+    </div>
+</div>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light" data-translate-key="questionnaire_templates">Plantillas de Cuestionarios</span> /
+        <span data-translate-key="assigned_questionnaires">Cuestionarios Asignados</span>
+    </h4>
+
+    <div class="card">
+        <div class="card-header border-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="card-title mb-0">@Model.TemplateTitle</h5>
+                    @if (!string.IsNullOrEmpty(Model.TemplateDescription))
+                    {
+                        <p class="text-muted mb-0 mt-1">@Model.TemplateDescription</p>
+                    }
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a asp-action="Assign" asp-route-id="@Model.TemplateId" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> <span data-translate-key="assign_more">Asignar a más clientes</span>
+                    </a>
+                    <a asp-action="Index" class="btn btn-label-secondary">
+                        <i class="fas fa-arrow-left"></i> <span data-translate-key="back">Volver</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form method="get" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@Model.TemplateId" />
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="search" name="searchQuery" class="form-control" 
+                                   placeholder="Buscar por cliente..." id="searchInput" value="@ViewBag.SearchQuery">
+                        </div>
+                        <select name="statusFilter" id="statusFilter" class="form-select" style="width: auto;">
+                            @if (ViewBag.StatusFilter == "all")
+                            {
+                                <option value="all" selected>Todos los estados</option>
+                            }
+                            else
+                            {
+                                <option value="all">Todos los estados</option>
+                            }
+                            
+                            @if (ViewBag.StatusFilter == "pending")
+                            {
+                                <option value="pending" selected>Pendientes</option>
+                            }
+                            else
+                            {
+                                <option value="pending">Pendientes</option>
+                            }
+                            
+                            @if (ViewBag.StatusFilter == "inprogress")
+                            {
+                                <option value="inprogress" selected>En Progreso</option>
+                            }
+                            else
+                            {
+                                <option value="inprogress">En Progreso</option>
+                            }
+                            
+                            @if (ViewBag.StatusFilter == "completed")
+                            {
+                                <option value="completed" selected>Completados</option>
+                            }
+                            else
+                            {
+                                <option value="completed">Completados</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="text-muted">
+                        Total: <strong>@Model.Assignments.Count</strong> asignaciones
+                    </span>
+                </div>
+            </div>
+
+            @if (Model.Assignments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="assignmentsTable">
+                        <thead>
+                            <tr>
+                                <th data-translate-key="client">Cliente</th>
+                                <th data-translate-key="assigned_date">Fecha Asignación</th>
+                                <th data-translate-key="status">Estado</th>
+                                <th data-translate-key="started_date">Fecha Inicio</th>
+                                <th data-translate-key="completed_date">Fecha Completado</th>
+                                <th data-translate-key="progress">Progreso</th>
+                                <th data-translate-key="actions">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.Assignments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@(string.IsNullOrEmpty(assignment.ClientAvatarUrl) ? "/img/default-avatar.png" : assignment.ClientAvatarUrl)" 
+                                                 alt="Avatar" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                            <div>
+                                                <strong>@assignment.ClientName</strong>
+                                                <br>
+                                                <small class="text-muted">@assignment.ClientEmail</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@assignment.AssignedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge @(assignment.Status == QuestionnaireStatus.Completed ? "bg-success" : assignment.Status == QuestionnaireStatus.InProgress ? "bg-warning" : "bg-secondary")">
+                                            @assignment.Status.GetDisplayName()
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (assignment.StartedAt.HasValue)
+                                        {
+                                            @assignment.StartedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (assignment.CompletedAt.HasValue)
+                                        {
+                                            @assignment.CompletedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (assignment.TotalQuestions > 0)
+                                        {
+                                            var percentage = (assignment.AnsweredQuestions * 100) / assignment.TotalQuestions;
+                                            <div class="progress" style="width: 100px; height: 8px;">
+                                                <div class="progress-bar" role="progressbar" style="width: @percentage%;" 
+                                                     aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">@assignment.AnsweredQuestions / @assignment.TotalQuestions</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-sm btn-icon btn-label-secondary dropdown-toggle hide-arrow" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                @if (assignment.Status == QuestionnaireStatus.Completed)
+                                                {
+                                                    <a class="dropdown-item" href="@Url.Action("ViewResponses", new { instanceId = assignment.InstanceId })">
+                                                        <i class="fas fa-eye me-2"></i> <span data-translate-key="view_responses">Ver Respuestas</span>
+                                                    </a>
+                                                    <a class="dropdown-item" href="@Url.Action("ExportResponses", new { instanceId = assignment.InstanceId })">
+                                                        <i class="fas fa-download me-2"></i> <span data-translate-key="export_pdf">Exportar PDF</span>
+                                                    </a>
+                                                }
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);" 
+                                                   onclick="confirmCancelAssignment(@assignment.InstanceId)">
+                                                    <i class="fas fa-times me-2"></i> <span data-translate-key="cancel_assignment">Cancelar Asignación</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <p class="text-muted" data-translate-key="no_assignments">No hay asignaciones para este cuestionario.</p>
+                    <a asp-action="Assign" asp-route-id="@Model.TemplateId" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> <span data-translate-key="assign_first">Asignar a clientes</span>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Búsqueda en tiempo real
+        document.getElementById('searchInput')?.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const tableRows = document.querySelectorAll('#assignmentsTable tbody tr');
+            
+            tableRows.forEach(row => {
+                const clientName = row.cells[0]?.textContent.toLowerCase() || '';
+                const matches = clientName.includes(searchTerm);
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+
+        // Cambio de filtro de estado
+        document.getElementById('statusFilter')?.addEventListener('change', function() {
+            document.querySelector('form').submit();
+        });
+
+        // Confirmar cancelación de asignación
+        function confirmCancelAssignment(instanceId) {
+            if (confirm('¿Está seguro de cancelar esta asignación? Esta acción no se puede deshacer.')) {
+                // TODO: Implementar llamada AJAX para cancelar asignación
+                console.log('Cancelar asignación:', instanceId);
+            }
+        }
+    </script>
+}
