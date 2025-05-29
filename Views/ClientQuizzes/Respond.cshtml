@@ -5,6 +5,103 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/questionnaire-templates.css" />
+    <style>
+        /* Fix badge width to fit text */
+        .badge {
+            display: inline-flex !important;
+            align-items: center;
+            width: auto !important;
+            min-width: auto !important;
+            max-width: none !important;
+            white-space: nowrap;
+            padding: 0.375rem 0.75rem !important;
+        }
+        
+        .badge i {
+            margin-right: 0.25rem;
+        }
+        
+        /* Question number badge */
+        .form-label .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem !important;
+        }
+        
+        /* Rating Scale Styles (1-10) */
+        .rating-scale {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+        
+        .rating-label {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .rating-label:hover {
+            background-color: #e3f2fd;
+            transform: scale(1.1);
+        }
+        
+        .rating-label:has(input:checked) {
+            background-color: #1976d2;
+            color: white;
+            transform: scale(1.15);
+        }
+        
+        .rating-scale .form-check-input {
+            cursor: pointer;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        .rating-scale .form-check-input:checked {
+            background-color: #1976d2;
+            border-color: #1976d2;
+        }
+        
+        .rating-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        
+        .rating-label:has(input:checked) .rating-value {
+            color: white;
+        }
+        
+        /* Responsive adjustment for small screens */
+        @@media (max-width: 576px) {
+            .rating-scale {
+                padding: 1rem 0.5rem;
+            }
+            
+            .rating-label {
+                padding: 0.25rem;
+            }
+            
+            .rating-value {
+                font-size: 1rem;
+            }
+            
+            .rating-scale .form-check-input {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+        }
+        
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+}
+
 <!-- Page Header -->
 <div class="page-header d-print-none">
     <div class="container-xl">
@@ -65,6 +162,7 @@
                         }
 
                         <form id="quizForm" asp-action="SubmitAnswers" method="post">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" asp-for="InstanceId" />
                             
                             @for (int i = 0; i < Model.Questions.Count; i++)
@@ -172,28 +270,30 @@
                                                     break;
 
                                                 case QuestionType.LikertScale:
-                                                    <div class="likert-scale mb-3">
-                                                        <div class="row text-center">
-                                                            @foreach (var likertOption in question.LikertOptions)
+                                                    <div class="rating-scale mb-3">
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            @for (int rating = 1; rating <= 10; rating++)
                                                             {
-                                                                var inputId = $"question_{question.QuestionTemplateId}_likert_{likertOption.Value}";
-                                                                <div class="col">
-                                                                    <label class="form-check form-check-inline">
+                                                                var inputId = $"question_{question.QuestionTemplateId}_rating_{rating}";
+                                                                var isChecked = question.ClientLikertResponse == rating;
+                                                                <div class="text-center flex-fill">
+                                                                    <label class="rating-label d-block cursor-pointer" for="@inputId">
                                                                         <input type="radio" 
                                                                                name="Questions[@i].Response"
                                                                                data-question-id="@question.QuestionTemplateId"
-                                                                               value="@likertOption.Value" 
-                                                                               class="form-check-input question-input"
+                                                                               value="@rating" 
+                                                                               class="form-check-input question-input mb-2"
                                                                                id="@inputId"
-                                                                               @(question.ClientLikertResponse == likertOption.Value ? "checked" : "")
+                                                                               @(isChecked ? "checked" : "")
                                                                                @(question.IsRequired ? "required" : "") />
-                                                                        <span class="form-check-label">
-                                                                            <div class="fw-bold">@likertOption.Value</div>
-                                                                            <div class="text-muted small">@likertOption.Text</div>
-                                                                        </span>
+                                                                        <div class="rating-value">@rating</div>
                                                                     </label>
                                                                 </div>
                                                             }
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mt-2">
+                                                            <small class="text-muted">Muy Malo</small>
+                                                            <small class="text-muted">Excelente</small>
                                                         </div>
                                                     </div>
                                                     break;

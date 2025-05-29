@@ -122,18 +122,23 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getAntiForgeryToken()
+                'RequestVerificationToken': getAntiForgeryToken()
             },
             body: JSON.stringify({
                 InstanceId: parseInt(instanceId),
                 Answers: answers
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             if (!silent) {
                 if (result.success) {
-                    showToast(result.message, 'success');
+                    showToast(result.message || 'Borrador guardado exitosamente', 'success');
                 } else {
                     showToast(result.message || 'Error al guardar', 'danger');
                 }

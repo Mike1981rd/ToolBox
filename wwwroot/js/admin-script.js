@@ -1323,6 +1323,8 @@ const translations = {
         "notification_types.session_scheduled_by_coach": "New session scheduled",
         "notification_types.calendar_event_scheduled_for_client": "New calendar event",
         "notification_types.calendar_event_invitation": "Event invitation",
+        "notification_types.questionnaire_assigned": "New questionnaire assigned",
+        "notification_types.questionnaire_completed_by_client": "Questionnaire completed",
         "notifications.newCount": "New",
         "notifications.markAllAsReadTooltip": "Mark all as read",
         "common.loading": "Loading..."
@@ -2691,9 +2693,31 @@ const translations = {
         "notification_types.session_scheduled_by_coach": "Nueva sesión programada",
         "notification_types.calendar_event_scheduled_for_client": "Nuevo evento en el calendario",
         "notification_types.calendar_event_invitation": "Invitación a evento",
+        "notification_types.questionnaire_assigned": "Nuevo cuestionario asignado",
+        "notification_types.questionnaire_completed_by_client": "Cuestionario completado",
         "notifications.newCount": "Nuevas",
         "notifications.markAllAsReadTooltip": "Marcar todas como leídas",
-        "common.loading": "Cargando..."
+        "common.loading": "Cargando...",
+        // Módulo Client Quizzes
+        "common.dashboard": "Panel de Control",
+        "common.notification": "Notificación",
+        "client_quizzes.page_title": "Mis Cuestionarios",
+        "client_quizzes.list_title": "Cuestionarios Asignados",
+        "client_quizzes.table.title": "Cuestionario",
+        "client_quizzes.table.assigned_date": "Fecha Asignación",
+        "client_quizzes.table.status": "Estado",
+        "client_quizzes.table.progress": "Progreso",
+        "client_quizzes.table.actions": "Acciones",
+        "client_quizzes.status.pending": "Pendiente",
+        "client_quizzes.status.in_progress": "En Progreso",
+        "client_quizzes.status.completed": "Completado",
+        "client_quizzes.no_quizzes": "No tienes cuestionarios asignados",
+        "client_quizzes.no_quizzes_description": "Cuando tu coach te asigne cuestionarios aparecerán aquí.",
+        "client_quizzes.filter_by_status": "Filtrar por estado:",
+        "client_quizzes.filter.all": "Todos",
+        "client_quizzes.filter.pending": "Pendientes",
+        "client_quizzes.filter.in_progress": "En Progreso",
+        "client_quizzes.filter.completed": "Completados"
     }
 };
 

@@ -141,6 +141,10 @@
                 return lang === 'es' ? 'Nuevo evento en el calendario' : 'New calendar event';
             case 'calendar_event_invitation':
                 return lang === 'es' ? 'Invitación a evento' : 'Event invitation';
+            case 'questionnaire_assigned':
+                return lang === 'es' ? 'Nuevo cuestionario asignado' : 'New questionnaire assigned';
+            case 'questionnaire_completed_by_client':
+                return lang === 'es' ? 'Cuestionario completado' : 'Questionnaire completed';
             default:
                 return lang === 'es' ? 'Notificación' : 'Notification';
         }
@@ -208,6 +212,20 @@
                         return `${data.invitedBy || 'A coach'} has invited you to the event "${data.eventTitle || 'Untitled'}" on ${inviteDateStr}.`;
                     }
                     
+                case 'questionnaire_assigned':
+                    if (lang === 'es') {
+                        return `${data.coachName || 'Tu coach'} te ha enviado un nuevo cuestionario: "${data.questionnaireTitle || 'Sin título'}".`;
+                    } else {
+                        return `${data.coachName || 'Your coach'} has sent you a new questionnaire: "${data.questionnaireTitle || 'Untitled'}".`;
+                    }
+                    
+                case 'questionnaire_completed_by_client':
+                    if (lang === 'es') {
+                        return `${data.clientName || 'Un cliente'} ha completado el cuestionario: "${data.questionnaireTitle || 'Sin título'}".`;
+                    } else {
+                        return `${data.clientName || 'A client'} has completed the questionnaire: "${data.questionnaireTitle || 'Untitled'}".`;
+                    }
+                    
                 default:
                     return JSON.stringify(data);
             }
@@ -225,6 +243,10 @@
                 return { icon: 'fas fa-calendar-alt', class: 'calendar' };
             case 'calendar_event_invitation':
                 return { icon: 'fas fa-calendar-plus', class: 'calendar' };
+            case 'questionnaire_assigned':
+                return { icon: 'fas fa-clipboard-list', class: 'default' };
+            case 'questionnaire_completed_by_client':
+                return { icon: 'fas fa-check-square', class: 'default' };
             default:
                 return { icon: 'fas fa-bell', class: 'default' };
         }

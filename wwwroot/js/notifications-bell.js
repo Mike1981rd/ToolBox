@@ -379,6 +379,12 @@
             case 'calendar_event_scheduled_for_client':
                 icon = { icon: 'fas fa-calendar-alt', class: 'order' }; // Calendar icon for events
                 break;
+            case 'questionnaire_assigned':
+                icon = { icon: 'fas fa-clipboard-list', class: 'approved' }; // Clipboard icon for questionnaires
+                break;
+            case 'questionnaire_completed_by_client':
+                icon = { icon: 'fas fa-check-square', class: 'approved' }; // Check icon for completed questionnaires
+                break;
             default:
                 icon = { icon: 'fas fa-bell', class: 'approved' }; // Bell icon for general notifications
         }
@@ -457,6 +463,32 @@
                         return {
                             title: 'New Event Scheduled 📋',
                             subtitle: `Event "${data.eventTitle || 'Untitled'}" has been scheduled for you`
+                        };
+                    }
+                    
+                case 'questionnaire_assigned':
+                    if (lang === 'es') {
+                        return {
+                            title: 'Nuevo Cuestionario 📝',
+                            subtitle: `${data.coachName || 'Tu coach'} te ha enviado un nuevo cuestionario: "${data.questionnaireTitle || 'Sin título'}"`
+                        };
+                    } else {
+                        return {
+                            title: 'New Questionnaire 📝',
+                            subtitle: `${data.coachName || 'Your coach'} has sent you a new questionnaire: "${data.questionnaireTitle || 'Untitled'}"`
+                        };
+                    }
+                    
+                case 'questionnaire_completed_by_client':
+                    if (lang === 'es') {
+                        return {
+                            title: 'Cuestionario Completado ✅',
+                            subtitle: `${data.clientName || 'Un cliente'} ha completado el cuestionario: "${data.questionnaireTitle || 'Sin título'}"`
+                        };
+                    } else {
+                        return {
+                            title: 'Questionnaire Completed ✅',
+                            subtitle: `${data.clientName || 'A client'} has completed the questionnaire: "${data.questionnaireTitle || 'Untitled'}"`
                         };
                     }
                     

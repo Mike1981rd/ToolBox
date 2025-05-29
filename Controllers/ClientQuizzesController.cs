@@ -25,14 +25,35 @@ namespace ToolBox.Controllers
         }
 
         // GET: ClientQuizzes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? statusFilter = null)
         {
+            // Default to pending status
+            statusFilter = statusFilter ?? "pending";
+            ViewBag.CurrentStatusFilter = statusFilter;
+            
             var currentUserId = GetCurrentUserId();
             
-            var instances = await _context.QuestionnaireInstances
+            var query = _context.QuestionnaireInstances
                 .Include(qi => qi.QuestionnaireTemplate)
                 .ThenInclude(qt => qt.Questions)
-                .Where(qi => qi.ClientId == currentUserId)
+                .Where(qi => qi.ClientId == currentUserId);
+            
+            // Apply status filter
+            if (statusFilter == "pending")
+            {
+                query = query.Where(qi => qi.Status == QuestionnaireStatus.Pending);
+            }
+            else if (statusFilter == "in_progress")
+            {
+                query = query.Where(qi => qi.Status == QuestionnaireStatus.InProgress);
+            }
+            else if (statusFilter == "completed")
+            {
+                query = query.Where(qi => qi.Status == QuestionnaireStatus.Completed);
+            }
+            // "all" shows everything, no additional filter needed
+            
+            var instances = await query
                 .OrderByDescending(qi => qi.AssignedAt)
                 .ToListAsync();
 
@@ -135,7 +156,9 @@ namespace ToolBox.Controllers
                     }
                     else if (q.Type == QuestionType.LikertScale)
                     {
-                        questionViewModel.LikertOptions = ParseLikertOptionsFromJson(q.OptionsJson);
+                        // For LikertScale, we don't need to parse options anymore
+                        // The scale is always 1-10
+                        questionViewModel.LikertOptions = new List<LikertOptionViewModel>();
                         
                         if (!string.IsNullOrEmpty(existingAnswer?.ResponseText) && int.TryParse(existingAnswer.ResponseText, out int likertValue))
                         {

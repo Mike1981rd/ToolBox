@@ -172,35 +172,37 @@
                                     case "LikertScale":
                                         <div class="likert-scale-answer">
                                             <h6 class="text-success mb-2">
-                                                <i class="fas fa-star me-1"></i>Puntuación seleccionada:
+                                                <i class="fas fa-star me-1"></i>Calificación:
                                             </h6>
                                             @{
-                                                var selectedValue = question.ClientLikertResponse ?? 0;
-                                                var scaleMax = 5; // Default scale 1-5
+                                                int.TryParse(question.ClientResponseText, out int selectedValue);
                                             }
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="text-muted">1</span>
+                                                <span class="text-muted small">Muy Malo</span>
                                                 <div class="d-flex gap-1">
-                                                    @for (int i = 1; i <= scaleMax; i++)
+                                                    @for (int i = 1; i <= 10; i++)
                                                     {
                                                         <div class="likert-item p-2 border rounded text-center @(i == selectedValue ? "bg-primary text-white" : "bg-white text-muted")" 
-                                                             style="width: 40px;">
+                                                             style="width: 40px; height: 40px;">
                                                             @if (i == selectedValue)
                                                             {
-                                                                <i class="fas fa-check"></i>
+                                                                <strong>@i</strong>
                                                             }
                                                             else
                                                             {
-                                                                @i
+                                                                <span class="text-muted small">@i</span>
                                                             }
                                                         </div>
                                                     }
                                                 </div>
-                                                <span class="text-muted">@scaleMax</span>
-                                                <div class="ms-3">
-                                                    <span class="badge bg-primary">Valor: @selectedValue</span>
-                                                </div>
+                                                <span class="text-muted small">Excelente</span>
                                             </div>
+                                            @if (selectedValue > 0)
+                                            {
+                                                <div class="mt-2">
+                                                    <span class="badge bg-primary fs-6">Calificación: @selectedValue/10</span>
+                                                </div>
+                                            }
                                         </div>
                                         break;
 

@@ -237,13 +237,9 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             optionsList.appendChild(falseDiv);
         } else if (selectedType === 'LikertScale') {
-            likertSection.style.display = 'block';
-            if (likertOptionsList.children.length === 0) {
-                // Add default 5-point scale
-                for (let i = 1; i <= 5; i++) {
-                    addLikertOptionField(i, `Nivel ${i}`);
-                }
-            }
+            // For LikertScale, we don't need options anymore
+            // It's always 1-10 scale
+            likertSection.style.display = 'none';
         }
     }
 
@@ -386,44 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (selectedType === 'TrueFalse') {
             // True/False always has valid options, no validation needed
         } else if (selectedType === 'LikertScale') {
-            const likertOptions = likertOptionsList.querySelectorAll('.likert-option-item');
-            
-            if (likertOptions.length < 2) {
-                showError('Debes agregar al menos 2 opciones para la escala Likert');
-                isValid = false;
-            }
-            
-            // Validate that all Likert options have valid values and text
-            let hasInvalidLikert = false;
-            Array.from(likertOptions).forEach(item => {
-                const valueInput = item.querySelector('.likert-value-input').value.trim();
-                const textInput = item.querySelector('.likert-text-input').value.trim();
-                
-                if (valueInput === '' || textInput === '') {
-                    hasInvalidLikert = true;
-                    item.querySelector('.likert-value-input').classList.add('is-invalid');
-                    item.querySelector('.likert-text-input').classList.add('is-invalid');
-                }
-                
-                // Check for duplicate values
-                const currentValue = parseInt(valueInput, 10);
-                if (!isNaN(currentValue)) {
-                    const otherValues = Array.from(likertOptions)
-                        .filter(otherItem => otherItem !== item)
-                        .map(otherItem => parseInt(otherItem.querySelector('.likert-value-input').value.trim(), 10))
-                        .filter(v => !isNaN(v));
-                    
-                    if (otherValues.includes(currentValue)) {
-                        hasInvalidLikert = true;
-                        item.querySelector('.likert-value-input').classList.add('is-invalid');
-                    }
-                }
-            });
-            
-            if (hasInvalidLikert) {
-                showError('Todas las opciones Likert deben tener valores únicos y etiquetas válidas');
-                isValid = false;
-            }
+            // LikertScale is now always 1-10, no validation needed
         }
         
         return isValid;
@@ -452,20 +411,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 optionsJson = JSON.stringify(options);
             }
         } else if (selectedType === 'LikertScale') {
-            const likertOptions = Array.from(likertOptionsList.querySelectorAll('.likert-option-item'))
-                .map(item => {
-                    const valueInput = item.querySelector('.likert-value-input').value.trim();
-                    const text = item.querySelector('.likert-text-input').value.trim();
-                    
-                    // Only convert to number if there's actually a value
-                    const value = valueInput !== '' ? parseInt(valueInput, 10) : null;
-                    return { value, text };
-                })
-                .filter(option => option.value !== null && !isNaN(option.value) && option.text);
-            
-            if (likertOptions.length > 0) {
-                optionsJson = JSON.stringify(likertOptions);
-            }
+            // LikertScale doesn't need options anymore
+            // It's always 1-10 scale
+            optionsJson = null;
         }
         
         const formData = {
