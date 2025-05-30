@@ -68,6 +68,15 @@
         .lang-select:hover {
             background-color: rgba(0, 0, 0, 0.04) !important;
         }
+        
+        /* Estado activo/seleccionado del selector de idioma */
+        .lang-select.active,
+        .lang-select:active,
+        .dropdown-item.active,
+        .dropdown-item:active {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+        }
     </style>
     
     @await RenderSectionAsync("Styles", required: false)
@@ -78,7 +87,7 @@
         <div class="sidebar" id="sidebar-wrapper">
             <div class="sidebar-heading d-flex flex-column justify-content-center align-items-center">
                 <div class="logo-container">
-                    <img src="~/img/toolbox-logo.svg" alt="ToolBox Logo" class="logo" id="sidebarLogo">
+                    <img src="@(ViewBag.SiteLogo ?? "/img/toolbox-logo.svg")" alt="ToolBox Logo" class="logo" id="sidebarLogo">
                 </div>
                 <button class="btn btn-link d-lg-none position-absolute top-0 end-0" id="menu-close" aria-expanded="true" aria-label="Close sidebar">
                     <i class="fas fa-times"></i>

@@ -3,6 +3,30 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+@section Styles {
+    <style>
+        .logo-preview-image {
+            max-width: 100%;
+            max-height: 100px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: none;
+            background: transparent;
+            /* Removed problematic image-rendering properties */
+        }
+        
+        .logo-preview-container {
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+    </style>
+}
+
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard" data-translate-key="breadcrumbs.dashboard">Tablero</a></li>
@@ -142,7 +166,7 @@
                             <div class="text-center">
                                 <label class="form-label" data-translate-key="labels.logoPreview">Logo Preview</label>
                                 <div class="logo-preview-container bg-light border rounded p-3 mb-3" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
-                                    <img id="logoPreview" src="@(Model.CurrentLogoPath ?? "/img/toolbox-logo.svg")" alt="Logo Preview" style="max-width: 100%; max-height: 100px; object-fit: contain;">
+                                    <img id="logoPreview" src="@(Model.CurrentLogoPath ?? "/img/toolbox-logo.svg")" alt="Logo Preview" class="logo-preview-image">
                                 </div>
                                 <small class="text-muted" data-translate-key="help.logoPreview">This is how your logo will appear in the sidebar</small>
                             </div>

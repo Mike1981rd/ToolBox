@@ -319,7 +319,7 @@
 
 /* Solo mostrar cuando tiene la clase 'validation-summary-errors' (ASP.NET la agrega cuando hay errores) */
 .validation-summary.validation-summary-errors {
-    display: block;
+    display: block !important;
 }
 
 .text-danger {

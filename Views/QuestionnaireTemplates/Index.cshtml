@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Plantillas de Cuestionarios";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.HideTitleInLayout = true;
 }
 
 <!-- Page Header -->
@@ -10,9 +11,7 @@
     <div class="container-xl">
         <div class="row g-2 align-items-center">
             <div class="col">
-                <h2 class="page-title" data-translate-key="questionnaire_templates.page_title">
-                    Plantillas de Cuestionarios
-                </h2>
+                <h2 class="page-title" data-translate-key="questionnaire_templates.page_title"></h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="btn-list">

@@ -24,10 +24,26 @@ namespace ToolBox.Controllers
                         ViewBag.UserPermissions = permissions;
                         ViewBag.UserReadableModules = readableModules;
                     }
+                    
+                    // Cargar logo actual del sitio
+                    var configService = HttpContext.RequestServices.GetService<IWebsiteConfigurationService>();
+                    if (configService != null)
+                    {
+                        try
+                        {
+                            var config = await configService.GetConfigurationAsync();
+                            ViewBag.SiteLogo = config.LogoPath ?? "/img/toolbox-logo.svg";
+                        }
+                        catch
+                        {
+                            ViewBag.SiteLogo = "/img/toolbox-logo.svg";
+                        }
+                    }
                     else
                     {
                         ViewBag.UserPermissions = new Dictionary<string, List<string>>();
                         ViewBag.UserReadableModules = new List<string>();
+                        ViewBag.SiteLogo = "/img/toolbox-logo.svg";
                     }
                 }
                 catch (Exception ex)
@@ -35,12 +51,14 @@ namespace ToolBox.Controllers
                     // Log error pero no interrumpir la ejecución
                     ViewBag.UserPermissions = new Dictionary<string, List<string>>();
                     ViewBag.UserReadableModules = new List<string>();
+                    ViewBag.SiteLogo = "/img/toolbox-logo.svg";
                 }
             }
             else
             {
                 ViewBag.UserPermissions = new Dictionary<string, List<string>>();
                 ViewBag.UserReadableModules = new List<string>();
+                ViewBag.SiteLogo = "/img/toolbox-logo.svg";
             }
 
             await next();

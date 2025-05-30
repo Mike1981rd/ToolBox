@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using ToolBox.Models;
 using ToolBox.Interfaces;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Drawing.Text;
 
 namespace ToolBox.Controllers
 {
@@ -276,32 +280,127 @@ namespace ToolBox.Controllers
                     throw new ArgumentException("File size too large. Maximum allowed size is 5MB.");
                 }
 
-                // Generate unique filename
-                var fileName = $"logo_{Guid.NewGuid()}{fileExtension}";
-                var uploadPath = Path.Combine(_environment.WebRootPath, "img", "branding");
-                var fullPath = Path.Combine(uploadPath, fileName);
-
                 // Create directory if it doesn't exist
+                var uploadPath = Path.Combine(_environment.WebRootPath, "img", "branding");
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
                 }
 
-                // Save the file
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                // Handle SVG files differently (no processing needed)
+                if (fileExtension == ".svg")
                 {
-                    await logoFile.CopyToAsync(stream);
+                    var svgFileName = $"logo_{Guid.NewGuid()}.svg";
+                    var svgFullPath = Path.Combine(uploadPath, svgFileName);
+                    
+                    using (var stream = new FileStream(svgFullPath, FileMode.Create))
+                    {
+                        await logoFile.CopyToAsync(stream);
+                    }
+                    
+                    return $"/img/branding/{svgFileName}";
+                }
+
+                // Process raster images (PNG, JPG, GIF) - Optimize for crisp display
+                return await ProcessRasterLogo(logoFile, uploadPath, fileExtension);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing logo upload");
+                return null;
+            }
+        }
+
+        private async Task<string?> ProcessRasterLogo(IFormFile logoFile, string uploadPath, string fileExtension)
+        {
+            try
+            {
+                using var originalStream = logoFile.OpenReadStream();
+                using var originalImage = Image.FromStream(originalStream);
+                
+                // Ultra high-resolution target for maximum sharpness
+                // Target: 900x300 (3:1 ratio) - 3x resolution for ultra-crisp scaling
+                const int targetWidth = 900;
+                const int targetHeight = 300;
+                
+                // Calculate optimal dimensions maintaining aspect ratio
+                var (newWidth, newHeight) = CalculateOptimalDimensions(
+                    originalImage.Width, originalImage.Height, targetWidth, targetHeight);
+                
+                // Create optimized image
+                using var optimizedImage = new Bitmap(targetWidth, targetHeight, PixelFormat.Format32bppArgb);
+                using var graphics = Graphics.FromImage(optimizedImage);
+                
+                // Ultra-crisp graphics settings for maximum logo sharpness
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.CompositingMode = CompositingMode.SourceOver;
+                
+                // Additional optimizations for text and logo clarity
+                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                
+                // Fill with transparent background
+                graphics.Clear(Color.Transparent);
+                
+                // Calculate position to center the logo
+                var x = (targetWidth - newWidth) / 2;
+                var y = (targetHeight - newHeight) / 2;
+                
+                // Draw the resized image
+                graphics.DrawImage(originalImage, x, y, newWidth, newHeight);
+                
+                // Save as PNG for best quality and transparency support
+                var fileName = $"logo_{Guid.NewGuid()}.png";
+                var fullPath = Path.Combine(uploadPath, fileName);
+                
+                // Save with high quality PNG settings
+                var codec = ImageCodecInfo.GetImageDecoders()
+                    .FirstOrDefault(c => c.FormatID == ImageFormat.Png.Guid);
+                
+                if (codec != null)
+                {
+                    var encoderParams = new EncoderParameters(1);
+                    encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+                    optimizedImage.Save(fullPath, codec, encoderParams);
+                }
+                else
+                {
+                    optimizedImage.Save(fullPath, ImageFormat.Png);
                 }
                 
-                // Return the web path
                 return $"/img/branding/{fileName}";
             }
             catch (Exception ex)
             {
-                // Log error in real implementation
-                Console.WriteLine($"Error processing logo upload: {ex.Message}");
+                _logger.LogError(ex, "Error processing raster logo");
                 return null;
             }
+        }
+        
+        private static (int width, int height) CalculateOptimalDimensions(
+            int originalWidth, int originalHeight, int targetWidth, int targetHeight)
+        {
+            var targetRatio = (double)targetWidth / targetHeight;
+            var originalRatio = (double)originalWidth / originalHeight;
+            
+            int newWidth, newHeight;
+            
+            if (originalRatio > targetRatio)
+            {
+                // Original is wider, fit by width
+                newWidth = targetWidth;
+                newHeight = (int)(targetWidth / originalRatio);
+            }
+            else
+            {
+                // Original is taller, fit by height
+                newHeight = targetHeight;
+                newWidth = (int)(targetHeight * originalRatio);
+            }
+            
+            return (newWidth, newHeight);
         }
 
 

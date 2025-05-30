@@ -108,15 +108,22 @@ body::-webkit-scrollbar {
 }
 
 .logo {
-    height: 90px;
+    height: 108px; /* Increased from 90px by 20% (90 * 1.2 = 108) */
     width: auto;
     transition: all var(--transition-speed);
     object-fit: contain;
     margin: 0 auto;
-    image-rendering: -webkit-optimize-contrast; /* Chrome/Safari */
-    image-rendering: crisp-edges; /* Estándar */
-    image-rendering: pixelated; /* Alternativa para mejor definición en algunos navegadores */
-    -ms-interpolation-mode: nearest-neighbor; /* IE/Edge */
+    /* Ultra-crisp logo rendering optimizations */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    outline: none;
 }
 
 .sidebar .list-group-item {
@@ -260,8 +267,8 @@ body::-webkit-scrollbar {
     }
 
     .sidebar.toggled .logo {
-        max-height: 60px;
-        max-width: 70px;
+        max-height: 72px; /* Increased from 60px by 20% (60 * 1.2 = 72) */
+        max-width: 84px; /* Increased from 70px by 20% (70 * 1.2 = 84) */
     }
 
     .sidebar.toggled .d-none {
