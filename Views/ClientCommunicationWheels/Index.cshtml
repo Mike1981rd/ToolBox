@@ -1,0 +1,210 @@
+@model ToolBox.Models.ViewModels.ClientWheelsIndexViewModel
+@{
+    ViewData["Title"] = "Mis Ruedas de Comunicación";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-2" data-translate-key="client_communication_wheels_title">
+                @ViewData["Title"]
+            </h1>
+            <p class="text-muted mb-0" data-translate-key="client_communication_wheels_subtitle">
+                Completa tus evaluaciones de comunicación asignadas
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.TotalCount == 0)
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-chart-radar fa-4x text-muted opacity-50"></i>
+                </div>
+                <h5 class="text-muted" data-translate-key="client_no_wheels_assigned">
+                    No tienes ruedas de comunicación asignadas
+                </h5>
+                <p class="text-muted" data-translate-key="client_no_wheels_description">
+                    Tu coach te asignará ruedas cuando sea el momento apropiado
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Pending Wheels -->
+        @if (Model.PendingWheels.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock text-warning me-2"></i>
+                        <span data-translate-key="client_wheels_pending">Pendientes</span>
+                        <span class="badge bg-warning ms-2">@Model.PendingWheels.Count</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @foreach (var wheel in Model.PendingWheels)
+                        {
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card h-100 border-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-warning-subtle text-warning rounded-circle">
+                                                    <i class="fas fa-chart-radar"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-1">@wheel.WheelTemplateName</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    <span data-translate-key="client_wheel_assigned_date">Asignada:</span>
+                                                    @wheel.AssignedAt.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(wheel.WheelTemplateDescription))
+                                        {
+                                            <p class="text-muted small mb-3">@wheel.WheelTemplateDescription</p>
+                                        }
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                @wheel.DimensionCount <span data-translate-key="client_wheel_dimensions">dimensiones</span>
+                                            </span>
+                                            <a asp-action="CompleteWheel" asp-route-id="@wheel.InstanceId" 
+                                               class="btn btn-warning btn-sm">
+                                                <i class="fas fa-play me-1"></i>
+                                                <span data-translate-key="client_wheel_start">Iniciar</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- In Progress Wheels -->
+        @if (Model.InProgressWheels.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-spinner text-info me-2"></i>
+                        <span data-translate-key="client_wheels_in_progress">En Progreso</span>
+                        <span class="badge bg-info ms-2">@Model.InProgressWheels.Count</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @foreach (var wheel in Model.InProgressWheels)
+                        {
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card h-100 border-info">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-info-subtle text-info rounded-circle">
+                                                    <i class="fas fa-chart-radar"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-1">@wheel.WheelTemplateName</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    <span data-translate-key="client_wheel_started_date">Iniciada:</span>
+                                                    @wheel.StartedAt?.ToString("dd/MM/yyyy HH:mm")
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                @wheel.DimensionCount <span data-translate-key="client_wheel_dimensions">dimensiones</span>
+                                            </span>
+                                            <a asp-action="CompleteWheel" asp-route-id="@wheel.InstanceId" 
+                                               class="btn btn-info btn-sm">
+                                                <i class="fas fa-pencil-alt me-1"></i>
+                                                <span data-translate-key="client_wheel_continue">Continuar</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Completed Wheels -->
+        @if (Model.CompletedWheels.Any())
+        {
+            <div class="card">
+                <div class="card-header bg-success bg-opacity-10">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span data-translate-key="client_wheels_completed">Completadas</span>
+                        <span class="badge bg-success ms-2">@Model.CompletedWheels.Count</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @foreach (var wheel in Model.CompletedWheels)
+                        {
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card h-100 border-success">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                                    <i class="fas fa-chart-radar"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-1">@wheel.WheelTemplateName</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    <span data-translate-key="client_wheel_completed_date">Completada:</span>
+                                                    @wheel.CompletedAt?.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                @wheel.DimensionCount <span data-translate-key="client_wheel_dimensions">dimensiones</span>
+                                            </span>
+                                            <a asp-action="ViewWheel" asp-route-id="@wheel.InstanceId" 
+                                               class="btn btn-success btn-sm">
+                                                <i class="fas fa-eye me-1"></i>
+                                                <span data-translate-key="client_wheel_view">Ver Rueda</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

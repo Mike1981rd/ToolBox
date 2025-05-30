@@ -15,7 +15,9 @@ namespace ToolBox.Models
             { "habit_reminder", "notification_type_habit_reminder" },
             { "achievement_unlocked", "notification_type_achievement_unlocked" },
             { "questionnaire_assigned", "notification_type_questionnaire_assigned" },
-            { "questionnaire_completed_by_client", "notification_type_questionnaire_completed" }
+            { "questionnaire_completed_by_client", "notification_type_questionnaire_completed" },
+            { "communication_wheel_assigned", "notification_type_communication_wheel_assigned" },
+            { "communication_wheel_completed", "notification_type_communication_wheel_completed" }
         };
 
         public static IEnumerable<string> GetAllTypeKeys() => Types.Keys;

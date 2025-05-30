@@ -44,6 +44,10 @@ namespace ToolBox.Data
         public DbSet<QuestionnaireInstance> QuestionnaireInstances { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<LifeEvent> LifeEvents { get; set; }
+        public DbSet<CommunicationWheelTemplate> CommunicationWheelTemplates { get; set; }
+        public DbSet<CommunicationDimension> CommunicationDimensions { get; set; }
+        public DbSet<ClientCommunicationWheelInstance> ClientCommunicationWheelInstances { get; set; }
+        public DbSet<DimensionScore> DimensionScores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -822,6 +826,96 @@ namespace ToolBox.Data
 
             modelBuilder.Entity<LifeEvent>()
                 .HasIndex(le => new { le.UserId, le.EventYear });
+                
+            // CommunicationWheelTemplate configuration
+            modelBuilder.Entity<CommunicationWheelTemplate>()
+                .HasKey(cwt => cwt.Id);
+                
+            modelBuilder.Entity<CommunicationWheelTemplate>()
+                .HasOne(cwt => cwt.Coach)
+                .WithMany()
+                .HasForeignKey(cwt => cwt.CoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<CommunicationWheelTemplate>()
+                .Property(cwt => cwt.Description)
+                .HasColumnType("TEXT");
+                
+            modelBuilder.Entity<CommunicationWheelTemplate>()
+                .HasIndex(cwt => cwt.CoachId);
+                
+            modelBuilder.Entity<CommunicationWheelTemplate>()
+                .HasIndex(cwt => cwt.IsActive);
+                
+            // CommunicationDimension configuration
+            modelBuilder.Entity<CommunicationDimension>()
+                .HasKey(cd => cd.Id);
+                
+            modelBuilder.Entity<CommunicationDimension>()
+                .HasOne(cd => cd.CommunicationWheelTemplate)
+                .WithMany(cwt => cwt.Dimensions)
+                .HasForeignKey(cd => cd.CommunicationWheelTemplateId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<CommunicationDimension>()
+                .Property(cd => cd.GuidingQuestion)
+                .HasColumnType("TEXT");
+                
+            modelBuilder.Entity<CommunicationDimension>()
+                .HasIndex(cd => new { cd.CommunicationWheelTemplateId, cd.Order });
+                
+            // ClientCommunicationWheelInstance configuration
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasKey(ccwi => ccwi.Id);
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasOne(ccwi => ccwi.CommunicationWheelTemplate)
+                .WithMany()
+                .HasForeignKey(ccwi => ccwi.CommunicationWheelTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasOne(ccwi => ccwi.Client)
+                .WithMany()
+                .HasForeignKey(ccwi => ccwi.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasOne(ccwi => ccwi.AssignedByCoach)
+                .WithMany()
+                .HasForeignKey(ccwi => ccwi.AssignedByCoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .Property(ccwi => ccwi.ClientNotes)
+                .HasColumnType("TEXT");
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasIndex(ccwi => new { ccwi.ClientId, ccwi.Status });
+                
+            modelBuilder.Entity<ClientCommunicationWheelInstance>()
+                .HasIndex(ccwi => ccwi.AssignedAt);
+                
+            // DimensionScore configuration
+            modelBuilder.Entity<DimensionScore>()
+                .HasKey(ds => ds.Id);
+                
+            modelBuilder.Entity<DimensionScore>()
+                .HasOne(ds => ds.ClientCommunicationWheelInstance)
+                .WithMany(ccwi => ccwi.Scores)
+                .HasForeignKey(ds => ds.ClientCommunicationWheelInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<DimensionScore>()
+                .HasOne(ds => ds.CommunicationDimension)
+                .WithMany()
+                .HasForeignKey(ds => ds.CommunicationDimensionId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            // Unique index to prevent duplicate scores
+            modelBuilder.Entity<DimensionScore>()
+                .HasIndex(ds => new { ds.ClientCommunicationWheelInstanceId, ds.CommunicationDimensionId })
+                .IsUnique();
         }
     }
 }

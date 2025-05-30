@@ -1,0 +1,304 @@
+@model ToolBox.Models.ViewModels.AssignedWheelsListViewModel
+@{
+    ViewData["Title"] = "Ruedas de Comunicación Asignadas";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<style>
+    /* Make badges fit their content - override Bootstrap defaults */
+    .badge.status-badge {
+        display: inline-flex !important;
+        align-items: center;
+        white-space: nowrap;
+        padding: 0.375rem 0.75rem;
+        width: auto !important;
+        min-width: auto !important;
+        max-width: none !important;
+    }
+    
+    /* Ensure icon and text stay together */
+    .status-badge i {
+        margin-right: 0.25rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Remove any fixed width from parent td */
+    td.text-center {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2" data-translate-key="coach_assigned_wheels_title">
+                        @ViewData["Title"]
+                    </h1>
+                    <p class="text-muted mb-0" data-translate-key="coach_assigned_wheels_subtitle">
+                        Monitorea el progreso de las ruedas de comunicación asignadas a tus clientes
+                    </p>
+                </div>
+                <a asp-controller="CommunicationWheelTemplates" asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-cog me-2"></i>
+                    <span data-translate-key="coach_manage_templates">Gestionar Plantillas</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label for="templateId" class="form-label" data-translate-key="filter_by_template">
+                        Filtrar por Plantilla
+                    </label>
+                    <select name="templateId" id="templateId" class="form-select">
+                        <option value="" data-translate-key="filter_all_templates">Todas las plantillas</option>
+                        @foreach (var template in Model.TemplateOptions)
+                        {
+                            <option value="@template.Value" selected="@template.Selected">@template.Text</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="col-12 col-md-4">
+                    <label for="clientId" class="form-label" data-translate-key="filter_by_client">
+                        Filtrar por Cliente
+                    </label>
+                    <select name="clientId" id="clientId" class="form-select">
+                        <option value="" data-translate-key="filter_all_clients">Todos los clientes</option>
+                        @foreach (var client in Model.ClientOptions)
+                        {
+                            <option value="@client.Value" selected="@client.Selected">@client.Text</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="col-12 col-md-4">
+                    <label for="status" class="form-label" data-translate-key="filter_by_status">
+                        Filtrar por Estado
+                    </label>
+                    <select name="status" id="status" class="form-select">
+                        @foreach (var statusOption in Model.StatusOptions)
+                        {
+                            <option value="@statusOption.Value" selected="@statusOption.Selected">@statusOption.Text</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i>
+                        <span data-translate-key="button_apply_filters">Aplicar Filtros</span>
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>
+                        <span data-translate-key="button_clear_filters">Limpiar Filtros</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    @if (Model.Wheels.Any())
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th data-translate-key="coach_wheel_template_column">Plantilla</th>
+                                <th data-translate-key="coach_wheel_client_column">Cliente</th>
+                                <th data-translate-key="coach_wheel_assigned_date_column">Fecha Asignación</th>
+                                <th class="text-center" data-translate-key="coach_wheel_status_column">Estado</th>
+                                <th data-translate-key="coach_wheel_completed_date_column">Fecha Completado</th>
+                                <th class="text-center" data-translate-key="coach_wheel_actions_column">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var wheel in Model.Wheels)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                    <i class="fas fa-chart-radar"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="fw-medium">@wheel.WheelTemplateName</span>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-layer-group me-1"></i>
+                                                    @wheel.DimensionCount <span data-translate-key="dimensions">dimensiones</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span>@wheel.ClientName</span>
+                                            <br>
+                                            <small class="text-muted">@wheel.ClientEmail</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">@wheel.AssignedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @switch (wheel.Status)
+                                        {
+                                            case WheelCompletionStatus.Pending:
+                                                <span class="badge bg-warning status-badge">
+                                                    <i class="fas fa-clock"></i>
+                                                    <span data-translate-key="status_pending">Pendiente</span>
+                                                </span>
+                                                break;
+                                            case WheelCompletionStatus.InProgress:
+                                                <span class="badge bg-info status-badge">
+                                                    <i class="fas fa-spinner"></i>
+                                                    <span data-translate-key="status_in_progress">En Progreso</span>
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <span data-translate-key="started_at">Iniciado:</span>
+                                                    @wheel.StartedAt?.ToString("dd/MM/yyyy")
+                                                </small>
+                                                break;
+                                            case WheelCompletionStatus.Completed:
+                                                <span class="badge bg-success status-badge">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span data-translate-key="status_completed">Completado</span>
+                                                </span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (wheel.CompletedAt.HasValue)
+                                        {
+                                            <span class="text-muted">@wheel.CompletedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-1">
+                                            @if (wheel.Status == WheelCompletionStatus.Completed)
+                                            {
+                                                <a asp-action="ViewClientWheel" asp-route-id="@wheel.InstanceId" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Ver Rueda Completada">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                                        title="La rueda aún no ha sido completada">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Wheels pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" 
+                                   asp-route-templateId="@Model.SelectedTemplateId"
+                                   asp-route-clientId="@Model.SelectedClientId"
+                                   asp-route-status="@Model.SelectedStatus"
+                                   asp-route-page="@(Model.CurrentPage - 1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" 
+                                       asp-route-templateId="@Model.SelectedTemplateId"
+                                       asp-route-clientId="@Model.SelectedClientId"
+                                       asp-route-status="@Model.SelectedStatus"
+                                       asp-route-page="@i">@i</a>
+                                </li>
+                            }
+                            
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" 
+                                   asp-route-templateId="@Model.SelectedTemplateId"
+                                   asp-route-clientId="@Model.SelectedClientId"
+                                   asp-route-status="@Model.SelectedStatus"
+                                   asp-route-page="@(Model.CurrentPage + 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-chart-radar fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted" data-translate-key="coach_no_assigned_wheels">
+                        No se encontraron ruedas con los filtros seleccionados
+                    </h5>
+                    <p class="text-muted mb-4" data-translate-key="coach_try_different_filters">
+                        Intenta cambiar los filtros o asigna nuevas ruedas a tus clientes
+                    </p>
+                </div>
+            }
+        </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-chart-radar fa-4x text-muted opacity-50"></i>
+                </div>
+                <h5 class="text-muted" data-translate-key="coach_no_wheels_assigned_yet">
+                    Aún no has asignado ruedas de comunicación
+                </h5>
+                <p class="text-muted mb-4" data-translate-key="coach_start_assigning">
+                    Comienza creando plantillas y asignándolas a tus clientes
+                </p>
+                <a asp-controller="CommunicationWheelTemplates" asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    <span data-translate-key="coach_create_first_template">Crear Primera Plantilla</span>
+                </a>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,511 @@
+@model ToolBox.Models.ViewModels.ViewClientWheelViewModel
+@{
+    ViewData["Title"] = "Rueda de Comunicación del Cliente";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<style>
+    /* Chart container styling */
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin: 2rem 0;
+    }
+    
+    /* Make chart canvas crisp and clear */
+    .chart-container canvas {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index" data-translate-key="coach_assigned_wheels_title">
+                            Ruedas Asignadas
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <span data-translate-key="coach_view_client_wheel">Ver Rueda Completada</span>
+                    </li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h3 mb-2">@Model.WheelTemplateName</h1>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-user me-1"></i>
+                        <span data-translate-key="coach_completed_by">Completado por:</span>
+                        <strong>@Model.ClientName</strong> (@Model.ClientEmail)
+                    </p>
+                </div>
+                <button class="btn btn-primary d-print-none" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>
+                    <span data-translate-key="button_print">Imprimir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Selector -->
+    @if (Model.AvailableInstancesForComparison.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-1"></i>
+                    <span data-translate-key="coach_compare_evaluations">Comparar con evaluaciones anteriores</span>
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="get" id="comparisonForm">
+                    <input type="hidden" name="id" value="@Model.InstanceId" />
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label" data-translate-key="coach_select_evaluations_compare">
+                                Selecciona hasta 3 evaluaciones para comparar:
+                            </label>
+                            <div class="comparison-checkboxes">
+                                @foreach (var instance in Model.AvailableInstancesForComparison)
+                                {
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input comparison-checkbox" type="checkbox" 
+                                               name="compareWithInstanceIds" 
+                                               value="@instance.InstanceId" 
+                                               id="compare-@instance.InstanceId"
+                                               @(instance.IsCurrentlyCompared ? "checked" : "")>
+                                        <label class="form-check-label" for="compare-@instance.InstanceId">
+                                            @instance.DisplayLabel
+                                            <span class="badge bg-light text-dark ms-2">
+                                                <i class="fas fa-star text-warning"></i>
+                                                @instance.AverageScore.ToString("F1")
+                                            </span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                <span data-translate-key="button_update_comparison">Actualizar Comparación</span>
+                            </button>
+                            @if (Model.CurrentlyComparedInstanceIds.Any())
+                            {
+                                <a asp-action="ViewClientWheel" asp-route-id="@Model.InstanceId" 
+                                   class="btn btn-secondary w-100 mt-2">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span data-translate-key="button_clear_comparison">Limpiar Comparación</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Radar Chart -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" data-translate-key="coach_client_wheel_result">
+                        Resultado de la Evaluación
+                    </h5>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-check me-1"></i>
+                        <span data-translate-key="coach_completed_on">Completada el</span>
+                        @Model.CompletedAt?.ToString("dd 'de' MMMM 'de' yyyy 'a las' HH:mm")
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 500px;">
+                        <canvas id="wheelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Scores Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" data-translate-key="coach_detailed_scores">
+                        Puntuaciones Detalladas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="50">#</th>
+                                    <th data-translate-key="coach_dimension_column">Dimensión</th>
+                                    <th data-translate-key="coach_guiding_question_column">Pregunta Guía</th>
+                                    <th width="120" class="text-center" data-translate-key="coach_score_column">Puntuación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dimension in Model.DimensionDetails.OrderBy(d => d.Order))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary">@dimension.Order</span>
+                                        </td>
+                                        <td>
+                                            <strong>@dimension.DimensionName</strong>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(dimension.GuidingQuestion))
+                                            {
+                                                <small class="text-muted">@dimension.GuidingQuestion</small>
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">Sin pregunta guía</em>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge @dimension.ScoreBadgeClass fs-6">
+                                                @dimension.Score / 10
+                                            </span>
+                                            <div class="progress mt-1" style="height: 5px;">
+                                                <div class="progress-bar @dimension.ScoreBadgeClass.Replace("bg-", "bg-")" 
+                                                     role="progressbar" 
+                                                     style="width: @(dimension.Score * 10)%">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Information -->
+        <div class="col-lg-4">
+            <!-- Statistics -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0" data-translate-key="coach_statistics">
+                        Estadísticas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <h3 class="text-primary mb-1">@Model.AverageScore.ToString("F1")</h3>
+                            <small class="text-muted" data-translate-key="coach_avg_score">Promedio General</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-info mb-1">@Model.DimensionLabelsForChart.Count</h3>
+                            <small class="text-muted" data-translate-key="coach_total_dimensions">Dimensiones Evaluadas</small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted" data-translate-key="coach_highest_score">Puntuación más alta:</small>
+                            <span class="badge bg-success">@Model.MaxScore / 10</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.HighestDimension))
+                        {
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                @Model.HighestDimension
+                            </small>
+                        }
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted" data-translate-key="coach_lowest_score">Puntuación más baja:</small>
+                            <span class="badge bg-warning">@Model.MinScore / 10</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.LowestDimension))
+                        {
+                            <small class="text-warning">
+                                <i class="fas fa-arrow-down me-1"></i>
+                                @Model.LowestDimension
+                            </small>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Notes -->
+            @if (!string.IsNullOrEmpty(Model.ClientNotes))
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-comment-dots me-1"></i>
+                            <span data-translate-key="coach_client_notes">Notas del Cliente</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">@Model.ClientNotes</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Template Info -->
+            @if (!string.IsNullOrEmpty(Model.WheelTemplateDescription))
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0" data-translate-key="coach_template_description">
+                            Descripción de la Plantilla
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0 small">@Model.WheelTemplateDescription</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Timeline -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0" data-translate-key="coach_timeline">
+                        Línea de Tiempo
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline-simple">
+                        <div class="timeline-item">
+                            <i class="fas fa-paper-plane text-primary"></i>
+                            <div class="ms-3">
+                                <small class="text-muted d-block" data-translate-key="coach_assigned_date">Asignada</small>
+                                <span class="small">@Model.AssignedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item mt-3">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <div class="ms-3">
+                                <small class="text-muted d-block" data-translate-key="coach_completed_date">Completada</small>
+                                <span class="small">@Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-print-none">
+                <a asp-action="Index" class="btn btn-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    <span data-translate-key="button_back_to_list">Volver a la Lista</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get data from the model
+            const labels = @Html.Raw(Json.Serialize(Model.DimensionLabelsForChart));
+            const seriesData = @Html.Raw(Json.Serialize(Model.SeriesForChart));
+            
+            // Prepare datasets for Chart.js
+            const datasets = seriesData.map((series, index) => ({
+                label: series.seriesLabel,
+                data: series.scores,
+                fill: true,
+                backgroundColor: series.backgroundColor,
+                borderColor: series.borderColor,
+                pointBackgroundColor: series.borderColor,
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: series.borderColor,
+                pointRadius: series.isPrimary ? 6 : 4,
+                pointHoverRadius: series.isPrimary ? 8 : 6,
+                borderWidth: series.isPrimary ? 3 : 2,
+                borderDash: series.isPrimary ? [] : [5, 5] // Dashed line for comparisons
+            }));
+            
+            // Create the radar chart
+            const ctx = document.getElementById('wheelChart').getContext('2d');
+            const wheelChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    
+                    // CRITICAL: Configuration for high-resolution displays
+                    devicePixelRatio: window.devicePixelRatio || 2,
+                    
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    family: 'Inter, system-ui, -apple-system, sans-serif',
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ' - ' + context.label + ': ' + context.parsed.r + '/10';
+                                }
+                            },
+                            titleFont: {
+                                family: 'Inter, system-ui, -apple-system, sans-serif',
+                                size: 13,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: 'Inter, system-ui, -apple-system, sans-serif',
+                                size: 12,
+                                weight: '400'
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: {
+                                stepSize: 2,
+                                font: {
+                                    family: 'Inter, system-ui, -apple-system, sans-serif',
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            pointLabels: {
+                                font: {
+                                    family: 'Inter, system-ui, -apple-system, sans-serif',
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Limit checkbox selection to 3
+            const checkboxes = document.querySelectorAll('.comparison-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('.comparison-checkbox:checked').length;
+                    if (checkedCount >= 3) {
+                        // Disable unchecked checkboxes
+                        checkboxes.forEach(cb => {
+                            if (!cb.checked) {
+                                cb.disabled = true;
+                            }
+                        });
+                    } else {
+                        // Enable all checkboxes
+                        checkboxes.forEach(cb => {
+                            cb.disabled = false;
+                        });
+                    }
+                });
+            });
+            
+            // Trigger the check on page load
+            const checkedCount = document.querySelectorAll('.comparison-checkbox:checked').length;
+            if (checkedCount >= 3) {
+                checkboxes.forEach(cb => {
+                    if (!cb.checked) {
+                        cb.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <style>
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item i {
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+        
+        @@media print {
+            .breadcrumb,
+            .btn,
+            .d-print-none {
+                display: none !important;
+            }
+            
+            .card {
+                border: 1px solid #dee2e6 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            
+            .chart-container {
+                page-break-inside: avoid;
+            }
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .progress {
+            background-color: #e9ecef;
+        }
+        
+        .comparison-checkboxes {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        
+        .form-check-input:disabled ~ .form-check-label {
+            opacity: 0.5;
+        }
+    </style>
+}

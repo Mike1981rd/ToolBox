@@ -171,6 +171,27 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("CommunicationWheelTemplates"))
+                {
+                    <a href="@Url.Action("Index", "CommunicationWheelTemplates")" class="list-group-item list-group-item-action" data-translate-key="sidebar.communicationWheelTemplates">
+                        <i class="fas fa-comments fa-fw"></i><span class="sidebar-item-text">Communication Wheel Templates</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("CoachClientWheels"))
+                {
+                    <a href="@Url.Action("Index", "CoachClientWheels")" class="list-group-item list-group-item-action" data-translate-key="sidebar.coachClientWheels">
+                        <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">Client Communication Wheels</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("ClientCommunicationWheels"))
+                {
+                    <a href="@Url.Action("Index", "ClientCommunicationWheels")" class="list-group-item list-group-item-action" data-translate-key="sidebar.clientCommunicationWheels">
+                        <i class="fas fa-comment-dots fa-fw"></i><span class="sidebar-item-text">My Communication Wheels</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("Tasks"))
                 {
                     <a href="@Url.Action("Index", "Tasks")" class="list-group-item list-group-item-action" data-translate-key="sidebar.tasks">

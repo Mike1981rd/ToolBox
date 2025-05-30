@@ -492,6 +492,33 @@
                         };
                     }
                     
+                case 'communication_wheel_assigned':
+                    console.log('Communication wheel notification data:', data);
+                    if (lang === 'es') {
+                        return {
+                            title: 'Nueva Rueda de Comunicación 🎯',
+                            subtitle: `${data.coachName || 'Tu coach'} te ha enviado una rueda de comunicación: "${data.wheelName || 'Sin título'}"`
+                        };
+                    } else {
+                        return {
+                            title: 'New Communication Wheel 🎯',
+                            subtitle: `${data.coachName || 'Your coach'} has sent you a communication wheel: "${data.wheelName || 'Untitled'}"`
+                        };
+                    }
+                    
+                case 'communication_wheel_completed':
+                    if (lang === 'es') {
+                        return {
+                            title: 'Rueda de Comunicación Completada ✅',
+                            subtitle: `${data.clientName || 'Un cliente'} ha completado la rueda de comunicación: "${data.wheelName || 'Sin título'}"`
+                        };
+                    } else {
+                        return {
+                            title: 'Communication Wheel Completed ✅',
+                            subtitle: `${data.clientName || 'A client'} has completed the communication wheel: "${data.wheelName || 'Untitled'}"`
+                        };
+                    }
+                    
                 default:
                     if (lang === 'es') {
                         return {

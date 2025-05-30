@@ -145,6 +145,10 @@
                 return lang === 'es' ? 'Nuevo cuestionario asignado' : 'New questionnaire assigned';
             case 'questionnaire_completed_by_client':
                 return lang === 'es' ? 'Cuestionario completado' : 'Questionnaire completed';
+            case 'communication_wheel_assigned':
+                return lang === 'es' ? 'Nueva rueda de comunicación asignada' : 'New communication wheel assigned';
+            case 'communication_wheel_completed':
+                return lang === 'es' ? 'Rueda de comunicación completada' : 'Communication wheel completed';
             default:
                 return lang === 'es' ? 'Notificación' : 'Notification';
         }
@@ -226,6 +230,21 @@
                         return `${data.clientName || 'A client'} has completed the questionnaire: "${data.questionnaireTitle || 'Untitled'}".`;
                     }
                     
+                case 'communication_wheel_assigned':
+                    console.log('Communication wheel notification data in page:', data);
+                    if (lang === 'es') {
+                        return `${data.coachName || 'Tu coach'} te ha enviado una rueda de comunicación: "${data.wheelName || 'Sin título'}".`;
+                    } else {
+                        return `${data.coachName || 'Your coach'} has sent you a communication wheel: "${data.wheelName || 'Untitled'}".`;
+                    }
+                    
+                case 'communication_wheel_completed':
+                    if (lang === 'es') {
+                        return `${data.clientName || 'Un cliente'} ha completado la rueda de comunicación: "${data.wheelName || 'Sin título'}".`;
+                    } else {
+                        return `${data.clientName || 'A client'} has completed the communication wheel: "${data.wheelName || 'Untitled'}".`;
+                    }
+                    
                 default:
                     return JSON.stringify(data);
             }
@@ -247,6 +266,10 @@
                 return { icon: 'fas fa-clipboard-list', class: 'default' };
             case 'questionnaire_completed_by_client':
                 return { icon: 'fas fa-check-square', class: 'default' };
+            case 'communication_wheel_assigned':
+                return { icon: 'fas fa-comments', class: 'default' };
+            case 'communication_wheel_completed':
+                return { icon: 'fas fa-check-circle', class: 'success' };
             default:
                 return { icon: 'fas fa-bell', class: 'default' };
         }

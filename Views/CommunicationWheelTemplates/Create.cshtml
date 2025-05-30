@@ -1,0 +1,112 @@
+@model ToolBox.Models.ViewModels.CommunicationWheelTemplateViewModel
+@{
+    ViewData["Title"] = "Nueva Plantilla de Rueda de Comunicación";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index" data-translate-key="communication_wheel_templates_title">
+                            Plantillas de Rueda de Comunicación
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page" data-translate-key="communication_wheel_new_template">
+                        Nueva Plantilla
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0" data-translate-key="communication_wheel_create_title">
+                @ViewData["Title"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label">
+                                <span data-translate-key="communication_wheel_template_name">Nombre de la Plantilla</span>
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" 
+                                   placeholder="Ej: Comunicación en Liderazgo"
+                                   data-translate-placeholder="communication_wheel_name_placeholder" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <small class="form-text text-muted" data-translate-key="communication_wheel_name_help">
+                                El nombre debe ser descriptivo y único para identificar esta plantilla
+                            </small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label" data-translate-key="communication_wheel_template_description">
+                                Descripción
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="4" 
+                                      placeholder="Describe el propósito y enfoque de esta rueda de comunicación..."
+                                      data-translate-placeholder="communication_wheel_description_placeholder"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="form-text text-muted" data-translate-key="communication_wheel_description_help">
+                                Opcional: Proporciona contexto sobre cuándo y cómo usar esta plantilla
+                            </small>
+                        </div>
+                        
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <span data-translate-key="communication_wheel_create_info">
+                                    Después de crear la plantilla, podrás agregar las dimensiones de comunicación que la compondrán.
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                <span data-translate-key="button_cancel">Cancelar</span>
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span data-translate-key="button_create_continue">Crear y Continuar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title d-flex align-items-center">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        <span data-translate-key="communication_wheel_tips_title">Consejos para crear una buena plantilla</span>
+                    </h6>
+                    <ul class="mb-0 ps-4">
+                        <li data-translate-key="communication_wheel_tip_1">
+                            Elige un nombre claro que indique el contexto de uso (ej: "Comunicación en Equipos", "Comunicación Personal")
+                        </li>
+                        <li data-translate-key="communication_wheel_tip_2">
+                            Planifica entre 6 y 10 dimensiones para un balance visual óptimo en el gráfico
+                        </li>
+                        <li data-translate-key="communication_wheel_tip_3">
+                            Cada dimensión debe representar un aspecto específico y medible de la comunicación
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

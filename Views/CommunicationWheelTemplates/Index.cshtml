@@ -1,0 +1,175 @@
+@model ToolBox.Models.ViewModels.CommunicationWheelTemplateListViewModel
+@{
+    ViewData["Title"] = "Plantillas de Rueda de Comunicación";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2" data-translate-key="communication_wheel_templates_title">
+                        @ViewData["Title"]
+                    </h1>
+                    <p class="text-muted mb-0" data-translate-key="communication_wheel_templates_subtitle">
+                        Gestiona tus plantillas de rueda de comunicación
+                    </p>
+                </div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    <span data-translate-key="communication_wheel_new_template">Nueva Plantilla</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Templates Table -->
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Templates.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="templatesTable">
+                        <thead>
+                            <tr>
+                                <th data-translate-key="communication_wheel_name_column">Nombre</th>
+                                <th data-translate-key="communication_wheel_description_column">Descripción</th>
+                                <th class="text-center" data-translate-key="communication_wheel_dimensions_column">Dimensiones</th>
+                                <th data-translate-key="communication_wheel_created_column">Creado</th>
+                                <th class="text-center" data-translate-key="communication_wheel_status_column">Estado</th>
+                                <th class="text-center" data-translate-key="communication_wheel_actions_column">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var template in Model.Templates)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                    <i class="fas fa-comments"></i>
+                                                </div>
+                                            </div>
+                                            <span class="fw-medium">@template.Name</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">
+                                            @if (!string.IsNullOrEmpty(template.Description))
+                                            {
+                                                @(template.Description.Length > 100 ? template.Description.Substring(0, 100) + "..." : template.Description)
+                                            }
+                                            else
+                                            {
+                                                <em data-translate-key="communication_wheel_no_description">Sin descripción</em>
+                                            }
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">@template.DimensionCount</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">@template.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (template.IsActive)
+                                        {
+                                            <span class="badge bg-success" data-translate-key="status_active">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary" data-translate-key="status_inactive">Inactivo</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-block text-nowrap">
+                                            <a asp-action="Edit" asp-route-id="@template.Id" 
+                                               class="btn btn-sm btn-icon" 
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            <form asp-action="ToggleActiveStatus" asp-route-id="@template.Id" 
+                                                  method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-icon @(template.IsActive ? "text-warning" : "text-success")"
+                                                        title="@(template.IsActive ? "Desactivar" : "Activar")">
+                                                    <i class="fas fa-@(template.IsActive ? "pause-circle" : "check-circle")"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            <a asp-action="Assign" asp-route-id="@template.Id" 
+                                               class="btn btn-sm btn-icon" 
+                                               title="Asignar a clientes">
+                                                <i class="fas fa-user-plus"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Templates pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                                </li>
+                            }
+                            
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-chart-radar fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted" data-translate-key="communication_wheel_no_templates">
+                        No tienes plantillas de rueda de comunicación
+                    </h5>
+                    <p class="text-muted mb-4" data-translate-key="communication_wheel_create_first">
+                        Crea tu primera plantilla para empezar
+                    </p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        <span data-translate-key="communication_wheel_create_template">Crear Plantilla</span>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
