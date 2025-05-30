@@ -48,6 +48,12 @@ namespace ToolBox.Data
         public DbSet<CommunicationDimension> CommunicationDimensions { get; set; }
         public DbSet<ClientCommunicationWheelInstance> ClientCommunicationWheelInstances { get; set; }
         public DbSet<DimensionScore> DimensionScores { get; set; }
+        
+        // Feedback 360 entities
+        public DbSet<Feedback360Instance> Feedback360Instances { get; set; }
+        public DbSet<Feedback360Rater> Feedback360Raters { get; set; }
+        public DbSet<Feedback360ResponseScale> Feedback360ResponseScales { get; set; }
+        public DbSet<Feedback360ResponseOpen> Feedback360ResponseOpens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -564,6 +570,95 @@ namespace ToolBox.Data
             // Índice único para evitar respuestas duplicadas
             modelBuilder.Entity<Answer>()
                 .HasIndex(a => new { a.QuestionnaireInstanceId, a.QuestionTemplateId })
+                .IsUnique();
+
+            // Feedback 360 configurations
+            ConfigureFeedback360Entities(modelBuilder);
+        }
+
+        private void ConfigureFeedback360Entities(ModelBuilder modelBuilder)
+        {
+            // Feedback360Instance configuration
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasKey(f => f.Id);
+
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasOne(f => f.SubjectUser)
+                .WithMany()
+                .HasForeignKey(f => f.SubjectUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasOne(f => f.InitiatedByCoach)
+                .WithMany()
+                .HasForeignKey(f => f.InitiatedByCoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasIndex(f => f.SubjectUserId);
+
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasIndex(f => f.InitiatedByCoachId);
+
+            modelBuilder.Entity<Feedback360Instance>()
+                .HasIndex(f => f.CreatedAt);
+
+            // Feedback360Rater configuration
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasKey(r => r.Id);
+
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasOne(r => r.Feedback360Instance)
+                .WithMany(f => f.Raters)
+                .HasForeignKey(r => r.Feedback360InstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasOne(r => r.RaterUser)
+                .WithMany()
+                .HasForeignKey(r => r.RaterUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasIndex(r => r.UniqueResponseToken)
+                .IsUnique();
+
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasIndex(r => r.Feedback360InstanceId);
+
+            modelBuilder.Entity<Feedback360Rater>()
+                .HasIndex(r => r.RaterUserId);
+
+            // Feedback360ResponseScale configuration
+            modelBuilder.Entity<Feedback360ResponseScale>()
+                .HasKey(rs => rs.Id);
+
+            modelBuilder.Entity<Feedback360ResponseScale>()
+                .HasOne(rs => rs.Feedback360Rater)
+                .WithMany(r => r.ScaleResponses)
+                .HasForeignKey(rs => rs.Feedback360RaterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Feedback360ResponseScale>()
+                .HasIndex(rs => new { rs.Feedback360RaterId, rs.QuestionCode })
+                .IsUnique();
+
+            // Feedback360ResponseOpen configuration
+            modelBuilder.Entity<Feedback360ResponseOpen>()
+                .HasKey(ro => ro.Id);
+
+            modelBuilder.Entity<Feedback360ResponseOpen>()
+                .HasOne(ro => ro.Feedback360Rater)
+                .WithMany(r => r.OpenEndedResponses)
+                .HasForeignKey(ro => ro.Feedback360RaterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Feedback360ResponseOpen>()
+                .Property(ro => ro.ResponseText)
+                .HasColumnType("TEXT");
+
+            modelBuilder.Entity<Feedback360ResponseOpen>()
+                .HasIndex(ro => new { ro.Feedback360RaterId, ro.QuestionCode })
                 .IsUnique();
         }
 

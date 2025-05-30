@@ -408,3 +408,63 @@ body {
   color: white !important;
   font-size: 11px !important;
 }
+
+/* Avatar styles for consistency */
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(102, 88, 221, 0.12) !important;
+}
+
+.text-primary {
+    color: #6658dd !important;
+}
+
+/* Button icon styles */
+.btn-icon {
+    padding: 0.4rem 0.65rem;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    color: #6658dd;
+    background-color: rgba(102, 88, 221, 0.08);
+    border-radius: 0.25rem;
+}
+
+.btn-icon.text-success:hover {
+    color: #0acf97 !important;
+    background-color: rgba(10, 207, 151, 0.08);
+}
+
+.btn-icon.text-warning:hover {
+    color: #ffbc00 !important;
+    background-color: rgba(255, 188, 0, 0.08);
+}
+
+/* Fix for badges to properly fit text content */
+.badge {
+    display: inline-block !important;
+    width: auto !important;
+    max-width: fit-content !important;
+    white-space: nowrap !important;
+}
+
+/* Force cache refresh with specific timestamp */
+/* Updated: ${new Date().toISOString()} */

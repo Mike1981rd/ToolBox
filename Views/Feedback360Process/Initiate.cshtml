@@ -1,0 +1,148 @@
+@model ToolBox.Models.ViewModels.InitiateFeedback360ViewModel
+@{
+    ViewData["Title"] = "Start New Feedback 360° Process";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-circle-notch me-2"></i>
+                        <span data-translate-key="feedback360_initiate_title">Start New Feedback 360° Process</span>
+                    </h3>
+                </div>
+                <form asp-action="Initiate" method="post">
+                    <div class="card-body">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="SelectedSubjectUserId" class="form-label">
+                                    <span data-translate-key="feedback360_select_client">Select Client (Subject)</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="SelectedSubjectUserId" 
+                                        asp-items="Model.PotentialSubjects" 
+                                        class="form-select">
+                                    <option value="" data-translate-key="feedback360_choose_client">-- Choose a client --</option>
+                                </select>
+                                <span asp-validation-for="SelectedSubjectUserId" class="text-danger"></span>
+                                <small class="form-text text-muted" data-translate-key="feedback360_client_help">
+                                    Select the person who will be evaluated in this 360° feedback process.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="InstanceTitle" class="form-label">
+                                    <span data-translate-key="feedback360_instance_title">Process Title</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="InstanceTitle" 
+                                       class="form-control" 
+                                       placeholder="e.g., Feedback 360° for John Doe - Q1 2024"
+                                       data-translate-placeholder="feedback360_title_placeholder" />
+                                <span asp-validation-for="InstanceTitle" class="text-danger"></span>
+                                <small class="form-text text-muted" data-translate-key="feedback360_title_help">
+                                    Give this feedback process a descriptive title for easy identification.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FeedbackDeadline" class="form-label">
+                                    <span data-translate-key="feedback360_deadline">Feedback Deadline</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FeedbackDeadline" 
+                                       type="date" 
+                                       class="form-control"
+                                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="FeedbackDeadline" class="text-danger"></span>
+                                <small class="form-text text-muted" data-translate-key="feedback360_deadline_help">
+                                    Set the deadline by which all evaluators should complete their feedback.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span data-translate-key="feedback360_next_steps">Next Steps</span>
+                            </h6>
+                            <p class="mb-0" data-translate-key="feedback360_next_steps_text">
+                                After creating this process, you'll be able to:
+                            </p>
+                            <ul class="mb-0 mt-2">
+                                <li data-translate-key="feedback360_step1">Add evaluators (self, manager, peers, direct reports, etc.)</li>
+                                <li data-translate-key="feedback360_step2">Review the competencies and questions that will be used</li>
+                                <li data-translate-key="feedback360_step3">Send invitation emails to all evaluators</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            <span data-translate-key="common_cancel">Cancel</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <span data-translate-key="feedback360_continue_setup">Continue to Setup</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Auto-generate title when client is selected
+        document.getElementById('SelectedSubjectUserId').addEventListener('change', function() {
+            var select = this;
+            var titleInput = document.getElementById('InstanceTitle');
+            
+            if (select.value && !titleInput.value) {
+                var selectedText = select.options[select.selectedIndex].text;
+                var currentQuarter = 'Q' + Math.ceil((new Date().getMonth() + 1) / 3);
+                var currentYear = new Date().getFullYear();
+                
+                // Get the translated template
+                var titleTemplate = document.querySelector('[data-translate-key="feedback360_title_template"]')?.textContent 
+                                 || 'Feedback 360° for {name} - {quarter} {year}';
+                
+                titleInput.value = titleTemplate
+                    .replace('{name}', selectedText)
+                    .replace('{quarter}', currentQuarter)
+                    .replace('{year}', currentYear);
+            }
+        });
+        
+        // Set minimum date for deadline
+        document.addEventListener('DOMContentLoaded', function() {
+            var deadlineInput = document.querySelector('input[type="date"]');
+            if (deadlineInput) {
+                var today = new Date();
+                var minDate = new Date(today.setDate(today.getDate() + 7)); // Minimum 7 days from now
+                deadlineInput.min = minDate.toISOString().split('T')[0];
+                
+                // If no value set, default to 14 days from now
+                if (!deadlineInput.value) {
+                    var defaultDate = new Date();
+                    defaultDate.setDate(defaultDate.getDate() + 14);
+                    deadlineInput.value = defaultDate.toISOString().split('T')[0];
+                }
+            }
+        });
+    </script>
+    
+    <!-- Hidden translation templates -->
+    <span data-translate-key="feedback360_title_template" style="display:none">Feedback 360° for {name} - {quarter} {year}</span>
+}

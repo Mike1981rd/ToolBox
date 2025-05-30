@@ -1,0 +1,181 @@
+/* Feedback 360 Response Styles */
+
+/* Question blocks */
+.competency-block {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.question-block {
+    background-color: white;
+    padding: 1.25rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.question-block:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Likert scale styling */
+.likert-scale-container {
+    padding: 0.5rem;
+}
+
+.likert-option {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.likert-option:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.likert-option .form-check-input:checked ~ .form-check-label {
+    font-weight: 600;
+}
+
+.likert-option:has(.form-check-input:checked) {
+    background-color: #e7f3ff;
+    border-color: #0066cc;
+}
+
+/* Badge styling */
+.likert-option .badge {
+    font-size: 0.875rem;
+    min-width: 2rem;
+}
+
+/* Progress bar enhancement */
+.progress {
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Mobile optimizations */
+@media (max-width: 576px) {
+    .competency-block {
+        padding: 1rem;
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+    
+    .likert-option {
+        margin-bottom: 0.5rem;
+    }
+    
+    .likert-scale-container.mobile-view .row {
+        flex-direction: column;
+    }
+    
+    .likert-scale-container.mobile-view .col {
+        width: 100%;
+    }
+}
+
+/* Form actions */
+.form-actions {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    margin: -1.25rem;
+    margin-top: 2rem;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+/* Textarea enhancement */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+textarea.form-control:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+}
+
+/* Alert customization */
+.alert-info {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+    color: #004085;
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Toast positioning */
+#toastContainer {
+    max-width: 350px;
+}
+
+/* Validation errors */
+.field-validation-error {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.input-validation-error {
+    border-color: #dc3545;
+}
+
+/* Competency header */
+.competency-block h5 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.competency-block h5 .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Simple layout specific */
+.simple-header .logo {
+    max-height: 40px;
+}
+
+/* Animation for thank you page */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Print styles */
+@media print {
+    .simple-header,
+    .simple-footer,
+    .form-actions,
+    .language-switcher {
+        display: none !important;
+    }
+    
+    .competency-block {
+        page-break-inside: avoid;
+    }
+}

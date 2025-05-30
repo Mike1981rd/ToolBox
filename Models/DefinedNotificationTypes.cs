@@ -17,7 +17,10 @@ namespace ToolBox.Models
             { "questionnaire_assigned", "notification_type_questionnaire_assigned" },
             { "questionnaire_completed_by_client", "notification_type_questionnaire_completed" },
             { "communication_wheel_assigned", "notification_type_communication_wheel_assigned" },
-            { "communication_wheel_completed", "notification_type_communication_wheel_completed" }
+            { "communication_wheel_completed", "notification_type_communication_wheel_completed" },
+            { "feedback_360_process_initiated", "notification_type_feedback360_initiated" },
+            { "feedback_360_collection_complete", "notification_type_feedback360_complete" },
+            { "feedback_360_reminder", "notification_type_feedback360_reminder" }
         };
 
         public static IEnumerable<string> GetAllTypeKeys() => Types.Keys;

@@ -1,0 +1,287 @@
+@model List<ClientFeedback360ReportSummaryViewModel>
+@{
+    ViewData["Title"] = "My 360° Feedback Reports";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.HideTitleInLayout = true;
+}
+
+@section Styles {
+    <style>
+        .report-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .status-header {
+            border-radius: 0.375rem 0.375rem 0 0;
+            padding: 0.75rem 1.25rem;
+            margin: -1.25rem -1.25rem 1rem -1.25rem;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__background {
+            fill: none;
+            stroke: #e9ecef;
+            stroke-width: 8;
+        }
+        
+        .progress-ring__progress {
+            fill: none;
+            stroke: #28a745;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+        
+        .report-available {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .report-pending {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+        
+        .report-in-progress {
+            background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-chart-line text-primary me-3"></i>
+                        <span data-translate-key="client_feedback360_reports.page_title"></span>
+                    </h1>
+                    <p class="text-muted mb-0" data-translate-key="client_feedback360_reports.subtitle"></p>
+                </div>
+                <div class="text-end">
+                    <div class="badge bg-primary fs-6 px-3 py-2">
+                        @Model.Count <span data-translate-key="@(Model.Count != 1 ? "client_feedback360_reports.reports_available_plural" : "client_feedback360_reports.reports_available")"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <!-- Empty State -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 data-translate-key="client_feedback360_reports.no_reports_title"></h3>
+                            <p class="lead mb-4" data-translate-key="client_feedback360_reports.no_reports_message"></p>
+                            <p data-translate-key="client_feedback360_reports.no_reports_description"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Reports Grid -->
+        <div class="row">
+            @foreach (var report in Model)
+            {
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card report-card h-100">
+                        <!-- Status Header -->
+                        <div class="status-header @(report.IsReportAvailable ? "report-available" : report.Status == Feedback360Status.CollectingFeedback ? "report-in-progress" : "report-pending")">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge @report.StatusBadgeClass">@report.StatusDisplayName</span>
+                                    @if (report.IsOverdue)
+                                    {
+                                        <span class="badge bg-danger ms-2">Overdue</span>
+                                    }
+                                </div>
+                                <div>
+                                    @if (report.Status == Feedback360Status.CollectingFeedback)
+                                    {
+                                        <!-- Progress Ring -->
+                                        <svg class="progress-ring" width="40" height="40">
+                                            <circle class="progress-ring__background" cx="20" cy="20" r="16"></circle>
+                                            <circle class="progress-ring__progress" cx="20" cy="20" r="16"
+                                                    style="stroke-dasharray: @(Math.Round(report.CompletionPercentage * 100.53 / 100, 2)) 100.53;"></circle>
+                                        </svg>
+                                    }
+                                    else if (report.IsReportAvailable)
+                                    {
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-clock fa-2x"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">@report.InstanceTitle</h5>
+                            
+                            <div class="mb-3">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <div class="h4 mb-0 text-primary">@report.CompletedRaters</div>
+                                            <small class="text-muted">Completed</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 mb-0 text-secondary">@report.TotalRaters</div>
+                                        <small class="text-muted">Total Raters</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            @if (report.Status == Feedback360Status.CollectingFeedback)
+                            {
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar @(report.IsOverdue ? "bg-danger" : "bg-primary")" 
+                                         style="width: @report.CompletionPercentage%"></div>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    @report.CompletionStatusText • 
+                                    Deadline: @(report.FeedbackDeadline?.ToString("MMM dd, yyyy") ?? "TBD")
+                                </p>
+                            }
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Coach:</span>
+                                    <span class="fw-bold">@report.CoachName</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Started:</span>
+                                    <span>@report.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                @if (report.ReportGeneratedAt.HasValue)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Report Ready:</span>
+                                        <span>@report.ReportGeneratedAt.Value.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0 pt-0">
+                            @if (report.CanViewReport && report.IsReportAvailable)
+                            {
+                                <a href="@Url.Action("ViewReport", new { instanceId = report.Id })" 
+                                   class="btn btn-primary w-100">
+                                    <i class="fas fa-chart-bar me-2"></i>View My Report
+                                </a>
+                            }
+                            else if (report.Status == Feedback360Status.CollectingFeedback)
+                            {
+                                <div class="text-center">
+                                    <button class="btn btn-outline-secondary w-100" disabled>
+                                        <i class="fas fa-hourglass-half me-2"></i>
+                                        Waiting for Feedback
+                                    </button>
+                                    <p class="small text-muted mt-2 mb-0">
+                                        Your report will be available when feedback collection is complete.
+                                    </p>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-secondary w-100" disabled>
+                                    <i class="fas fa-clock me-2"></i>Report Not Ready
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <!-- Summary Stats -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-pie me-2"></i>Summary
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="h3 text-success">@Model.Count(r => r.IsReportAvailable)</div>
+                                <div class="text-muted">Reports Available</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-primary">@Model.Count(r => r.Status == Feedback360Status.CollectingFeedback)</div>
+                                <div class="text-muted">In Progress</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-warning">@Model.Count(r => r.Status == Feedback360Status.PendingSetup)</div>
+                                <div class="text-muted">Being Setup</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-info">@Model.Sum(r => r.CompletedRaters)</div>
+                                <div class="text-muted">Total Responses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/feedback360-reports.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add tooltips for additional information
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Auto-refresh for in-progress reports (every 5 minutes)
+            const hasInProgress = @Model.Any(r => r.Status == Feedback360Status.CollectingFeedback).ToString().ToLower();
+            if (hasInProgress) {
+                setTimeout(function() {
+                    location.reload();
+                }, 300000); // 5 minutes
+            }
+        });
+    </script>
+}

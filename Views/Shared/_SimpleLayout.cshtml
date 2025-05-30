@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ToolBox</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/feedback360-response.css" asp-append-version="true" />
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .simple-header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .simple-footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .language-switcher {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Header -->
+    <header class="simple-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <img src="~/img/logo.png" alt="ToolBox" class="logo" />
+                </div>
+                <div class="col-6 text-end">
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe me-1"></i>
+                            <span id="selectedLanguage">Language</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            <li><a class="dropdown-item lang-select" href="#" data-lang="en">English</a></li>
+                            <li><a class="dropdown-item lang-select" href="#" data-lang="es">Español</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="simple-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; @DateTime.Now.Year - ToolBox. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Simple language switcher
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get saved language or default to 'en'
+            let currentLang = localStorage.getItem('selectedLanguage') || 'en';
+            
+            // Check for cookie as well
+            const cookieLang = getCookie('SelectedLanguage');
+            if (cookieLang) {
+                currentLang = cookieLang;
+            }
+            
+            // Update language display
+            updateLanguageDisplay(currentLang);
+            
+            // Handle language selection
+            document.querySelectorAll('.lang-select').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    
+                    // Save to localStorage and cookie
+                    localStorage.setItem('selectedLanguage', lang);
+                    setCookie('SelectedLanguage', lang, 365);
+                    
+                    // Reload page to apply language
+                    location.reload();
+                });
+            });
+        });
+        
+        function updateLanguageDisplay(lang) {
+            const display = document.getElementById('selectedLanguage');
+            if (display) {
+                display.textContent = lang === 'es' ? 'Español' : 'English';
+            }
+        }
+        
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

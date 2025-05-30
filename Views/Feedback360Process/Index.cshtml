@@ -1,0 +1,211 @@
+@model List<ToolBox.Models.ViewModels.Feedback360InstanceSummaryViewModel>
+@{
+    ViewData["Title"] = "Feedback 360° Processes";
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2" data-translate-key="feedback360_processes_title">
+                        Feedback 360° Processes
+                    </h1>
+                    <p class="text-muted mb-0" data-translate-key="feedback360_processes_subtitle">
+                        Manage comprehensive feedback processes for your clients
+                    </p>
+                </div>
+                <a asp-action="Initiate" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    <span data-translate-key="feedback360_initiate_new">Start New Process</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Processes Table -->
+    <div class="card">
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @if (Model.Count == 0)
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-circle-notch fa-4x text-muted opacity-50"></i>
+                            </div>
+                            <h5 class="text-muted" data-translate-key="feedback360_no_processes">
+                                You haven't initiated any 360° feedback processes yet
+                            </h5>
+                            <p class="text-muted mb-4" data-translate-key="feedback360_no_processes_description">
+                                Start a comprehensive feedback process to help your clients grow
+                            </p>
+                            <a asp-action="Initiate" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                <span data-translate-key="feedback360_start_first">Start Your First Process</span>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="feedback360Table">
+                                <thead>
+                                    <tr>
+                                        <th data-translate-key="feedback360_table_process">Process</th>
+                                        <th class="text-center" data-translate-key="feedback360_table_status">Status</th>
+                                        <th data-translate-key="feedback360_table_deadline">Deadline</th>
+                                        <th data-translate-key="feedback360_table_progress">Progress</th>
+                                        <th data-translate-key="feedback360_table_created">Created</th>
+                                        <th class="text-center" data-translate-key="feedback360_table_actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instance in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-3">
+                                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                            <i class="fas fa-circle-notch"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-medium">@instance.InstanceTitle</span>
+                                                        <small class="d-block text-muted">@instance.SubjectUserName</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                @{
+                                                    var statusBadgeClass = instance.Status switch
+                                                    {
+                                                        ToolBox.Models.Feedback360Status.PendingSetup => "bg-warning",
+                                                        ToolBox.Models.Feedback360Status.CollectingFeedback => "bg-info",
+                                                        ToolBox.Models.Feedback360Status.GeneratingReport => "bg-secondary",
+                                                        ToolBox.Models.Feedback360Status.Completed => "bg-success",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                }
+                                                <span class="badge @statusBadgeClass">
+                                                    <span data-translate-key="feedback360_status_@instance.Status.ToString().ToLower()">
+                                                        @instance.Status
+                                                    </span>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (instance.FeedbackDeadline.HasValue)
+                                                {
+                                                    <span>@instance.FeedbackDeadline.Value.ToString("MMM dd, yyyy")</span>
+                                                    @if (instance.FeedbackDeadline.Value < DateTime.Now && instance.Status == ToolBox.Models.Feedback360Status.CollectingFeedback)
+                                                    {
+                                                        <i class="fas fa-exclamation-triangle text-warning ms-1" 
+                                                           data-bs-toggle="tooltip" 
+                                                           data-bs-title="Deadline passed"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1" style="height: 20px; min-width: 100px;">
+                                                        <div class="progress-bar bg-success" 
+                                                             role="progressbar" 
+                                                             style="width: @instance.ProgressPercentage%"
+                                                             aria-valuenow="@instance.ProgressPercentage" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="100">
+                                                            @instance.ProgressPercentage%
+                                                        </div>
+                                                    </div>
+                                                    <small class="ms-2 text-nowrap">
+                                                        @instance.CompletedRaters/@instance.TotalRaters
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td>@instance.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <div class="d-inline-block text-nowrap">
+                                                    @if (instance.Status == ToolBox.Models.Feedback360Status.PendingSetup)
+                                                    {
+                                                        <a asp-action="ManageRaters" 
+                                                           asp-route-instanceId="@instance.Id" 
+                                                           class="btn btn-sm btn-icon" 
+                                                           title="Manage Raters">
+                                                            <i class="fas fa-users"></i>
+                                                        </a>
+                                                    }
+                                                    else if (instance.Status == ToolBox.Models.Feedback360Status.CollectingFeedback)
+                                                    {
+                                                        <a asp-action="ManageRaters" 
+                                                           asp-route-instanceId="@instance.Id"
+                                                           class="btn btn-sm btn-icon"
+                                                           title="View Progress">
+                                                            <i class="fas fa-chart-line"></i>
+                                                        </a>
+                                                        <button class="btn btn-sm btn-icon text-warning"
+                                                                title="Send Reminders"
+                                                                onclick="sendReminders(@instance.Id)">
+                                                            <i class="fas fa-bell"></i>
+                                                        </button>
+                                                    }
+                                                    else if (instance.Status == ToolBox.Models.Feedback360Status.Completed)
+                                                    {
+                                                        <a asp-action="ViewReport" 
+                                                           asp-route-instanceId="@instance.Id"
+                                                           class="btn btn-sm btn-icon text-success"
+                                                           title="View Report">
+                                                            <i class="fas fa-chart-bar"></i>
+                                                        </a>
+                                                    }
+                                                    @* Show "Generate Report" for collecting feedback with completed responses *@
+                                                    @if (instance.Status == ToolBox.Models.Feedback360Status.CollectingFeedback && instance.CompletedRaters > 0)
+                                                    {
+                                                        <a asp-action="ViewReport" 
+                                                           asp-route-instanceId="@instance.Id"
+                                                           class="btn btn-sm btn-icon"
+                                                           title="Generate Report">
+                                                            <i class="fas fa-file-chart"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        function sendReminders(instanceId) {
+            // TODO: Implement send reminders functionality
+            console.log('Send reminders for instance:', instanceId);
+        }
+    </script>
+}

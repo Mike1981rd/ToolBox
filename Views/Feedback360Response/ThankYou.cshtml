@@ -1,0 +1,107 @@
+@model ToolBox.Models.ViewModels.Feedback360ThankYouViewModel
+@{
+    ViewData["Title"] = "Thank You - Feedback 360°";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                
+                <h2 class="mb-4 text-success">
+                    <span data-translate-key="feedback360_thank_you_title">Thank You!</span>
+                </h2>
+                
+                <p class="lead mb-4" data-translate-key="feedback360_submission_confirmed">
+                    Your feedback has been successfully submitted.
+                </p>
+                
+                <div class="alert alert-light">
+                    <h5 class="alert-heading">@Model.InstanceTitle</h5>
+                    
+                    @if (Model.WasSelfEvaluation)
+                    {
+                        <p class="mb-0" data-translate-key="feedback360_self_eval_complete">
+                            You have completed your self-evaluation. Your honest reflection will contribute to your personal development journey.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="mb-0">
+                            <span data-translate-key="feedback360_thank_you_for_evaluating">Your feedback for</span> 
+                            <strong>@Model.SubjectUserName</strong> 
+                            <span data-translate-key="feedback360_will_help_growth">will help in their professional growth and development.</span>
+                        </p>
+                    }
+                </div>
+                
+                <div class="mt-5">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-lock fa-2x text-muted mb-2"></i>
+                            <h6 data-translate-key="feedback360_confidential">Confidential</h6>
+                            <p class="small text-muted" data-translate-key="feedback360_confidential_text">
+                                Your responses are kept confidential and will be aggregated with other feedback.
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
+                            <h6 data-translate-key="feedback360_aggregated">Aggregated Results</h6>
+                            <p class="small text-muted" data-translate-key="feedback360_aggregated_text">
+                                Individual responses are combined to provide comprehensive insights.
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-user-graduate fa-2x text-muted mb-2"></i>
+                            <h6 data-translate-key="feedback360_development">Development Focus</h6>
+                            <p class="small text-muted" data-translate-key="feedback360_development_text">
+                                The feedback will be used to support professional growth and development.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <p class="text-muted mb-0" data-translate-key="feedback360_window_close">
+                    You may now close this window.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .fa-check-circle {
+        animation: checkmark 0.8s ease-in-out;
+    }
+    
+    @@keyframes checkmark {
+        0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2) rotate(10deg);
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+</style>

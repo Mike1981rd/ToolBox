@@ -1,0 +1,525 @@
+@model Feedback360ReportViewModel
+@{
+    ViewData["Title"] = "My 360° Feedback Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/css/feedback360-response.css" rel="stylesheet" />
+    <style>
+        .client-report-header {
+            background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .insight-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .strength-card {
+            border-left: 4px solid #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .development-card {
+            border-left: 4px solid #007bff;
+            background: linear-gradient(135deg, #cfe2ff 0%, #b6d7ff 100%);
+        }
+        
+        .gap-card {
+            border-left: 4px solid #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+        
+        .competency-summary {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1.5rem 0;
+        }
+        
+        .feedback-quote {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        
+        .development-tip {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        @@media print {
+            .no-print { display: none !important; }
+            .client-report-header { 
+                background: #007bff !important; 
+                -webkit-print-color-adjust: exact; 
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- Report Header -->
+    <div class="client-report-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-user-circle me-3"></i>
+                    Your 360° Feedback Report
+                </h1>
+                <h2 class="h4 mb-3 opacity-90">Personal Development Insights</h2>
+                <p class="mb-2">
+                    <strong>Assessment:</strong> @Model.InstanceTitle
+                </p>
+                <p class="mb-0">
+                    <strong>Completed:</strong> @Model.ReportGeneratedAt.ToString("MMMM dd, yyyy")
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="bg-white bg-opacity-20 rounded p-3">
+                    <div class="h3 mb-1">@Model.CompletedRaters</div>
+                    <div>People Provided Feedback</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4 no-print">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to My Reports
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-secondary">
+                    <i class="fas fa-print me-2"></i>Print Report
+                </button>
+                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#shareModal">
+                    <i class="fas fa-share-alt me-2"></i>Share Results
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Insights Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="insight-card strength-card">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-star me-2"></i>Your Strengths
+                    </h5>
+                    @if (Model.IdentifiedStrengths.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var strength in Model.IdentifiedStrengths.Take(3))
+                            {
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>@strength
+                                </li>
+                            }
+                        </ul>
+                        @if (Model.IdentifiedStrengths.Count > 3)
+                        {
+                            <p class="small text-muted mt-2 mb-0">+@(Model.IdentifiedStrengths.Count - 3) more strengths identified</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Continue building on your existing skills</p>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="insight-card development-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-chart-line me-2"></i>Growth Opportunities
+                    </h5>
+                    @if (Model.IdentifiedDevelopmentAreas.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var area in Model.IdentifiedDevelopmentAreas.Take(3))
+                            {
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-primary me-2"></i>@area
+                                </li>
+                            }
+                        </ul>
+                        @if (Model.IdentifiedDevelopmentAreas.Count > 3)
+                        {
+                            <p class="small text-muted mt-2 mb-0">+@(Model.IdentifiedDevelopmentAreas.Count - 3) more opportunities</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Strong performance across all areas</p>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="insight-card gap-card">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-eye me-2"></i>Perspective Insights
+                    </h5>
+                    @if (Model.SignificantGaps.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var gap in Model.SignificantGaps.Take(2))
+                            {
+                                <li class="mb-2">
+                                    <i class="fas fa-balance-scale text-warning me-2"></i>
+                                    <small>@gap.Split(':').FirstOrDefault()</small>
+                                </li>
+                            }
+                        </ul>
+                        @if (Model.SignificantGaps.Count > 2)
+                        {
+                            <p class="small text-muted mt-2 mb-0">+@(Model.SignificantGaps.Count - 2) more insights</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Your self-perception aligns well with others' views</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Performance Chart -->
+    @if (Model.OverallComparisonSeries.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-chart-radar me-2"></i>Your Performance Overview
+                        </h3>
+                        <p class="text-muted small mb-0">How you rated yourself vs. how others see you</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 400px;">
+                            <canvas id="overallPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Competency Deep Dive -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="fas fa-microscope me-2"></i>Detailed Analysis by Competency
+            </h3>
+            
+            @foreach (var competency in Model.CompetencyReports)
+            {
+                <div class="card competency-summary">
+                    <div class="card-body">
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-8">
+                                <h4 class="mb-1">@competency.CompetencyName</h4>
+                                @if (!string.IsNullOrEmpty(competency.CompetencyDescription))
+                                {
+                                    <p class="text-muted mb-0">@competency.CompetencyDescription</p>
+                                }
+                            </div>
+                            <div class="col-md-4 text-center">
+                                @if (competency.OverallCompetencyAverage.HasValue)
+                                {
+                                    <div class="score-display text-@(competency.OverallCompetencyAverage.Value >= 4 ? "success" : competency.OverallCompetencyAverage.Value >= 3 ? "warning" : "danger")">
+                                        @competency.OverallCompetencyAverage.Value.ToString("F1")
+                                    </div>
+                                    <small class="text-muted">Others' Average</small>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                @if (competency.CompetencyAveragesByCategory.ContainsKey(RaterCategory.Self) && competency.OverallCompetencyAverage.HasValue)
+                                {
+                                    var selfScore = competency.CompetencyAveragesByCategory[RaterCategory.Self].Value;
+                                    var othersScore = competency.OverallCompetencyAverage.Value;
+                                    var difference = selfScore - othersScore;
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Your self-assessment:</span>
+                                        <span class="fw-bold">@selfScore.ToString("F1")</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Others see you as:</span>
+                                        <span class="fw-bold">@othersScore.ToString("F1")</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Difference:</span>
+                                        <span class="fw-bold text-@(Math.Abs(difference) < 0.5 ? "success" : difference > 0 ? "info" : "warning")">
+                                            @(difference > 0 ? "+" : "")@difference.ToString("F1")
+                                        </span>
+                                    </div>
+                                    
+                                    @if (Math.Abs(difference) >= 0.5)
+                                    {
+                                        <div class="development-tip">
+                                            <i class="fas fa-lightbulb text-primary me-2"></i>
+                                            <strong>Insight:</strong>
+                                            @if (difference > 0.5)
+                                            {
+                                                <span>You may be underestimating how others perceive your abilities in this area.</span>
+                                            }
+                                            else if (difference < -0.5)
+                                            {
+                                                <span>Consider seeking feedback to better understand how others view your performance here.</span>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            
+                            <div class="col-md-6">
+                                @if (competency.IsStrength)
+                                {
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-star me-2"></i>
+                                        <strong>Identified Strength</strong><br>
+                                        <small>Keep leveraging this competency and consider mentoring others.</small>
+                                    </div>
+                                }
+                                else if (competency.IsDevelopmentArea)
+                                {
+                                    <div class="alert alert-primary">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        <strong>Growth Opportunity</strong><br>
+                                        <small>Focus development efforts here for maximum impact.</small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-check me-2"></i>
+                                        <strong>Solid Performance</strong><br>
+                                        <small>Maintain current performance while focusing on other areas.</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Qualitative Feedback (Selected Highlights) -->
+    @if (Model.OpenEndedFeedback.Any(q => q.AllAnonymousResponses.Any()))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-quote-left me-2"></i>What People Are Saying
+                        </h3>
+                        <p class="text-muted small mb-0">Anonymous feedback from your colleagues</p>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var question in Model.OpenEndedFeedback.Where(q => q.AllAnonymousResponses.Any()).Take(2))
+                        {
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">@question.QuestionText</h5>
+                                
+                                @foreach (var response in question.AllAnonymousResponses.Take(3))
+                                {
+                                    <div class="feedback-quote">
+                                        "@response"
+                                    </div>
+                                }
+                                
+                                @if (question.AllAnonymousResponses.Count > 3)
+                                {
+                                    <p class="small text-muted">+@(question.AllAnonymousResponses.Count - 3) more responses available</p>
+                                }
+                            </div>
+                        }
+                        
+                        @if (Model.OpenEndedFeedback.Count(q => q.AllAnonymousResponses.Any()) > 2)
+                        {
+                            <div class="text-center">
+                                <p class="text-muted">More detailed feedback available in the complete report...</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Next Steps -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-road me-2"></i>Your Development Roadmap
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-success">
+                                <i class="fas fa-trophy me-2"></i>Continue Building On
+                            </h5>
+                            @if (Model.IdentifiedStrengths.Any())
+                            {
+                                <ul>
+                                    @foreach (var strength in Model.IdentifiedStrengths.Take(3))
+                                    {
+                                        <li>Look for opportunities to leverage your <strong>@strength</strong> skills</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>Continue developing your existing skills and maintaining good performance.</p>
+                            }
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-primary">
+                                <i class="fas fa-target me-2"></i>Focus Development On
+                            </h5>
+                            @if (Model.IdentifiedDevelopmentAreas.Any())
+                            {
+                                <ul>
+                                    @foreach (var area in Model.IdentifiedDevelopmentAreas.Take(3))
+                                    {
+                                        <li>Create an action plan for improving <strong>@area</strong></li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>Consider stretching into new areas or taking on additional challenges.</p>
+                            }
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-handshake me-2"></i>
+                        <strong>Recommended Next Step:</strong> Schedule a development discussion with your coach to create a personalized action plan based on these insights.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/feedback360-reports.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart.js configuration for crisp rendering
+            Chart.defaults.font.family = 'Inter, system-ui, -apple-system, sans-serif';
+            Chart.defaults.devicePixelRatio = window.devicePixelRatio || 2;
+            
+            // Overall performance chart (radar chart for client view)
+            @if (Model.OverallComparisonSeries.Any())
+            {
+                <text>
+                const overallCtx = document.getElementById('overallPerformanceChart').getContext('2d');
+                new Chart(overallCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.OverallComparisonLabels)),
+                        datasets: @Html.Raw(Json.Serialize(Model.OverallComparisonSeries.Select(s => new {
+                            label = s.SeriesLabel,
+                            data = s.Data,
+                            backgroundColor = s.BackgroundColor.Replace(")", ", 0.2)").Replace("rgb", "rgba"),
+                            borderColor = s.BorderColor,
+                            borderWidth = 2,
+                            pointBackgroundColor = s.BorderColor,
+                            pointBorderColor = s.BorderColor,
+                            pointRadius = 4
+                        })))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        devicePixelRatio: window.devicePixelRatio || 2,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 11,
+                                        weight: '500'
+                                    }
+                                },
+                                pointLabels: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 12,
+                                        weight: '600'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Self-Assessment vs. Others\' Perceptions'
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

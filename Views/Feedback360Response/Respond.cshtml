@@ -1,0 +1,211 @@
+@model ToolBox.Models.ViewModels.Feedback360ResponseViewModel
+@{
+    ViewData["Title"] = "360° Feedback Evaluation";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-circle-notch me-2"></i>
+                    <span data-translate-key="feedback360_response_title">360° Feedback Evaluation</span>
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Instance Information -->
+                <div class="alert alert-info mb-4">
+                    <h5 class="alert-heading mb-3">@Model.InstanceTitle</h5>
+                    <p class="mb-2">
+                        <strong data-translate-key="feedback360_evaluating">Evaluating:</strong> 
+                        <span class="text-primary">@Model.SubjectUserName</span>
+                    </p>
+                    @if (Model.FeedbackDeadline.HasValue)
+                    {
+                        <p class="mb-2">
+                            <strong data-translate-key="feedback360_deadline_label">Deadline:</strong> 
+                            <span class="text-danger">@Model.FeedbackDeadline.Value.ToString("MMMM dd, yyyy")</span>
+                        </p>
+                    }
+                    @if (Model.IsSelfEvaluation)
+                    {
+                        <div class="mt-3 p-3 bg-white rounded">
+                            <i class="fas fa-user-circle text-primary me-2"></i>
+                            <span data-translate-key="feedback360_self_evaluation_note">
+                                You are completing your <strong>Self-Evaluation</strong>. Please be honest and reflective in your responses.
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Instructions -->
+                <div class="mb-4">
+                    <p data-translate-key="feedback360_instructions">
+                        Please rate each competency based on your observations and experiences. 
+                        All scale questions are required. Your responses are confidential and will be aggregated with other feedback.
+                    </p>
+                </div>
+
+                <!-- Progress Indicator -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span data-translate-key="feedback360_progress">Progress</span>
+                        <span class="text-muted"><span id="answeredCount">0</span> / <span id="totalQuestions">0</span></span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form asp-action="SubmitResponse" method="post" id="feedbackForm">
+                    <input type="hidden" asp-for="Token" />
+                    
+                    <!-- Competencies Section -->
+                    <div class="competencies-section">
+                        <h4 class="mb-4" data-translate-key="feedback360_competencies_section">
+                            <i class="fas fa-star me-2"></i>Competency Evaluation
+                        </h4>
+                        
+                        @for (int i = 0; i < Model.Competencies.Count; i++)
+                        {
+                            var competency = Model.Competencies[i];
+                            <div class="competency-block mb-5 pb-4 border-bottom">
+                                <h5 class="text-primary mb-4">
+                                    <span class="badge bg-primary me-2">@(i + 1)</span>
+                                    @competency.CompetencyName
+                                </h5>
+                                
+                                @for (int j = 0; j < competency.ScaleQuestions.Count; j++)
+                                {
+                                    var question = competency.ScaleQuestions[j];
+                                    <div class="question-block mb-4">
+                                        <input type="hidden" asp-for="Competencies[i].CompetencyCode" />
+                                        <input type="hidden" asp-for="Competencies[i].CompetencyName" />
+                                        <input type="hidden" asp-for="Competencies[i].ScaleQuestions[j].QuestionCode" />
+                                        <input type="hidden" asp-for="Competencies[i].ScaleQuestions[j].IsRequired" />
+                                        
+                                        <label class="form-label fw-bold">
+                                            @question.QuestionText
+                                            @if (question.IsRequired)
+                                            {
+                                                <span class="text-danger">*</span>
+                                            }
+                                        </label>
+                                        
+                                        <div class="likert-scale-container mt-3">
+                                            <div class="row g-2">
+                                                @foreach (var option in question.LikertScaleOptions)
+                                                {
+                                                    <div class="col-12 col-sm-6 col-md-4 col-lg">
+                                                        <div class="form-check likert-option">
+                                                            <input class="form-check-input scale-input" 
+                                                                   type="radio" 
+                                                                   name="Competencies[@i].ScaleQuestions[@j].Score"
+                                                                   id="q_@(i)_@(j)_@option.Value"
+                                                                   value="@option.Value"
+                                                                   @(question.Score.HasValue && question.Score.Value.ToString() == option.Value ? "checked" : "")
+                                                                   data-question-id="@question.QuestionCode" />
+                                                            <label class="form-check-label" for="q_@(i)_@(j)_@option.Value">
+                                                                <span class="badge bg-secondary me-1">@option.Value</span>
+                                                                @option.Text
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        <span asp-validation-for="Competencies[i].ScaleQuestions[j].Score" class="text-danger"></span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Open-Ended Questions Section -->
+                    <div class="open-questions-section mt-5">
+                        <h4 class="mb-4" data-translate-key="feedback360_open_questions_section">
+                            <i class="fas fa-comment-dots me-2"></i>Additional Feedback
+                        </h4>
+                        
+                        @for (int i = 0; i < Model.OpenEndedQuestions.Count; i++)
+                        {
+                            var openQuestion = Model.OpenEndedQuestions[i];
+                            <div class="mb-4">
+                                <input type="hidden" asp-for="OpenEndedQuestions[i].QuestionCode" />
+                                
+                                <label asp-for="OpenEndedQuestions[i].ResponseText" class="form-label fw-bold">
+                                    @openQuestion.QuestionText
+                                </label>
+                                
+                                <textarea asp-for="OpenEndedQuestions[i].ResponseText" 
+                                          class="form-control" 
+                                          rows="4"
+                                          placeholder="@(Html.Raw(Html.Encode("Your feedback here...")))"
+                                          data-translate-placeholder="feedback360_open_question_placeholder"></textarea>
+                                          
+                                <small class="form-text text-muted" data-translate-key="feedback360_optional_field">
+                                    This field is optional
+                                </small>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions mt-5 pt-4 border-top">
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <button type="button" 
+                                        class="btn btn-outline-secondary w-100" 
+                                        id="saveDraftBtn"
+                                        data-translate-key="feedback360_save_draft">
+                                    <i class="fas fa-save me-2"></i>Save Draft
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" 
+                                        class="btn btn-primary w-100" 
+                                        id="submitBtn"
+                                        data-translate-key="feedback360_submit">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted" data-translate-key="feedback360_submit_warning">
+                                Once submitted, you cannot modify your responses.
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span data-translate-key="validation_errors">Validation Errors</span>
+                </strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/feedback360-response.js"></script>
+}

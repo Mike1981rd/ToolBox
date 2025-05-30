@@ -1,0 +1,508 @@
+@model Feedback360ReportViewModel
+@{
+    ViewData["Title"] = "Feedback 360° Report - " + Model.SubjectUserName;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/css/feedback360-response.css" rel="stylesheet" />
+    <style>
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .competency-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .competency-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .strength-indicator {
+            border-left: 4px solid #28a745;
+        }
+        
+        .development-indicator {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .gap-indicator {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+        
+        .score-badge {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+        }
+        
+        .anonymous-comment {
+            background-color: #f8f9fa;
+            border-left: 3px solid #007bff;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .print-section {
+            margin: 2rem 0;
+        }
+        
+        @@media print {
+            .no-print { display: none !important; }
+            .report-header { 
+                background: #667eea !important; 
+                -webkit-print-color-adjust: exact; 
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <!-- Report Header -->
+    <div class="report-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-chart-line me-3"></i>
+                    <span data-translate-key="feedback360_reports.coach_view_title">360° Feedback Report</span>
+                </h1>
+                <h2 class="h4 mb-3 opacity-90">@Model.SubjectUserName</h2>
+                <p class="mb-2">
+                    <strong>Process:</strong> @Model.InstanceTitle
+                </p>
+                <p class="mb-0">
+                    <strong>Generated:</strong> @Model.ReportGeneratedAt.ToString("MMMM dd, yyyy 'at' h:mm tt")
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="bg-white bg-opacity-20 rounded p-3">
+                    <div class="h3 mb-1">@Model.CompletedRaters/@Model.TotalRaters</div>
+                    <div data-translate-key="feedback360_reports.responses_collected">Responses Collected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4 no-print">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i><span data-translate-key="feedback360_reports.back_to_dashboard">Back to Dashboard</span>
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-secondary">
+                    <i class="fas fa-print me-2"></i><span data-translate-key="feedback360_reports.print_report">Print Report</span>
+                </button>
+                @if (Model.IsCoachView)
+                {
+                    <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#shareReportModal">
+                        <i class="fas fa-share me-2"></i><span data-translate-key="feedback360_reports.share_report">Share with Client</span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i><span data-translate-key="feedback360_reports.executive_summary">Executive Summary</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="text-success">
+                                <i class="fas fa-thumbs-up me-2"></i><span data-translate-key="feedback360_reports.key_strengths">Key Strengths</span>
+                            </h5>
+                            @if (Model.IdentifiedStrengths.Any())
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var strength in Model.IdentifiedStrengths)
+                                    {
+                                        <li class="mb-2">
+                                            <i class="fas fa-star text-warning me-2"></i>@strength
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Analysis in progress...</p>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-primary">
+                                <i class="fas fa-chart-line me-2"></i>Development Areas
+                            </h5>
+                            @if (Model.IdentifiedDevelopmentAreas.Any())
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var area in Model.IdentifiedDevelopmentAreas)
+                                    {
+                                        <li class="mb-2">
+                                            <i class="fas fa-arrow-up text-primary me-2"></i>@area
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted">All areas performing well.</p>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-warning">
+                                <i class="fas fa-balance-scale me-2"></i>Perception Gaps
+                            </h5>
+                            @if (Model.SignificantGaps.Any())
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var gap in Model.SignificantGaps)
+                                    {
+                                        <li class="mb-2">
+                                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                            <small>@gap</small>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No significant perception gaps identified.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Comparison Chart -->
+    @if (Model.OverallComparisonSeries.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Overall Competency Comparison
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="overallComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Competency Details -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="fas fa-cogs me-2"></i>Detailed Competency Analysis
+            </h3>
+            
+            @foreach (var competency in Model.CompetencyReports)
+            {
+                <div class="card competency-card mb-4 @(competency.IsStrength ? "strength-indicator" : "") @(competency.IsDevelopmentArea ? "development-indicator" : "") @(competency.HasSignificantGap ? "gap-indicator" : "")">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="card-title mb-1">@competency.CompetencyName</h4>
+                                @if (!string.IsNullOrEmpty(competency.CompetencyDescription))
+                                {
+                                    <p class="text-muted mb-0">@competency.CompetencyDescription</p>
+                                }
+                            </div>
+                            <div class="col-md-4 text-end">
+                                @if (competency.OverallCompetencyAverage.HasValue)
+                                {
+                                    <span class="badge score-badge @(competency.OverallCompetencyAverage.Value >= 4 ? "bg-success" : competency.OverallCompetencyAverage.Value >= 3 ? "bg-warning" : "bg-danger")">
+                                        @competency.OverallCompetencyAverage.Value.ToString("F1")
+                                    </span>
+                                }
+                                
+                                @if (competency.IsStrength)
+                                {
+                                    <span class="badge bg-success ms-2">Strength</span>
+                                }
+                                @if (competency.IsDevelopmentArea)
+                                {
+                                    <span class="badge bg-primary ms-2">Development</span>
+                                }
+                                @if (competency.HasSignificantGap)
+                                {
+                                    <span class="badge bg-warning ms-2">Gap</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (competency.CompetencyComparisonSeries.Any())
+                        {
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="competencyChart_@competency.CompetencyCode"></canvas>
+                            </div>
+                        }
+                        
+                        @if (Model.CanViewDetailedBreakdown)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Question</th>
+                                            <th>Self</th>
+                                            <th>Manager</th>
+                                            <th>Peers</th>
+                                            <th>Direct Reports</th>
+                                            <th>Overall</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var question in competency.QuestionScaleReports)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold" style="max-width: 300px;">@question.QuestionText</td>
+                                                <td>
+                                                    @if (question.ScoresByRaterCategory.ContainsKey(RaterCategory.Self))
+                                                    {
+                                                        @question.ScoresByRaterCategory[RaterCategory.Self]?.ToString("F1")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (question.ScoresByRaterCategory.ContainsKey(RaterCategory.Manager))
+                                                    {
+                                                        @question.ScoresByRaterCategory[RaterCategory.Manager]?.ToString("F1")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (question.ScoresByRaterCategory.ContainsKey(RaterCategory.Peer))
+                                                    {
+                                                        @question.ScoresByRaterCategory[RaterCategory.Peer]?.ToString("F1")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (question.ScoresByRaterCategory.ContainsKey(RaterCategory.DirectReport))
+                                                    {
+                                                        @question.ScoresByRaterCategory[RaterCategory.DirectReport]?.ToString("F1")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (question.OverallAverageScore.HasValue)
+                                                    {
+                                                        <strong>@question.OverallAverageScore.Value.ToString("F1")</strong>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Qualitative Feedback -->
+    @if (Model.OpenEndedFeedback.Any(q => q.AllAnonymousResponses.Any()))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-comments me-2"></i>Qualitative Feedback
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var question in Model.OpenEndedFeedback.Where(q => q.AllAnonymousResponses.Any()))
+                        {
+                            <div class="mb-4">
+                                <h5 class="text-primary">@question.QuestionText</h5>
+                                <p class="text-muted small">@question.TotalResponseCount response(s)</p>
+                                
+                                @foreach (var response in question.AllAnonymousResponses)
+                                {
+                                    <div class="anonymous-comment">
+                                        "@response"
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/feedback360-reports.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart.js configuration for crisp rendering
+            Chart.defaults.font.family = 'Inter, system-ui, -apple-system, sans-serif';
+            Chart.defaults.devicePixelRatio = window.devicePixelRatio || 2;
+            
+            // Overall comparison chart
+            @if (Model.OverallComparisonSeries.Any())
+            {
+                <text>
+                const overallCtx = document.getElementById('overallComparisonChart').getContext('2d');
+                new Chart(overallCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.OverallComparisonLabels)),
+                        datasets: @Html.Raw(Json.Serialize(Model.OverallComparisonSeries.Select(s => new {
+                            label = s.SeriesLabel,
+                            data = s.Data,
+                            backgroundColor = s.BackgroundColor,
+                            borderColor = s.BorderColor,
+                            borderWidth = 1
+                        })))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        devicePixelRatio: window.devicePixelRatio || 2,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Average Scores by Competency'
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+            
+            // Individual competency charts
+            @foreach (var competency in Model.CompetencyReports.Where(c => c.CompetencyComparisonSeries.Any()))
+            {
+                <text>
+                const competency_@(competency.CompetencyCode)_ctx = document.getElementById('competencyChart_@competency.CompetencyCode').getContext('2d');
+                new Chart(competency_@(competency.CompetencyCode)_ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(competency.CompetencyChartLabels)),
+                        datasets: @Html.Raw(Json.Serialize(competency.CompetencyComparisonSeries.Select(s => new {
+                            label = s.SeriesLabel,
+                            data = s.Data,
+                            backgroundColor = s.BackgroundColor,
+                            borderColor = s.BorderColor,
+                            borderWidth = 1
+                        })))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        devicePixelRatio: window.devicePixelRatio || 2,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 11,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, system-ui, -apple-system, sans-serif',
+                                        size: 10,
+                                        weight: '500'
+                                    },
+                                    maxRotation: 45
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: '@competency.CompetencyName - Question Breakdown'
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

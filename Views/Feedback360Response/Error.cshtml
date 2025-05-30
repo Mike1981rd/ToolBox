@@ -1,0 +1,65 @@
+@model ToolBox.Models.ViewModels.Feedback360ErrorViewModel
+@{
+    ViewData["Title"] = "Feedback 360° - Error";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas @Model.ErrorIcon fa-4x @Model.ErrorColor mb-4"></i>
+                
+                <h3 class="mb-4">
+                    @switch (Model.ErrorType)
+                    {
+                        case "InvalidToken":
+                            <span data-translate-key="feedback360_error_invalid_token">Invalid Link</span>
+                            break;
+                        case "AlreadyCompleted":
+                            <span data-translate-key="feedback360_error_already_completed">Feedback Already Submitted</span>
+                            break;
+                        case "DeadlinePassed":
+                            <span data-translate-key="feedback360_error_deadline_passed">Deadline Has Passed</span>
+                            break;
+                        default:
+                            <span data-translate-key="feedback360_error_general">Error</span>
+                            break;
+                    }
+                </h3>
+                
+                <p class="lead mb-4">@Model.Message</p>
+                
+                @if (Model.ErrorType == "DeadlinePassed" && Model.Deadline.HasValue)
+                {
+                    <p class="text-muted">
+                        <span data-translate-key="feedback360_deadline_was">The deadline was:</span> 
+                        <strong>@Model.Deadline.Value.ToString("MMMM dd, yyyy")</strong>
+                    </p>
+                }
+                
+                <div class="mt-5">
+                    @if (Model.ErrorType == "InvalidToken")
+                    {
+                        <p class="text-muted" data-translate-key="feedback360_check_email">
+                            Please check your email for the correct feedback link, or contact your coach if you continue to have issues.
+                        </p>
+                    }
+                    else if (Model.ErrorType == "AlreadyCompleted")
+                    {
+                        <p class="text-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span data-translate-key="feedback360_thank_you_completed">Thank you for your valuable feedback!</span>
+                        </p>
+                    }
+                </div>
+                
+                <hr class="my-4">
+                
+                <p class="small text-muted" data-translate-key="feedback360_contact_support">
+                    If you believe this is an error, please contact your coach or system administrator.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

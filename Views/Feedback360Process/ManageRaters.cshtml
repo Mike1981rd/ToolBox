@@ -1,0 +1,236 @@
+@model ToolBox.Models.ViewModels.ManageRatersViewModel
+@{
+    ViewData["Title"] = "Manage Evaluators - " + Model.InstanceTitle;
+    ViewBag.HideTitleInLayout = true;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        <span data-translate-key="feedback360_manage_raters">Manage Evaluators</span>
+                    </h3>
+                    <p class="mb-0 mt-2">
+                        <strong data-translate-key="feedback360_for_subject">For:</strong> @Model.SubjectUserName | 
+                        <strong data-translate-key="feedback360_deadline_label">Deadline:</strong> 
+                        @(Model.FeedbackDeadline?.ToString("MMMM dd, yyyy") ?? "Not set")
+                    </p>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @if (Model.CanAddRaters)
+                    {
+                        <!-- Add Rater Form -->
+                        <div class="card mb-4 border-primary">
+                            <div class="card-header bg-primary">
+                                <h5 class="mb-0 text-white">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    <span data-translate-key="feedback360_add_evaluator">Add Evaluator</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="addRaterForm">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" id="instanceId" value="@Model.InstanceId" />
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="raterName" class="form-label">
+                                                <span data-translate-key="feedback360_rater_name">Name (Optional)</span>
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="raterName"
+                                                   placeholder="John Doe"
+                                                   data-translate-placeholder="feedback360_name_placeholder" />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="raterEmail" class="form-label">
+                                                <span data-translate-key="feedback360_rater_email">Email</span>
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="email" 
+                                                   class="form-control" 
+                                                   id="raterEmail"
+                                                   required
+                                                   placeholder="john.doe@example.com"
+                                                   data-translate-placeholder="feedback360_email_placeholder" />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="raterCategory" class="form-label">
+                                                <span data-translate-key="feedback360_rater_category">Category</span>
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" id="raterCategory" required>
+                                                <option value="" data-translate-key="feedback360_select_category">-- Select Category --</option>
+                                                <option value="0" data-translate-key="feedback360_category_self">Self-Evaluation</option>
+                                                <option value="1" data-translate-key="feedback360_category_manager">Manager</option>
+                                                <option value="2" data-translate-key="feedback360_category_peer">Peer/Colleague</option>
+                                                <option value="3" data-translate-key="feedback360_category_direct_report">Direct Report</option>
+                                                <option value="4" data-translate-key="feedback360_category_client">Client</option>
+                                                <option value="5" data-translate-key="feedback360_category_other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-plus me-2"></i>
+                                                <span data-translate-key="feedback360_add_button">Add Evaluator</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                    
+                    <!-- Current Raters List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                <span data-translate-key="feedback360_current_evaluators">Current Evaluators</span>
+                                <span class="badge bg-info ms-2" id="raterCount">@Model.CurrentRaters.Count</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (!Model.HasSelfEvaluation && Model.CanAddRaters)
+                            {
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span data-translate-key="feedback360_self_eval_warning">
+                                        Remember to add the subject (@Model.SubjectUserName) as a Self-Evaluator.
+                                    </span>
+                                </div>
+                            }
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="ratersTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-translate-key="feedback360_table_name">Name</th>
+                                            <th data-translate-key="feedback360_table_email">Email</th>
+                                            <th data-translate-key="feedback360_table_category">Category</th>
+                                            <th data-translate-key="feedback360_table_status">Status</th>
+                                            <th data-translate-key="feedback360_table_actions">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ratersTableBody">
+                                        @if (Model.CurrentRaters.Count == 0)
+                                        {
+                                            <tr id="noRatersRow">
+                                                <td colspan="5" class="text-center py-4">
+                                                    <span class="text-muted" data-translate-key="feedback360_no_evaluators">
+                                                        No evaluators added yet. Add at least 3 evaluators to continue.
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var rater in Model.CurrentRaters)
+                                            {
+                                                <tr data-rater-id="@rater.Id">
+                                                    <td>@rater.RaterNameOrEmail</td>
+                                                    <td>@rater.Email</td>
+                                                    <td>
+                                                        <span class="badge bg-info">
+                                                            <span data-translate-key="feedback360_category_@rater.Category.ToString().ToLower()">
+                                                                @rater.CategoryDisplay
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge @rater.StatusBadgeClass">
+                                                            <span data-translate-key="feedback360_rater_status_@rater.Status.ToString().ToLower()">
+                                                                @rater.Status
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @if (rater.CanRemove)
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-danger" 
+                                                                    onclick="removeRater(@rater.Id)"
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-title="Remove Evaluator">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            @if (Model.CanSendInvitations)
+                            {
+                                <div class="mt-4 text-center">
+                                    <form asp-action="FinalizeSetupAndSendInvitations" method="post" class="d-inline">
+                                        <input type="hidden" name="instanceId" value="@Model.InstanceId" />
+                                        <button type="submit" class="btn btn-success btn-lg" id="sendInvitationsBtn">
+                                            <i class="fas fa-paper-plane me-2"></i>
+                                            <span data-translate-key="feedback360_send_invitations">Finalize Setup and Send Invitations</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                            else if (Model.CurrentRaters.Count < 3 && Model.CanAddRaters)
+                            {
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span data-translate-key="feedback360_min_raters_info">
+                                        Add at least 3 evaluators (including self-evaluation) to send invitations.
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rater Row Template -->
+<template id="raterRowTemplate">
+    <tr data-rater-id="__ID__">
+        <td>__NAME__</td>
+        <td>__EMAIL__</td>
+        <td>
+            <span class="badge bg-info">
+                <span data-translate-key="feedback360_category___CATEGORY_LOWER__">__CATEGORY__</span>
+            </span>
+        </td>
+        <td>
+            <span class="badge bg-secondary">
+                <span data-translate-key="feedback360_rater_status_pendinginvitation">Pending Invitation</span>
+            </span>
+        </td>
+        <td>
+            <button class="btn btn-sm btn-outline-danger" 
+                    onclick="removeRater(__ID__)"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Remove Evaluator">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+@section Scripts {
+    <script src="~/js/feedback360-manage-raters.js"></script>
+}

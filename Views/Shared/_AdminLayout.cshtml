@@ -192,6 +192,27 @@
                     </a>
                 }
                 
+                @if (readableModules.Contains("Feedback360"))
+                {
+                    <a href="@Url.Action("Index", "Feedback360Process")" class="list-group-item list-group-item-action" data-translate-key="sidebar.feedback360">
+                        <i class="fas fa-circle-notch fa-fw"></i><span class="sidebar-item-text">Feedback 360°</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("Feedback360Reports"))
+                {
+                    <a href="@Url.Action("Index", "Feedback360Process")" class="list-group-item list-group-item-action" data-translate-key="sidebar.feedback360Reports">
+                        <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">360° Reports</span>
+                    </a>
+                }
+                
+                @if (readableModules.Contains("ClientFeedback360Reports"))
+                {
+                    <a href="@Url.Action("Index", "ClientFeedback360Reports")" class="list-group-item list-group-item-action" data-translate-key="sidebar.clientFeedback360Reports">
+                        <i class="fas fa-chart-line fa-fw"></i><span class="sidebar-item-text">My 360° Reports</span>
+                    </a>
+                }
+                
                 @if (readableModules.Contains("Tasks"))
                 {
                     <a href="@Url.Action("Index", "Tasks")" class="list-group-item list-group-item-action" data-translate-key="sidebar.tasks">
