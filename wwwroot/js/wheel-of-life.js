@@ -130,7 +130,11 @@ const WheelOfLife = {
                     }
                 },
                 background: 'transparent',
-                fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif'
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                // Ultra-crisp ApexCharts configuration
+                pixelRatio: window.devicePixelRatio || 2,
+                redrawOnParentResize: true,
+                redrawOnWindowResize: true
             },
             plotOptions: {
                 radialBar: {
@@ -172,7 +176,8 @@ const WheelOfLife = {
                             show: true,
                             color: '#2d3748',
                             fontSize: '11px',
-                            fontWeight: '600'
+                            fontWeight: '600',
+                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
                         },
                         value: {
                             formatter: function(val, opts) {
@@ -182,6 +187,7 @@ const WheelOfLife = {
                             fontSize: '13px',
                             fontWeight: 'bold',
                             show: true,
+                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
                         }
                     }
                 }
@@ -218,7 +224,7 @@ const WheelOfLife = {
                 theme: 'dark',
                 style: {
                     fontSize: '12px',
-                    fontFamily: '"Segoe UI", sans-serif'
+                    fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
                 },
                 y: {
                     formatter: function(val, opts) {

@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordIcon = document.getElementById('passwordIcon');
     const errorMessage = document.getElementById('errorMessage');
     const errorText = document.getElementById('errorText');
-    const siteLogo = document.getElementById('siteLogo');
+    const loginLogo = document.getElementById('loginLogo');
     const siteTitle = document.getElementById('siteTitle');
     const welcomeMessage = document.getElementById('welcomeMessage');
 
@@ -112,11 +112,15 @@ document.addEventListener('DOMContentLoaded', function() {
      * Update the page with site configuration data
      */
     function updateSiteConfiguration(config) {
-        // Update logo
-        if (config.logoUrl && siteLogo) {
-            siteLogo.src = config.logoUrl;
-            siteLogo.alt = config.siteName || 'Site Logo';
+        // DISABLED: Logo update on login page to maintain consistent branding
+        // The login page should always show the static logo at /img/logo.png
+        // If you need to re-enable dynamic logo, uncomment the following lines:
+        /*
+        if (config.logoUrl && loginLogo) {
+            loginLogo.src = config.logoUrl;
+            loginLogo.alt = config.siteName || 'Site Logo';
         }
+        */
 
         // Update site title
         if (config.siteName && siteTitle) {

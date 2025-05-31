@@ -34,6 +34,24 @@
             max-height: 100%;
             max-width: 100%;
         }
+        
+        /* Ultra-crisp ApexCharts optimization */
+        .chart-container svg {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: optimizeQuality;
+            -webkit-backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+        
+        .chart-container .apexcharts-canvas {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: optimizeQuality;
+        }
 
         .scores-panel {
             background: white;
